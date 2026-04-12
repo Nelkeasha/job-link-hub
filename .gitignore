@@ -1,0 +1,100 @@
+# ============================================================
+# JobLink Hub — .gitignore
+# ASP.NET Core 8 / Visual Studio 2022 / SQL Server
+# ============================================================
+
+# ── Build outputs ──────────────────────────────────────────
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# ── Visual Studio ──────────────────────────────────────────
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.userprefs
+.vscode/
+*.VC.db
+*.VC.opendb
+
+# ── NuGet ──────────────────────────────────────────────────
+*.nupkg
+*.snupkg
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+*.nuget.props
+*.nuget.targets
+project.lock.json
+project.fragment.lock.json
+artifacts/
+packages.lock.json
+
+# ── ASP.NET Core secrets — NEVER commit these ──────────────
+**/appsettings.Development.json
+**/appsettings.Production.json
+**/appsettings.Staging.json
+*secrets*
+*.pfx
+*.p12
+
+# ── Entity Framework migrations backup ─────────────────────
+# Keep migration files but ignore snapshot conflicts
+# (Do NOT ignore Migrations/ — those must be committed)
+
+# ── SQL Server ─────────────────────────────────────────────
+*.mdf
+*.ldf
+*.ndf
+
+# ── Logs ───────────────────────────────────────────────────
+logs/
+*.log
+Serilog/
+
+# ── Published output ───────────────────────────────────────
+**/publish/
+**/PublishProfiles/
+
+# ── Test results ───────────────────────────────────────────
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+TestResult.xml
+coverage/
+*.coverage
+*.coveragexml
+*.trx
+
+# ── OS files ───────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ── Node (for TailwindCSS in JobLinkHub.Web) ───────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+
+# ── Rider / JetBrains ──────────────────────────────────────
+.idea/
+*.sln.iml
+
+# ── Azure / Deployment ─────────────────────────────────────
+.azure/
+.deployment
+deploy.cmd
