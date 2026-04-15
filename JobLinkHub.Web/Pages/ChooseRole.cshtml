@@ -1,0 +1,73 @@
+@page
+@model JobLinkHub.Web.Pages.ChooseRoleModel
+@{
+    ViewData["Title"] = "Choose Role";
+}
+
+<section class="choose-role-section">
+    <div class="container choose-role-wrapper">
+        <div class="choose-role-top">
+            <div>
+                <span class="role-eyebrow">Get started</span>
+                <h1>Choose how you want to use JobLink Hub</h1>
+                <p>
+                    Select the role that best matches how you will use the platform.
+                    You can continue as a job seeker or as an employer.
+                </p>
+            </div>
+
+            <div class="choose-role-login">
+                <span>Already have an account?</span>
+                <a asp-page="/Login">Log in</a>
+            </div>
+        </div>
+
+        <div class="role-card-grid">
+            <div class="role-card">
+                <div class="role-icon jobseeker-icon">
+                    
+                </div>
+
+                <h2>Join as a Job Seeker</h2>
+                <p>
+                    Build a skill-first profile, validate your abilities, and connect
+                    to jobs, internships, mentorships, and gigs.
+                </p>
+
+                <ul class="role-features">
+                    <li>Showcase skills and evidence</li>
+                    <li>Apply for relevant opportunities</li>
+                    <li>Track matches and applications</li>
+                </ul>
+
+                <a href="#" class="role-btn primary-role-btn">Continue as Job Seeker</a>
+            </div>
+
+            <div class="role-card featured-role-card">
+                <div class="role-icon employer-icon">
+                    
+                </div>
+
+                <div class="role-badge">Recommended for recruiters</div>
+
+                <h2>Join as an Employer</h2>
+                <p>
+                    Create a company profile, post opportunities, manage applicants,
+                    and discover qualified emerging talent efficiently.
+                </p>
+
+                <ul class="role-features">
+                    <li>Create and manage company profile</li>
+                    <li>Post jobs, internships, and other opportunities</li>
+                    <li>Review and manage applicants in one place</li>
+                </ul>
+
+                <a href="#" class="role-btn secondary-role-btn">Continue as Employer</a>
+            </div>
+        </div>
+
+        <div class="choose-role-footer-note">
+            <p>You can complete your profile details after creating your account.</p>
+        </div>
+    </div>
+</section>
