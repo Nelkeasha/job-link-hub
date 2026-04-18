@@ -1,0 +1,100 @@
+@page
+@model JobLinkHub.Web.Pages.ManageOpportunitiesModel
+@{
+    ViewData["Title"] = "Manage Opportunities";
+}
+
+<section class="manage-opportunities-page">
+    <div class="container manage-opportunities-wrapper">
+
+        <div class="manage-hero">
+            <div>
+                <span class="manage-eyebrow">Opportunity management</span>
+                <h1>Manage your opportunities</h1>
+                <p>
+                    Review, track, and update all opportunities posted by your organization from one place.
+                </p>
+            </div>
+
+            <div class="manage-hero-actions">
+                <a asp-page="/PostOpportunity" class="manage-primary-btn">Post New Opportunity</a>
+            </div>
+        </div>
+
+        <div class="manage-summary-grid">
+            <div class="manage-summary-card">
+                <p>Total Opportunities</p>
+                <h2>@Model.TotalOpportunitiesCount</h2>
+            </div>
+
+            <div class="manage-summary-card">
+                <p>Live Opportunities</p>
+                <h2>@Model.LiveOpportunitiesCount</h2>
+            </div>
+
+            <div class="manage-summary-card">
+                <p>Draft Opportunities</p>
+                <h2>@Model.DraftOpportunitiesCount</h2>
+            </div>
+
+            <div class="manage-summary-card">
+                <p>Closed Opportunities</p>
+                <h2>@Model.ClosedOpportunitiesCount</h2>
+            </div>
+        </div>
+
+        <div class="manage-opportunities-panel">
+            <div class="panel-top">
+                <div>
+                    <h3>All Opportunities</h3>
+                    <p>Track status, deadline, and candidate activity for each opportunity.</p>
+                </div>
+            </div>
+
+            <div class="opportunities-table-wrapper">
+                <table class="opportunities-table">
+                    <thead>
+                        <tr>
+                            <th>Opportunity</th>
+                            <th>Type</th>
+                            <th>Location</th>
+                            <th>Deadline</th>
+                            <th>Applicants</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Opportunities)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="opportunity-title-block">
+                                        <strong>@item.Title</strong>
+                                        <span>@item.Category</span>
+                                    </div>
+                                </td>
+                                <td>@item.Type</td>
+                                <td>@item.Location</td>
+                                <td>@item.Deadline</td>
+                                <td>@item.ApplicantCount</td>
+                                <td>
+                                    <span class="table-status-badge @(item.Status.ToLower())">
+                                        @item.Status
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="table-action-group">
+                                        <a asp-page="/PostOpportunity" class="table-action-btn">Edit</a>
+                                        <a asp-page="/ViewApplicants" class="table-action-btn secondary-action">Applicants</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</section>

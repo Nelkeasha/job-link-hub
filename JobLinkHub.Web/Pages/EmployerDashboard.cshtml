@@ -1,0 +1,146 @@
+@page
+@model JobLinkHub.Web.Pages.EmployerDashboardModel
+@{
+    ViewData["Title"] = "Employer Dashboard";
+}
+
+<section class="employer-dashboard-page">
+    <div class="container employer-dashboard-wrapper">
+
+        <div class="dashboard-hero">
+            <div>
+                <span class="dashboard-eyebrow">Employer workspace</span>
+                <h1>Welcome back, @Model.CompanyName</h1>
+                <p>
+                    Manage opportunities, review applicants, and keep track of hiring activity from one place.
+                </p>
+            </div>
+
+            <div class="dashboard-hero-actions">
+                <a asp-page="/PostOpportunity" class="dashboard-primary-btn">Post Opportunity</a>
+                <a asp-page="/ManageOpportunities" class="dashboard-secondary-btn">Manage Opportunities</a>
+            </div>
+        </div>
+
+        <div class="dashboard-stats-grid">
+            <div class="dashboard-stat-card">
+                <p class="stat-label">Active Opportunities</p>
+                <h2>@Model.ActiveOpportunitiesCount.ToString("D2")</h2>
+                <span class="stat-trend positive">Live roles on the platform</span>
+            </div>
+
+            <div class="dashboard-stat-card">
+                <p class="stat-label">Total Applicants</p>
+                <h2>@Model.TotalApplicantsCount</h2>
+                <span class="stat-trend positive">Applications received so far</span>
+            </div>
+
+            <div class="dashboard-stat-card">
+                <p class="stat-label">Shortlisted Candidates</p>
+                <h2>@Model.ShortlistedCandidatesCount</h2>
+                <span class="stat-trend neutral">Across all opportunities</span>
+            </div>
+
+            <div class="dashboard-stat-card">
+                <p class="stat-label">Pending Reviews</p>
+                <h2>@Model.PendingReviewsCount</h2>
+                <span class="stat-trend warning">Needs attention</span>
+            </div>
+        </div>
+
+        <div class="dashboard-main-grid">
+            <div class="dashboard-left-column">
+                <div class="dashboard-panel">
+                    <div class="panel-top">
+                        <div>
+                            <h3>Recent Opportunities</h3>
+                            <p>Monitor the latest roles you have posted.</p>
+                        </div>
+                        <a asp-page="/ManageOpportunities">View all</a>
+                    </div>
+
+                    <div class="opportunity-list">
+                        @foreach (var opportunity in Model.RecentOpportunities)
+                        {
+                            <div class="opportunity-row">
+                                <div>
+                                    <h4>@opportunity.Title</h4>
+                                    <p>@opportunity.Meta</p>
+                                </div>
+                                <span class="status-badge @(opportunity.Status == "Live" ? "live" : "review")">
+                                    @opportunity.Status
+                                </span>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="dashboard-panel">
+                    <div class="panel-top">
+                        <div>
+                            <h3>Hiring Activity</h3>
+                            <p>Quick overview of current recruitment momentum.</p>
+                        </div>
+                    </div>
+
+                    <div class="activity-metrics">
+                        <div class="activity-metric-card">
+                            <span>Applications Received</span>
+                            <strong>@Model.ApplicationsReceivedCount</strong>
+                        </div>
+                        <div class="activity-metric-card">
+                            <span>Candidates Shortlisted</span>
+                            <strong>@Model.CandidatesShortlistedMetric.ToString("D2")</strong>
+                        </div>
+                        <div class="activity-metric-card">
+                            <span>Roles Closing Soon</span>
+                            <strong>@Model.RolesClosingSoonCount.ToString("D2")</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-right-column">
+                <div class="dashboard-panel applicants-panel">
+                    <div class="panel-top">
+                        <div>
+                            <h3>Recent Applicants</h3>
+                            <p>Latest candidates across your opportunities.</p>
+                        </div>
+                        <a asp-page="/ViewApplicants">View all</a>
+                    </div>
+
+                    <div class="applicant-list">
+                        @foreach (var applicant in Model.RecentApplicants)
+                        {
+                            <div class="applicant-row">
+                                <div class="applicant-avatar">@applicant.Initials</div>
+                                <div class="applicant-info">
+                                    <h4>@applicant.FullName</h4>
+                                    <p>@applicant.AppliedRole</p>
+                                </div>
+                                <a asp-page="/CandidateProfileReview" class="mini-link-btn">Review</a>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="dashboard-panel quick-actions-panel">
+                    <div class="panel-top">
+                        <div>
+                            <h3>Quick Actions</h3>
+                            <p>Move faster with common employer tasks.</p>
+                        </div>
+                    </div>
+
+                    <div class="quick-actions-list">
+                        <a asp-page="/PostOpportunity" class="quick-action-item">+ Post a new opportunity</a>
+                        <a asp-page="/CompanyProfile" class="quick-action-item">Update company profile</a>
+                        <a asp-page="/ViewApplicants" class="quick-action-item">Review pending applicants</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
