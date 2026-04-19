@@ -1,0 +1,87 @@
+﻿@page
+@model JobLinkHub.Web.Pages.JobSeeker.MyApplicationsModel
+@{
+    ViewData["Title"] = "My Applications";
+    Layout = "_Layout";
+}
+
+<div style="background:#F8FAFC; min-height:100vh; padding:2rem 1rem;">
+  <div style="max-width:860px; margin:0 auto;">
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+      <h1 style="font-size:1.25rem; font-weight:700; color:#0F172A; margin:0;">My Applications</h1>
+      <a href="/JobSeeker/OpportunitiesListing" style="font-size:0.875rem; color:#2563EB; text-decoration:none;">Find more →</a>
+    </div>
+
+    <!-- Filter tabs -->
+    <div style="display:flex; gap:.5rem; margin-bottom:1.25rem; flex-wrap:wrap;">
+      @foreach (var status in new[] { ("", "All"), ("Pending", "Pending"), ("Interview", "Interview"), ("Accepted", "Accepted"), ("Rejected", "Rejected") })
+      {
+        bool isActive = Model.FilterStatus == status.Item1 || (string.IsNullOrEmpty(Model.FilterStatus) && status.Item1 == "");
+        <a href="?FilterStatus=@status.Item1"
+           style="font-size:0.8rem; padding:.35rem 1rem; border-radius:999px; text-decoration:none;
+                  background:@(isActive ? "#2563EB" : "white");
+                  color:@(isActive ? "white" : "#475569");
+                  border:1px solid @(isActive ? "#2563EB" : "#E2E8F0");">
+          @status.Item2
+        </a>
+      }
+    </div>
+
+    @if (!Model.Applications.Any())
+    {
+      <div style="background:white; border:1px solid #E2E8F0; border-radius:12px; padding:3rem; text-align:center;">
+        <p style="color:#94A3B8; font-size:0.875rem;">No applications found.</p>
+      </div>
+    }
+
+    <div style="display:flex; flex-direction:column; gap:.75rem;">
+      @foreach (var a in Model.Applications)
+      {
+        var (bgColor, textColor) = a.Status?.ToLower() switch {
+            "accepted" => ("#DCFCE7", "#166534"),
+            "rejected" => ("#FEE2E2", "#991B1B"),
+            "interview" => ("#DBEAFE", "#1E40AF"),
+            _ => ("#FEF9C3", "#854D0E")
+          };
+        <div style="background:white; border:1px solid #E2E8F0; border-radius:12px; padding:1.25rem;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div style="flex:1;">
+              <h3 style="font-size:1rem; font-weight:600; color:#0F172A; margin:0 0 .2rem;">@a.Title</h3>
+              <p style="font-size:0.8rem; color:#64748B; margin:0 0 .3rem;">@a.CompanyName</p>
+              <p style="font-size:0.75rem; color:#94A3B8; margin:0;">
+                Applied @a.AppliedAt.ToString("MMM dd, yyyy")
+              </p>
+              @if (!string.IsNullOrEmpty(a.CoverNote))
+              {
+                <p style="font-size:0.8rem; color:#475569; font-style:italic; margin:.5rem 0 0;
+                           display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">
+                  "@a.CoverNote"
+                </p>
+              }
+            </div>
+            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:.5rem; margin-left:1rem;">
+              <span style="font-size:0.75rem; padding:.3rem .8rem; border-radius:999px; font-weight:500;
+                           background:@bgColor; color:@textColor;">
+                @a.Status
+              </span>
+              <a href="/JobSeeker/OpportunityDetails?id=@a.OpportunityId"
+                 style="font-size:0.75rem; color:#2563EB; text-decoration:none;">View job</a>
+              @if (a.Status?.ToLower() == "pending")
+              {
+                <form method="post" asp-page-handler="Withdraw" style="margin:0;">
+                  <input type="hidden" name="appId" value="@a.Id" />
+                  <button type="submit"
+                          style="background:none; border:none; color:#EF4444; font-size:0.75rem; cursor:pointer; padding:0;">
+                    Withdraw
+                  </button>
+                </form>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+  </div>
+</div>

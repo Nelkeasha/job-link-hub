@@ -1,0 +1,95 @@
+﻿@page
+@model JobLinkHub.Web.Pages.JobSeeker.OpportunitiesListingModel
+@{
+    ViewData["Title"] = "Browse Opportunities";
+    Layout = "_Layout";
+}
+
+<div style="background:#F8FAFC; min-height:100vh; padding:2rem 1rem;">
+    <div style="max-width:960px; margin:0 auto;">
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+            <h1 style="font-size:1.25rem; font-weight:700; color:#0F172A; margin:0;">Browse Opportunities</h1>
+            <a href="/JobSeeker/Dashboard" style="font-size:0.875rem; color:#64748B; text-decoration:none;">← Dashboard</a>
+        </div>
+
+        <!-- Search Form -->
+        <form method="get" style="background:white; border:1px solid #E2E8F0; border-radius:12px; padding:1rem; margin-bottom:1.5rem;">
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr auto; gap:.75rem; align-items:end;">
+                <div>
+                    <label style="display:block; font-size:0.75rem; color:#475569; margin-bottom:.3rem;">Search</label>
+                    <input asp-for="SearchQ" type="text"
+                           style="width:100%; border:1px solid #E2E8F0; border-radius:8px; padding:.5rem .75rem; font-size:0.875rem; outline:none; box-sizing:border-box;"
+                           placeholder="Title or skill...">
+                    </div>
+                    <div>
+                        <label style="display:block; font-size:0.75rem; color:#475569; margin-bottom:.3rem;">Type</label>
+                        <select asp-for="FilterType"
+                                style="width:100%; border:1px solid #E2E8F0; border-radius:8px; padding:.5rem .75rem; font-size:0.875rem; outline:none; background:white;">
+                            <option value="">All Types</option>
+                            <option>Job</option>
+                            <option>Internship</option>
+                            <option>Freelance</option>
+                            <option>Mentorship</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display:block; font-size:0.75rem; color:#475569; margin-bottom:.3rem;">Location</label>
+                        <input asp-for="FilterLocation" type="text"
+                               style="width:100%; border:1px solid #E2E8F0; border-radius:8px; padding:.5rem .75rem; font-size:0.875rem; outline:none; box-sizing:border-box;"
+                               placeholder="City...">
+                        </div>
+                        <button type="submit"
+                                style="background:#2563EB; color:white; padding:.5rem 1.25rem; border:none; border-radius:8px; font-size:0.875rem; font-weight:500; cursor:pointer; white-space:nowrap;">
+                            Search
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Results -->
+                @if (!Model.Opportunities.Any())
+                {
+                    <div style="background:white; border:1px solid #E2E8F0; border-radius:12px; padding:3rem; text-align:center;">
+                        <p style="color:#94A3B8; font-size:0.875rem;">No opportunities found. Try adjusting your filters.</p>
+                    </div>
+                }
+
+                <div style="display:flex; flex-direction:column; gap:.75rem;">
+                    @foreach (var o in Model.Opportunities)
+                    {
+                        <div style="background:white; border:1px solid #E2E8F0; border-radius:12px; padding:1.25rem;">
+                            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                                <div style="flex:1;">
+                                    <div style="display:flex; gap:.5rem; margin-bottom:.4rem;">
+                                        <span style="font-size:0.7rem; background:#DBEAFE; color:#1E40AF; padding:.2rem .6rem; border-radius:999px;">@o.Type</span>
+                                    </div>
+                                    <h3 style="font-size:1rem; font-weight:600; color:#0F172A; margin:0 0 .25rem;">@o.Title</h3>
+                                    <p style="font-size:0.8rem; color:#64748B; margin:0 0 .5rem;">
+                                        @o.CompanyName @(o.Location != null ? "· " + o.Location : "")
+                                    </p>
+                                    @if (o.Description != null)
+                                    {
+                                        <p style="font-size:0.8rem; color:#475569; margin:0; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">
+                                            @o.Description
+                                        </p>
+                                    }
+                                    @if (o.Deadline.HasValue)
+                                    {
+                                        <p style="font-size:0.75rem; color:#F59E0B; margin:.4rem 0 0;">
+                                            Deadline: @o.Deadline.Value.ToString("MMM dd, yyyy")
+                                        </p>
+                                    }
+                                </div>
+                                <div style="display:flex; flex-direction:column; gap:.5rem; margin-left:1rem; align-items:flex-end;">
+                                    <a href="/JobSeeker/OpportunityDetails?id=@o.Id"
+                                       style="font-size:0.8rem; color:#2563EB; text-decoration:none; white-space:nowrap;">View →</a>
+                                    <a href="/JobSeeker/SavedJobs?save=@o.Id"
+                                       style="font-size:0.75rem; color:#64748B; text-decoration:none;">☆ Save</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+            </div>
+        </div>
