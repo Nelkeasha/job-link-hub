@@ -1,0 +1,119 @@
+@page
+@model JobLinkHub.Web.Pages.AboutModel
+@{
+    ViewData["Title"] = "About JobLink Hub";
+}
+
+<section class="about-page">
+    <div class="container about-wrapper">
+
+        <div class="about-hero">
+            <span class="about-eyebrow">About JobLink Hub</span>
+            <h1>A smarter way to connect talent to opportunity</h1>
+            <p>
+                JobLink Hub is a skill-first career opportunity platform designed to help students,
+                graduates, and emerging professionals connect with meaningful opportunities while
+                helping employers discover capable talent beyond the traditional CV.
+            </p>
+        </div>
+
+        <div class="about-grid">
+            <div class="about-main">
+                <div class="about-card">
+                    <h2>Our Purpose</h2>
+                    <p>
+                        Many talented young people struggle to access meaningful opportunities because
+                        recruitment systems often depend heavily on work experience, academic credentials,
+                        and CV-based screening. JobLink Hub was created to bridge this gap by giving
+                        users a platform where they can present their skills, potential, and readiness
+                        more effectively.
+                    </p>
+                </div>
+
+                <div class="about-card">
+                    <h2>What Makes JobLink Hub Different</h2>
+                    <div class="about-feature-list">
+                        <div class="about-feature-item">
+                            <h3>Skill-first profiles</h3>
+                            <p>
+                                Users can showcase their practical strengths, qualifications, and readiness
+                                beyond static CV information.
+                            </p>
+                        </div>
+
+                        <div class="about-feature-item">
+                            <h3>Multiple opportunity pathways</h3>
+                            <p>
+                                The platform supports jobs, internships, gigs, mentorships, and training
+                                opportunities in one place.
+                            </p>
+                        </div>
+
+                        <div class="about-feature-item">
+                            <h3>Employer-friendly review flow</h3>
+                            <p>
+                                Employers can manage opportunities, review applicants, and make informed
+                                decisions through a structured hiring workspace.
+                            </p>
+                        </div>
+
+                        <div class="about-feature-item">
+                            <h3>Career growth orientation</h3>
+                            <p>
+                                JobLink Hub is designed to support the transition from learning to work by
+                                making opportunities more visible and accessible.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="about-card">
+                    <h2>Who the Platform Serves</h2>
+                    <div class="about-audience-grid">
+                        <div class="audience-card">
+                            <h3>Students & Graduates</h3>
+                            <p>Find internships, entry-level jobs, training opportunities, and early-career pathways.</p>
+                        </div>
+
+                        <div class="audience-card">
+                            <h3>Emerging Professionals</h3>
+                            <p>Showcase practical skills, build visibility, and access opportunities that match career goals.</p>
+                        </div>
+
+                        <div class="audience-card">
+                            <h3>Employers</h3>
+                            <p>Discover talent, post opportunities, and review candidates using a more structured and skill-aware process.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="about-sidebar">
+                <div class="about-card sidebar-card">
+                    <h3>Our Mission</h3>
+                    <p>
+                        To bridge the gap between talent and opportunity by creating a platform that values
+                        skills, potential, and career readiness.
+                    </p>
+                </div>
+
+                <div class="about-card sidebar-card">
+                    <h3>Core Value</h3>
+                    <p>
+                        We believe opportunity should not be limited by lack of experience when skill,
+                        promise, and effort are clearly present.
+                    </p>
+                </div>
+
+                <div class="about-card sidebar-card">
+                    <h3>Get Started</h3>
+                    <div class="about-cta-group">
+                        <a asp-page="/Auth/ChooseRole" class="about-primary-btn">Create Account</a>
+                        <a asp-page="/Auth/Login" class="about-secondary-btn">Log In</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>

@@ -1,0 +1,199 @@
+@page
+@model JobLinkHub.Web.Pages.OpportunitiesModel
+@{
+    ViewData["Title"] = "Opportunities";
+}
+
+<section class="opportunities-page">
+    <div class="container opportunities-wrapper">
+
+        <div class="opportunities-hero">
+            <span class="opportunities-eyebrow">Explore opportunities</span>
+            <h1>Find opportunities that match your goals</h1>
+            <p>
+                Browse jobs, internships, training opportunities, gigs, and mentorships designed to support growth and career development.
+            </p>
+        </div>
+
+        <div class="opportunities-filter-bar">
+            <div class="filter-input-group">
+                <label for="search">Search</label>
+                <input id="search" type="text" placeholder="Search by title, skill, or category" />
+            </div>
+
+            <div class="filter-input-group">
+                <label for="type">Type</label>
+                <select id="type">
+                    <option>All Types</option>
+                    <option>Job</option>
+                    <option>Internship</option>
+                    <option>Training</option>
+                    <option>Gig</option>
+                    <option>Mentorship</option>
+                </select>
+            </div>
+
+            <div class="filter-input-group">
+                <label for="location">Location</label>
+                <select id="location">
+                    <option>All Locations</option>
+                    <option>Kigali</option>
+                    <option>Remote</option>
+                    <option>Hybrid</option>
+                </select>
+            </div>
+
+            <div class="filter-input-group">
+                <label for="category">Category</label>
+                <select id="category">
+                    <option>All Categories</option>
+                    <option>Technology</option>
+                    <option>Design</option>
+                    <option>Data</option>
+                    <option>Marketing</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="opportunities-results-top">
+            <div>
+                <h2>Available Opportunities</h2>
+                <p>@Model.Opportunities.Count opportunities currently listed</p>
+            </div>
+        </div>
+
+        <div class="opportunity-card-grid">
+            @foreach (var item in Model.Opportunities)
+            {
+                <div class="public-opportunity-card">
+                    <div class="public-opportunity-top">
+                        <span class="public-opportunity-type">@item.Type</span>
+                        <span class="public-opportunity-status">@item.Status</span>
+                    </div>
+
+                    <h3>@item.Title</h3>
+                    <p class="public-opportunity-company">@item.CompanyName</p>
+                    <p class="public-opportunity-description">@item.ShortDescription</p>
+
+                    <div class="public-opportunity-meta">
+                        <span>@item.Location</span>
+                        <span>@item.Category</span>
+                        <span>@item.Deadline</span>
+                    </div>
+
+                    <div class="public-opportunity-skills">
+                        @foreach (var skill in item.Skills)
+                        {
+                            <span>@skill</span>
+                        }
+                    </div>
+
+                    <div class="public-opportunity-actions">
+                        <button type="button"
+                                class="public-opportunity-btn view-details-btn"
+                                data-title="@item.Title"
+                                data-company="@item.CompanyName"
+                                data-type="@item.Type"
+                                data-status="@item.Status"
+                                data-location="@item.Location"
+                                data-category="@item.Category"
+                                data-deadline="@item.Deadline"
+                                data-qualification="@item.QualificationRequired"
+                                data-description="@item.FullDescription">
+                            View Details
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+
+    </div>
+</section>
+
+<div id="opportunityModal" class="opportunity-modal">
+    <div class="opportunity-modal-content">
+        <button type="button" id="closeOpportunityModal" class="opportunity-modal-close">&times;</button>
+
+        <div class="opportunity-modal-top">
+            <span id="modalType" class="public-opportunity-type"></span>
+            <span id="modalStatus" class="public-opportunity-status"></span>
+        </div>
+
+        <h2 id="modalTitle"></h2>
+        <p id="modalCompany" class="modal-company"></p>
+
+        <div class="modal-meta-grid">
+            <div>
+                <span>Location</span>
+                <strong id="modalLocation"></strong>
+            </div>
+            <div>
+                <span>Category</span>
+                <strong id="modalCategory"></strong>
+            </div>
+            <div>
+                <span>Deadline</span>
+                <strong id="modalDeadline"></strong>
+            </div>
+            <div>
+                <span>Qualification</span>
+                <strong id="modalQualification"></strong>
+            </div>
+        </div>
+
+        <div class="modal-section">
+            <h3>Opportunity Description</h3>
+            <p id="modalDescription"></p>
+        </div>
+
+        <div class="modal-actions">
+            <a asp-page="/Auth/Login" class="public-opportunity-btn">Log in to Apply</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const modal = document.getElementById("opportunityModal");
+            const closeBtn = document.getElementById("closeOpportunityModal");
+            const detailButtons = document.querySelectorAll(".view-details-btn");
+
+            const modalTitle = document.getElementById("modalTitle");
+            const modalCompany = document.getElementById("modalCompany");
+            const modalType = document.getElementById("modalType");
+            const modalStatus = document.getElementById("modalStatus");
+            const modalLocation = document.getElementById("modalLocation");
+            const modalCategory = document.getElementById("modalCategory");
+            const modalDeadline = document.getElementById("modalDeadline");
+            const modalQualification = document.getElementById("modalQualification");
+            const modalDescription = document.getElementById("modalDescription");
+
+            detailButtons.forEach(button => {
+                button.addEventListener("click", function () {
+                    modalTitle.textContent = this.dataset.title || "";
+                    modalCompany.textContent = this.dataset.company || "";
+                    modalType.textContent = this.dataset.type || "";
+                    modalStatus.textContent = this.dataset.status || "";
+                    modalLocation.textContent = this.dataset.location || "";
+                    modalCategory.textContent = this.dataset.category || "";
+                    modalDeadline.textContent = this.dataset.deadline || "";
+                    modalQualification.textContent = this.dataset.qualification || "";
+                    modalDescription.textContent = this.dataset.description || "";
+
+                    modal.classList.add("show");
+                });
+            });
+
+            closeBtn.addEventListener("click", function () {
+                modal.classList.remove("show");
+            });
+
+            modal.addEventListener("click", function (e) {
+                if (e.target === modal) {
+                    modal.classList.remove("show");
+                }
+            });
+        });
+    </script>
+}
