@@ -1947,3 +1947,740 @@ a {
         letter-spacing: -0.7px;
     }
 }
+
+/* =========================
+   POST OPPORTUNITY PAGE
+========================= */
+.post-opportunity-page {
+    padding: 4rem 0 5rem;
+    min-height: calc(100vh - 120px);
+    background: radial-gradient(circle at top right, rgba(37, 99, 235, 0.05), transparent 24%), #f8fafc;
+}
+
+.post-opportunity-wrapper {
+    max-width: 1100px;
+}
+
+.post-hero {
+    margin-bottom: 2rem;
+}
+
+.post-eyebrow {
+    display: inline-block;
+    background-color: #dbeafe;
+    color: #1d4ed8;
+    padding: 0.5rem 0.9rem;
+    border-radius: 999px;
+    font-size: 0.84rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.post-hero h1 {
+    margin: 0 0 0.7rem 0;
+    font-size: 2.5rem;
+    line-height: 1.08;
+    font-weight: 800;
+    letter-spacing: -1.1px;
+    color: #0f172a;
+}
+
+.post-hero p {
+    margin: 0;
+    max-width: 680px;
+    color: #64748b;
+    line-height: 1.8;
+    font-size: 1rem;
+}
+
+.post-opportunity-card {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 28px;
+    padding: 2rem;
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.05);
+}
+
+.post-opportunity-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+}
+
+.post-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.2rem;
+}
+
+.post-opportunity-form .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+}
+
+    .post-opportunity-form .form-group label {
+        font-size: 0.95rem;
+        font-weight: 650;
+        color: #334155;
+    }
+
+    .post-opportunity-form .form-group input,
+    .post-opportunity-form .form-group select,
+    .post-opportunity-form .form-group textarea {
+        border: 1px solid #cbd5e1;
+        border-radius: 14px;
+        padding: 0.95rem 1rem;
+        font-size: 0.98rem;
+        color: #0f172a;
+        background-color: #ffffff;
+        outline: none;
+        transition: border-color 0.25s ease, box-shadow 0.25s ease;
+        font-family: inherit;
+    }
+
+    .post-opportunity-form .form-group input,
+    .post-opportunity-form .form-group select {
+        height: 54px;
+    }
+
+    .post-opportunity-form .form-group textarea {
+        resize: vertical;
+        min-height: 140px;
+    }
+
+        .post-opportunity-form .form-group input:focus,
+        .post-opportunity-form .form-group select:focus,
+        .post-opportunity-form .form-group textarea:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.10);
+        }
+
+        .post-opportunity-form .form-group input::placeholder,
+        .post-opportunity-form .form-group textarea::placeholder {
+            color: #94a3b8;
+        }
+
+.full-width-group {
+    width: 100%;
+}
+
+.post-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.post-cancel-btn,
+.post-submit-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.95rem 1.3rem;
+    border-radius: 14px;
+    font-weight: 700;
+    transition: all 0.25s ease;
+}
+
+.post-cancel-btn {
+    background-color: #ffffff;
+    color: #0f172a;
+    border: 1px solid #cbd5e1;
+}
+
+    .post-cancel-btn:hover {
+        border-color: #2563eb;
+        color: #2563eb;
+    }
+
+.post-submit-btn {
+    background-color: #2563eb;
+    color: #ffffff;
+    border: 1px solid #2563eb;
+}
+
+    .post-submit-btn:hover {
+        background-color: #ffffff;
+        color: #2563eb;
+    }
+
+@media (max-width: 768px) {
+    .post-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .post-hero h1 {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .post-opportunity-page {
+        padding: 3rem 0 4rem;
+    }
+
+    .post-opportunity-card {
+        padding: 1.4rem;
+        border-radius: 22px;
+    }
+
+    .post-hero h1 {
+        font-size: 1.75rem;
+        letter-spacing: -0.7px;
+    }
+
+    .post-form-actions {
+        flex-direction: column;
+    }
+
+    .post-cancel-btn,
+    .post-submit-btn {
+        width: 100%;
+    }
+}
+
+/* =========================
+   VIEW APPLICANTS PAGE
+========================= */
+.view-applicants-page {
+    padding: 4rem 0 5rem;
+    min-height: calc(100vh - 120px);
+    background: radial-gradient(circle at top right, rgba(37, 99, 235, 0.05), transparent 24%), #f8fafc;
+}
+
+.view-applicants-wrapper {
+    max-width: 1240px;
+}
+
+.applicants-hero {
+    margin-bottom: 2rem;
+}
+
+.applicants-eyebrow {
+    display: inline-block;
+    background-color: #dbeafe;
+    color: #1d4ed8;
+    padding: 0.5rem 0.9rem;
+    border-radius: 999px;
+    font-size: 0.84rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.applicants-hero h1 {
+    margin: 0 0 0.7rem 0;
+    font-size: 2.5rem;
+    line-height: 1.08;
+    font-weight: 800;
+    letter-spacing: -1.1px;
+    color: #0f172a;
+}
+
+.applicants-hero p {
+    margin: 0;
+    max-width: 700px;
+    color: #64748b;
+    line-height: 1.8;
+    font-size: 1rem;
+}
+
+.applicants-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1.2rem;
+    margin-bottom: 1.8rem;
+}
+
+.applicants-summary-card {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 22px;
+    padding: 1.4rem;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.04);
+}
+
+    .applicants-summary-card p {
+        margin: 0 0 0.7rem 0;
+        color: #64748b;
+        font-size: 0.92rem;
+    }
+
+    .applicants-summary-card h2 {
+        margin: 0;
+        font-size: 1.95rem;
+        font-weight: 800;
+        color: #0f172a;
+    }
+
+.view-applicants-panel {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 26px;
+    padding: 1.5rem;
+    box-shadow: 0 16px 35px rgba(15, 23, 42, 0.04);
+}
+
+.applicants-table-wrapper {
+    overflow-x: auto;
+}
+
+.applicants-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 980px;
+}
+
+    .applicants-table thead th {
+        text-align: left;
+        padding: 1rem 0.9rem;
+        color: #64748b;
+        font-size: 0.9rem;
+        font-weight: 700;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .applicants-table tbody td {
+        padding: 1rem 0.9rem;
+        border-bottom: 1px solid #eef2f7;
+        vertical-align: middle;
+        color: #334155;
+        font-size: 0.95rem;
+    }
+
+.applicant-name-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+    .applicant-name-block strong {
+        color: #0f172a;
+        font-size: 0.98rem;
+        font-weight: 750;
+    }
+
+    .applicant-name-block span {
+        color: #64748b;
+        font-size: 0.88rem;
+    }
+
+.application-status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.42rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+    .application-status-badge.pending-review {
+        background-color: #fef3c7;
+        color: #b45309;
+    }
+
+    .application-status-badge.shortlisted {
+        background-color: #dcfce7;
+        color: #15803d;
+    }
+
+    .application-status-badge.rejected {
+        background-color: #fee2e2;
+        color: #b91c1c;
+    }
+
+.review-applicant-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.7rem 1rem;
+    border-radius: 12px;
+    border: 1px solid #2563eb;
+    background-color: #2563eb;
+    color: #ffffff;
+    font-size: 0.88rem;
+    font-weight: 700;
+    transition: all 0.25s ease;
+}
+
+    .review-applicant-btn:hover {
+        background-color: #ffffff;
+        color: #2563eb;
+    }
+
+@media (max-width: 1100px) {
+    .applicants-summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 576px) {
+    .view-applicants-page {
+        padding: 3rem 0 4rem;
+    }
+
+    .applicants-summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .view-applicants-panel,
+    .applicants-summary-card {
+        border-radius: 20px;
+        padding: 1.2rem;
+    }
+
+    .applicants-hero h1 {
+        font-size: 1.75rem;
+        letter-spacing: -0.7px;
+    }
+}
+
+/* =========================
+   CANDIDATE PROFILE REVIEW PAGE
+========================= */
+.candidate-review-page {
+    padding: 4rem 0 5rem;
+    min-height: calc(100vh - 120px);
+    background: radial-gradient(circle at top left, rgba(37, 99, 235, 0.05), transparent 24%), #f8fafc;
+}
+
+.candidate-review-wrapper {
+    max-width: 1240px;
+}
+
+.candidate-review-hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.candidate-review-eyebrow {
+    display: inline-block;
+    background-color: #dbeafe;
+    color: #1d4ed8;
+    padding: 0.5rem 0.9rem;
+    border-radius: 999px;
+    font-size: 0.84rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.candidate-review-hero h1 {
+    margin: 0 0 0.7rem 0;
+    font-size: 2.5rem;
+    line-height: 1.08;
+    font-weight: 800;
+    letter-spacing: -1.1px;
+    color: #0f172a;
+}
+
+.candidate-review-hero p {
+    margin: 0;
+    max-width: 720px;
+    color: #64748b;
+    line-height: 1.8;
+    font-size: 1rem;
+}
+
+.review-secondary-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.9rem 1.3rem;
+    border-radius: 14px;
+    font-weight: 700;
+    background-color: #ffffff;
+    color: #0f172a;
+    border: 1px solid #cbd5e1;
+    transition: all 0.25s ease;
+}
+
+    .review-secondary-btn:hover {
+        border-color: #2563eb;
+        color: #2563eb;
+    }
+
+.candidate-review-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 0.9fr;
+    gap: 1.4rem;
+}
+
+.candidate-review-main,
+.candidate-review-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+}
+
+.candidate-review-card {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 26px;
+    padding: 1.6rem;
+    box-shadow: 0 16px 35px rgba(15, 23, 42, 0.04);
+}
+
+.review-card-header {
+    margin-bottom: 1.5rem;
+}
+
+.candidate-overview {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.candidate-avatar-lg {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background-color: #dbeafe;
+    color: #1d4ed8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.candidate-overview h2 {
+    margin: 0 0 0.3rem 0;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.candidate-overview p {
+    margin: 0 0 0.45rem 0;
+    color: #64748b;
+}
+
+.candidate-status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.42rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+    .candidate-status-badge.pending-review {
+        background-color: #fef3c7;
+        color: #b45309;
+    }
+
+    .candidate-status-badge.shortlisted {
+        background-color: #dcfce7;
+        color: #15803d;
+    }
+
+    .candidate-status-badge.rejected {
+        background-color: #fee2e2;
+        color: #b91c1c;
+    }
+
+.review-section {
+    padding-top: 1.3rem;
+    border-top: 1px solid #eef2f7;
+    margin-top: 1.3rem;
+}
+
+    .review-section:first-of-type {
+        border-top: none;
+        padding-top: 0;
+        margin-top: 0;
+    }
+
+    .review-section h3,
+    .sidebar-card h3 {
+        margin: 0 0 1rem 0;
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: #0f172a;
+    }
+
+.review-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.review-info-item {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    padding: 1rem;
+}
+
+    .review-info-item span {
+        display: block;
+        color: #64748b;
+        font-size: 0.88rem;
+        margin-bottom: 0.45rem;
+    }
+
+    .review-info-item strong {
+        font-size: 0.98rem;
+        color: #0f172a;
+        font-weight: 750;
+    }
+
+.review-paragraph {
+    margin: 0;
+    color: #475569;
+    line-height: 1.8;
+}
+
+.candidate-skill-tags {
+    display: flex;
+    gap: 0.7rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.2rem;
+}
+
+    .candidate-skill-tags span {
+        background-color: #eff6ff;
+        color: #1d4ed8;
+        padding: 0.45rem 0.8rem;
+        border-radius: 999px;
+        font-size: 0.87rem;
+        font-weight: 700;
+    }
+
+.evidence-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+}
+
+.evidence-item {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    padding: 1rem;
+}
+
+    .evidence-item strong {
+        display: block;
+        margin-bottom: 0.35rem;
+        color: #0f172a;
+        font-size: 0.98rem;
+    }
+
+    .evidence-item p {
+        margin: 0;
+        color: #64748b;
+        line-height: 1.65;
+        font-size: 0.92rem;
+    }
+
+.document-link-list,
+.decision-action-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+}
+
+.document-link-item {
+    display: block;
+    padding: 1rem;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    color: #0f172a;
+    font-weight: 650;
+    transition: all 0.25s ease;
+}
+
+    .document-link-item:hover {
+        border-color: #2563eb;
+        color: #2563eb;
+        background-color: #ffffff;
+    }
+
+.decision-btn {
+    width: 100%;
+    padding: 0.95rem 1rem;
+    border-radius: 14px;
+    font-weight: 700;
+    border: 1px solid transparent;
+    transition: all 0.25s ease;
+}
+
+.shortlist-btn {
+    background-color: #2563eb;
+    color: #ffffff;
+    border-color: #2563eb;
+}
+
+    .shortlist-btn:hover {
+        background-color: #ffffff;
+        color: #2563eb;
+    }
+
+.review-btn {
+    background-color: #ffffff;
+    color: #0f172a;
+    border-color: #cbd5e1;
+}
+
+    .review-btn:hover {
+        border-color: #2563eb;
+        color: #2563eb;
+    }
+
+.reject-btn {
+    background-color: #ffffff;
+    color: #b91c1c;
+    border-color: #fecaca;
+}
+
+    .reject-btn:hover {
+        background-color: #fff5f5;
+    }
+
+@media (max-width: 1100px) {
+    .candidate-review-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .review-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .candidate-review-hero h1 {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .candidate-review-page {
+        padding: 3rem 0 4rem;
+    }
+
+    .candidate-review-card {
+        padding: 1.2rem;
+        border-radius: 20px;
+    }
+
+    .candidate-review-hero h1 {
+        font-size: 1.75rem;
+        letter-spacing: -0.7px;
+    }
+
+    .candidate-overview {
+        align-items: flex-start;
+    }
+}

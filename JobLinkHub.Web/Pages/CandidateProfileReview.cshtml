@@ -1,0 +1,135 @@
+@page "{id:int?}"
+@model JobLinkHub.Web.Pages.CandidateProfileReviewModel
+@{
+    ViewData["Title"] = "Candidate Profile Review";
+}
+
+<section class="candidate-review-page">
+    <div class="container candidate-review-wrapper">
+
+        <div class="candidate-review-hero">
+            <div>
+                <span class="candidate-review-eyebrow">Application review</span>
+                <h1>Review candidate application</h1>
+                <p>
+                    Review the applicant’s profile, qualifications, supporting documents, and application details before making a decision.
+                </p>
+            </div>
+
+            <div class="candidate-review-actions-top">
+                <a asp-page="/ViewApplicants" class="review-secondary-btn">Back to Applicants</a>
+            </div>
+        </div>
+
+        <div class="candidate-review-grid">
+
+            <div class="candidate-review-main">
+                <div class="candidate-review-card">
+                    <div class="review-card-header">
+                        <div class="candidate-overview">
+                            <div class="candidate-avatar-lg">@Model.CandidateInitials</div>
+                            <div>
+                                <h2>@Model.CandidateName</h2>
+                                <p>@Model.CandidateEmail</p>
+                                <span class="candidate-status-badge @(Model.ApplicationStatus.ToLower().Replace(" ", "-"))">
+                                    @Model.ApplicationStatus
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="review-section">
+                        <h3>Opportunity Applied For</h3>
+                        <div class="review-info-grid">
+                            <div class="review-info-item">
+                                <span>Job Title</span>
+                                <strong>@Model.OpportunityTitle</strong>
+                            </div>
+                            <div class="review-info-item">
+                                <span>Application Date</span>
+                                <strong>@Model.ApplicationDate</strong>
+                            </div>
+                            <div class="review-info-item">
+                                <span>Location</span>
+                                <strong>@Model.OpportunityLocation</strong>
+                            </div>
+                            <div class="review-info-item">
+                                <span>Type</span>
+                                <strong>@Model.OpportunityType</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="review-section">
+                        <h3>Profile Summary</h3>
+                        <p class="review-paragraph">@Model.ProfileSummary</p>
+                    </div>
+
+                    <div class="review-section">
+                        <h3>Qualifications</h3>
+                        <div class="review-info-grid">
+                            <div class="review-info-item">
+                                <span>Education</span>
+                                <strong>@Model.Education</strong>
+                            </div>
+                            <div class="review-info-item">
+                                <span>Experience Level</span>
+                                <strong>@Model.ExperienceLevel</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="review-section">
+                        <h3>Skills and Evidence</h3>
+                        <div class="candidate-skill-tags">
+                            @foreach (var skill in Model.Skills)
+                            {
+                                <span>@skill</span>
+                            }
+                        </div>
+
+                        <div class="evidence-list">
+                            @foreach (var item in Model.SkillEvidence)
+                            {
+                                <div class="evidence-item">
+                                    <strong>@item.Title</strong>
+                                    <p>@item.Description</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="review-section">
+                        <h3>Cover Letter</h3>
+                        <p class="review-paragraph">@Model.CoverLetter</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="candidate-review-sidebar">
+                <div class="candidate-review-card sidebar-card">
+                    <h3>Documents & Links</h3>
+
+                    <div class="document-link-list">
+                        <a href="#" class="document-link-item">View CV / Resume</a>
+                        <a href="#" class="document-link-item">Open Portfolio</a>
+                        <a href="#" class="document-link-item">View LinkedIn Profile</a>
+                        <a href="#" class="document-link-item">Open GitHub</a>
+                    </div>
+                </div>
+
+                <div class="candidate-review-card sidebar-card">
+                    <h3>Decision Actions</h3>
+
+                    <div class="decision-action-group">
+                        <button class="decision-btn shortlist-btn" type="button">Shortlist Candidate</button>
+                        <button class="decision-btn review-btn" type="button">Mark as Reviewed</button>
+                        <button class="decision-btn reject-btn" type="button">Reject Application</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</section>
