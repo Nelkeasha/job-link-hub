@@ -3174,3 +3174,270 @@ a {
         letter-spacing: -0.7px;
     }
 }
+
+/* =========================
+   FOR EMPLOYERS PAGE
+========================= */
+.for-employers-page {
+    padding: 4rem 0 5rem;
+    min-height: calc(100vh - 120px);
+    background: radial-gradient(circle at top left, rgba(37, 99, 235, 0.05), transparent 24%), #f8fafc;
+}
+
+.for-employers-wrapper {
+    max-width: 1220px;
+}
+
+.for-employers-hero {
+    display: grid;
+    grid-template-columns: 1.3fr 0.9fr;
+    gap: 1.4rem;
+    align-items: stretch;
+    margin-bottom: 2rem;
+}
+
+.for-employers-hero-text,
+.for-employers-hero-card,
+.for-employers-process-card,
+.for-employers-cta-card,
+.employer-benefit-card {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 26px;
+    box-shadow: 0 16px 35px rgba(15, 23, 42, 0.04);
+}
+
+.for-employers-hero-text {
+    padding: 2rem;
+}
+
+.for-employers-eyebrow {
+    display: inline-block;
+    background-color: #dbeafe;
+    color: #1d4ed8;
+    padding: 0.5rem 0.9rem;
+    border-radius: 999px;
+    font-size: 0.84rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.for-employers-hero-text h1 {
+    margin: 0 0 0.9rem 0;
+    font-size: 2.8rem;
+    line-height: 1.06;
+    font-weight: 800;
+    letter-spacing: -1.2px;
+    color: #0f172a;
+}
+
+.for-employers-hero-text p {
+    margin: 0;
+    color: #64748b;
+    line-height: 1.85;
+    font-size: 1.03rem;
+    max-width: 680px;
+}
+
+.for-employers-hero-actions,
+.for-employers-cta-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1.6rem;
+}
+
+.employers-primary-btn,
+.employers-secondary-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.95rem 1.2rem;
+    border-radius: 14px;
+    font-weight: 700;
+    transition: all 0.25s ease;
+}
+
+.employers-primary-btn {
+    background-color: #2563eb;
+    color: #ffffff;
+    border: 1px solid #2563eb;
+}
+
+    .employers-primary-btn:hover {
+        background-color: #ffffff;
+        color: #2563eb;
+    }
+
+.employers-secondary-btn {
+    background-color: #ffffff;
+    color: #0f172a;
+    border: 1px solid #cbd5e1;
+}
+
+    .employers-secondary-btn:hover {
+        border-color: #2563eb;
+        color: #2563eb;
+    }
+
+.for-employers-hero-card {
+    padding: 1.8rem;
+}
+
+    .for-employers-hero-card h3 {
+        margin: 0 0 1rem 0;
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: #0f172a;
+    }
+
+    .for-employers-hero-card ul {
+        margin: 0;
+        padding-left: 1.2rem;
+        color: #475569;
+    }
+
+    .for-employers-hero-card li {
+        margin-bottom: 0.9rem;
+        line-height: 1.75;
+    }
+
+.for-employers-benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.2rem;
+    margin-bottom: 1.8rem;
+}
+
+.employer-benefit-card {
+    padding: 1.5rem;
+}
+
+    .employer-benefit-card h3 {
+        margin: 0 0 0.7rem 0;
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: #0f172a;
+    }
+
+    .employer-benefit-card p {
+        margin: 0;
+        color: #64748b;
+        line-height: 1.8;
+    }
+
+.for-employers-process-card {
+    padding: 1.6rem;
+    margin-bottom: 1.8rem;
+}
+
+.left-header {
+    text-align: left;
+    margin-bottom: 1.5rem;
+}
+
+.employer-process-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.process-step-card {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 1.2rem;
+}
+
+.step-number {
+    display: inline-block;
+    margin-bottom: 0.8rem;
+    color: #2563eb;
+    font-size: 0.88rem;
+    font-weight: 800;
+}
+
+.process-step-card h3 {
+    margin: 0 0 0.6rem 0;
+    font-size: 1.02rem;
+    font-weight: 750;
+    color: #0f172a;
+}
+
+.process-step-card p {
+    margin: 0;
+    color: #64748b;
+    line-height: 1.7;
+    font-size: 0.95rem;
+}
+
+.for-employers-cta-card {
+    padding: 1.8rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+    .for-employers-cta-card h2 {
+        margin: 0 0 0.7rem 0;
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: #0f172a;
+    }
+
+    .for-employers-cta-card p {
+        margin: 0;
+        max-width: 720px;
+        color: #64748b;
+        line-height: 1.8;
+    }
+
+@media (max-width: 1100px) {
+    .for-employers-hero,
+    .for-employers-benefits-grid,
+    .employer-process-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .for-employers-hero-text h1 {
+        font-size: 2.2rem;
+    }
+
+    .for-employers-cta-card {
+        align-items: flex-start;
+    }
+}
+
+@media (max-width: 576px) {
+    .for-employers-page {
+        padding: 3rem 0 4rem;
+    }
+
+    .for-employers-hero-text,
+    .for-employers-hero-card,
+    .for-employers-process-card,
+    .for-employers-cta-card,
+    .employer-benefit-card {
+        padding: 1.2rem;
+        border-radius: 20px;
+    }
+
+        .for-employers-hero-text h1 {
+            font-size: 1.85rem;
+            letter-spacing: -0.7px;
+        }
+
+    .for-employers-hero-actions,
+    .for-employers-cta-actions {
+        flex-direction: column;
+    }
+
+    .employers-primary-btn,
+    .employers-secondary-btn {
+        width: 100%;
+    }
+}

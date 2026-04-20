@@ -1,0 +1,101 @@
+@page
+@model JobLinkHub.Web.Pages.ForEmployersModel
+@{
+    ViewData["Title"] = "For Employers";
+}
+
+<section class="for-employers-page">
+    <div class="container for-employers-wrapper">
+
+        <div class="for-employers-hero">
+            <div class="for-employers-hero-text">
+                <span class="for-employers-eyebrow">For Employers</span>
+                <h1>Hire emerging talent with more confidence</h1>
+                <p>
+                    JobLink Hub helps employers discover, review, and manage applicants through a structured,
+                    skill-aware hiring experience built for today’s evolving workforce.
+                </p>
+
+                <div class="for-employers-hero-actions">
+                    <a asp-page="/ChooseRole" class="employers-primary-btn">Create Employer Account</a>
+                    <a asp-page="/Login" class="employers-secondary-btn">Log In</a>
+                </div>
+            </div>
+
+            <div class="for-employers-hero-card">
+                <h3>What employers can do</h3>
+                <ul>
+                    <li>Post jobs, internships, and training opportunities</li>
+                    <li>Review applicants in one hiring workspace</li>
+                    <li>Track opportunities and hiring activity</li>
+                    <li>Access applicant details beyond the CV</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="for-employers-benefits-grid">
+            <div class="employer-benefit-card">
+                <h3>Post opportunities easily</h3>
+                <p>
+                    Create and manage opportunities in one place, including jobs, internships, mentorships, gigs, and training programmes.
+                </p>
+            </div>
+
+            <div class="employer-benefit-card">
+                <h3>Review candidates efficiently</h3>
+                <p>
+                    Access applicant profiles, opportunity details, supporting documents, and structured review flows.
+                </p>
+            </div>
+
+            <div class="employer-benefit-card">
+                <h3>Manage hiring activity</h3>
+                <p>
+                    Track active roles, pending reviews, applicant numbers, and current recruitment progress from a dedicated dashboard.
+                </p>
+            </div>
+        </div>
+
+        <div class="for-employers-process-card">
+            <div class="section-header left-header">
+                <h2>How it works for employers</h2>
+                <p>JobLink Hub helps employers move from posting to decision-making through a clear and simple process.</p>
+            </div>
+
+            <div class="employer-process-grid">
+                <div class="process-step-card">
+                    <span class="step-number">01</span>
+                    <h3>Create your company profile</h3>
+                    <p>Set up your organization details so applicants can understand who you are and what you offer.</p>
+                </div>
+
+                <div class="process-step-card">
+                    <span class="step-number">02</span>
+                    <h3>Post an opportunity</h3>
+                    <p>Publish roles with the right details, deadlines, and requirements to attract relevant applicants.</p>
+                </div>
+
+                <div class="process-step-card">
+                    <span class="step-number">03</span>
+                    <h3>Review applicants</h3>
+                    <p>Assess applications through structured pages that combine candidate details, qualifications, and supporting documents.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="for-employers-cta-card">
+            <div>
+                <h2>Start hiring through JobLink Hub</h2>
+                <p>
+                    Join the platform to connect with students, graduates, and emerging professionals in a more intentional and skill-aware way.
+                </p>
+            </div>
+
+            <div class="for-employers-cta-actions">
+                <a asp-page="/ChooseRole" class="employers-primary-btn">Get Started</a>
+                <a asp-page="/PostOpportunity" class="employers-secondary-btn">Post Opportunity</a>
+            </div>
+        </div>
+
+    </div>
+</section>
