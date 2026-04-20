@@ -17,8 +17,8 @@
             </div>
 
             <div class="dashboard-hero-actions">
-                <a asp-page="/PostOpportunity" class="dashboard-primary-btn">Post Opportunity</a>
-                <a asp-page="/ManageOpportunities" class="dashboard-secondary-btn">Manage Opportunities</a>
+                <a asp-page="/Employer/PostOpportunity" class="dashboard-primary-btn">Post Opportunity</a>
+                <a asp-page="/Employer/ManageOpportunities" class="dashboard-secondary-btn">Manage Opportunities</a>
             </div>
         </div>
 
@@ -119,7 +119,7 @@
                                     <h4>@applicant.FullName</h4>
                                     <p>@applicant.AppliedRole</p>
                                 </div>
-                                <a asp-page="/CandidateProfileReview" class="mini-link-btn">Review</a>
+                                <a asp-page="/Employer/CandidateProfileReview" class="mini-link-btn">Review</a>
                             </div>
                         }
                     </div>
@@ -134,9 +134,9 @@
                     </div>
 
                     <div class="quick-actions-list">
-                        <a asp-page="/PostOpportunity" class="quick-action-item">+ Post a new opportunity</a>
-                        <a asp-page="/CompanyProfile" class="quick-action-item">Update company profile</a>
-                        <a asp-page="/ViewApplicants" class="quick-action-item">Review pending applicants</a>
+                        <a asp-page="/Employer/PostOpportunity" class="quick-action-item">+ Post a new opportunity</a>
+                        <a asp-page="/Employer/CompanyProfile" class="quick-action-item">Update company profile</a>
+                        <a asp-page="/Employer/ViewApplicants" class="quick-action-item">Review pending applicants</a>
                     </div>
                 </div>
             </div>

@@ -3701,3 +3701,148 @@ a {
         letter-spacing: -0.7px;
     }
 }
+
+/* =========================
+   OPPORTUNITY MODAL
+========================= */
+.opportunity-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(15, 23, 42, 0.55);
+    z-index: 999;
+    padding: 2rem;
+    align-items: center;
+    justify-content: center;
+}
+
+    .opportunity-modal.show {
+        display: flex;
+    }
+
+.opportunity-modal-content {
+    position: relative;
+    width: 100%;
+    max-width: 760px;
+    background-color: #ffffff;
+    border-radius: 28px;
+    padding: 2rem;
+    box-shadow: 0 28px 70px rgba(15, 23, 42, 0.18);
+    max-height: 90vh;
+    overflow-y: auto;
+    border: 1px solid #e2e8f0;
+}
+
+.opportunity-modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 42px;
+    height: 42px;
+    border: none;
+    border-radius: 50%;
+    background-color: #f8fafc;
+    color: #0f172a;
+    font-size: 1.4rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+    .opportunity-modal-close:hover {
+        background-color: #e2e8f0;
+    }
+
+.opportunity-modal-top {
+    display: flex;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.opportunity-modal-content h2 {
+    margin: 0 0 0.35rem 0;
+    font-size: 2rem;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.1;
+}
+
+.modal-company {
+    margin: 0 0 1.2rem 0;
+    color: #2563eb;
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.modal-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.4rem;
+}
+
+    .modal-meta-grid div {
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 1rem;
+    }
+
+    .modal-meta-grid span {
+        display: block;
+        font-size: 0.85rem;
+        color: #64748b;
+        margin-bottom: 0.35rem;
+    }
+
+    .modal-meta-grid strong {
+        color: #0f172a;
+        font-size: 0.96rem;
+        font-weight: 700;
+    }
+
+.modal-section {
+    margin-top: 1.2rem;
+}
+
+    .modal-section h3 {
+        margin: 0 0 0.7rem 0;
+        font-size: 1.05rem;
+        font-weight: 800;
+        color: #0f172a;
+    }
+
+    .modal-section p {
+        margin: 0;
+        color: #475569;
+        line-height: 1.8;
+    }
+
+.modal-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.view-details-btn {
+    cursor: pointer;
+}
+
+@media (max-width: 576px) {
+    .opportunity-modal {
+        padding: 1rem;
+    }
+
+    .opportunity-modal-content {
+        padding: 1.3rem;
+        border-radius: 20px;
+    }
+
+        .opportunity-modal-content h2 {
+            font-size: 1.5rem;
+        }
+
+    .modal-meta-grid {
+        grid-template-columns: 1fr;
+    }
+}
