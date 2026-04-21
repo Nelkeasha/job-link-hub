@@ -3,10 +3,12 @@ using JobLinkHub.Data.Entities;
 using JobLinkHub.Services.DTOs;
 using JobLinkHub.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace JobLinkHub.API.Services;
@@ -17,17 +19,20 @@ public class AuthService : IAuthService
     private readonly SignInManager<User> _signInManager;
     private readonly IConfiguration _config;
     private readonly AppDbContext _context;
+    private readonly IEmailService _emailService;
 
     public AuthService(
         UserManager<User> userManager,
         SignInManager<User> signInManager,
         IConfiguration config,
-        AppDbContext context)
+        AppDbContext context,
+        IEmailService emailService)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _config = config;
         _context = context;
+        _emailService = emailService;
     }
 
     public async Task<AuthResponseDto> RegisterCandidateAsync(RegisterCandidateDto dto)
@@ -43,7 +48,7 @@ public class AuthService : IAuthService
             LastName = dto.LastName,
             PhoneNumber = dto.PhoneNumber,
             Role = "CANDIDATE",
-            EmailConfirmed = true,
+            EmailConfirmed = false,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
@@ -65,6 +70,8 @@ public class AuthService : IAuthService
         _context.JobSeekerProfiles.Add(profile);
         await _context.SaveChangesAsync();
 
+        await SendEmailVerificationAsync(user.Id);
+
         return await GenerateAuthResponseAsync(user, profile.Id);
     }
 
@@ -80,7 +87,7 @@ public class AuthService : IAuthService
             FirstName = dto.FirstName,
             LastName = dto.LastName,
             Role = "EMPLOYER",
-            EmailConfirmed = true,
+            EmailConfirmed = false,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
@@ -105,16 +112,21 @@ public class AuthService : IAuthService
         _context.EmployerProfiles.Add(profile);
         await _context.SaveChangesAsync();
 
+        await SendEmailVerificationAsync(user.Id);
+
         return await GenerateAuthResponseAsync(user, profile.Id);
     }
 
-    public async Task<AuthResponseDto> LoginAsync(LoginDto dto)
+    public async Task<AuthResponseDto> LoginAsync(LoginDto dto, string? ipAddress = null)
     {
         var user = await _userManager.FindByEmailAsync(dto.Email)
             ?? throw new Exception("Invalid email or password");
 
         if (!user.IsActive)
             throw new Exception("Account is deactivated");
+
+        if (!user.EmailConfirmed)
+            throw new Exception("Email not verified. Please check your inbox for the verification link.");
 
         var result = await _signInManager
             .CheckPasswordSignInAsync(user, dto.Password, lockoutOnFailure: true);
@@ -128,18 +140,18 @@ public class AuthService : IAuthService
         long? profileId = null;
         if (user.Role == "CANDIDATE")
         {
-            var profile = _context.JobSeekerProfiles
-                .FirstOrDefault(p => p.UserId == user.Id);
+            var profile = await _context.JobSeekerProfiles
+                .FirstOrDefaultAsync(p => p.UserId == user.Id);
             profileId = profile?.Id;
         }
         else if (user.Role == "EMPLOYER")
         {
-            var profile = _context.EmployerProfiles
-                .FirstOrDefault(p => p.UserId == user.Id);
+            var profile = await _context.EmployerProfiles
+                .FirstOrDefaultAsync(p => p.UserId == user.Id);
             profileId = profile?.Id;
         }
 
-        return await GenerateAuthResponseAsync(user, profileId);
+        return await GenerateAuthResponseAsync(user, profileId, ipAddress);
     }
 
     public async Task<bool> ChangePasswordAsync(long userId, ChangePasswordDto dto)
@@ -153,7 +165,147 @@ public class AuthService : IAuthService
         return result.Succeeded;
     }
 
-    private async Task<AuthResponseDto> GenerateAuthResponseAsync(User user, long? profileId)
+    public async Task<AuthResponseDto> RefreshTokenAsync(string refreshToken, string ipAddress)
+    {
+        var token = await _context.RefreshTokens
+            .Include(rt => rt.User)
+            .FirstOrDefaultAsync(rt => rt.Token == refreshToken)
+            ?? throw new Exception("Invalid refresh token");
+
+        if (token.IsRevoked)
+        {
+            // Possible token reuse detected — revoke all descendant tokens
+            await RevokeDescendantTokensAsync(token, ipAddress, $"Attempted reuse of revoked ancestor token: {token.Token}");
+            throw new Exception("Refresh token has been revoked");
+        }
+
+        if (token.IsExpired)
+            throw new Exception("Refresh token has expired");
+
+        // Rotate: revoke current, create new
+        var newRefreshToken = GenerateRefreshToken(token.User.Id, ipAddress);
+        token.RevokedAt = DateTime.UtcNow;
+        token.RevokedByIp = ipAddress;
+        token.ReplacedByToken = newRefreshToken.Token;
+
+        _context.RefreshTokens.Add(newRefreshToken);
+        await _context.SaveChangesAsync();
+
+        var user = token.User;
+        long? profileId = null;
+        if (user.Role == "CANDIDATE")
+        {
+            var profile = await _context.JobSeekerProfiles
+                .FirstOrDefaultAsync(p => p.UserId == user.Id);
+            profileId = profile?.Id;
+        }
+        else if (user.Role == "EMPLOYER")
+        {
+            var profile = await _context.EmployerProfiles
+                .FirstOrDefaultAsync(p => p.UserId == user.Id);
+            profileId = profile?.Id;
+        }
+
+        return await GenerateJwtResponseAsync(user, profileId, newRefreshToken);
+    }
+
+    public async Task RevokeTokenAsync(string refreshToken, string ipAddress)
+    {
+        var token = await _context.RefreshTokens
+            .FirstOrDefaultAsync(rt => rt.Token == refreshToken)
+            ?? throw new Exception("Invalid refresh token");
+
+        if (!token.IsActive)
+            throw new Exception("Token is already inactive");
+
+        token.RevokedAt = DateTime.UtcNow;
+        token.RevokedByIp = ipAddress;
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task LogoutAsync(string refreshToken, string ipAddress)
+    {
+        var token = await _context.RefreshTokens
+            .FirstOrDefaultAsync(rt => rt.Token == refreshToken);
+
+        if (token != null && token.IsActive)
+        {
+            token.RevokedAt = DateTime.UtcNow;
+            token.RevokedByIp = ipAddress;
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    public async Task<bool> SendEmailVerificationAsync(long userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId.ToString());
+        if (user == null) return false;
+
+        var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        var encodedToken = Uri.EscapeDataString(token);
+        var frontendUrl = _config["Email:FrontendBaseUrl"] ?? "http://localhost:3000";
+        var verificationLink = $"{frontendUrl}/verify-email?userId={user.Id}&token={encodedToken}";
+
+        await _emailService.SendEmailVerificationAsync(
+            user.Email!,
+            $"{user.FirstName} {user.LastName}",
+            verificationLink);
+
+        return true;
+    }
+
+    public async Task<bool> VerifyEmailAsync(string userId, string token)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null) return false;
+
+        var decodedToken = Uri.UnescapeDataString(token);
+        var result = await _userManager.ConfirmEmailAsync(user, decodedToken);
+        return result.Succeeded;
+    }
+
+    public async Task<bool> ForgotPasswordAsync(string email)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+        if (user == null) return true; // Don't reveal if email exists
+
+        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+        var encodedToken = Uri.EscapeDataString(token);
+        var frontendUrl = _config["Email:FrontendBaseUrl"] ?? "http://localhost:3000";
+        var resetLink = $"{frontendUrl}/reset-password?email={Uri.EscapeDataString(email)}&token={encodedToken}";
+
+        await _emailService.SendPasswordResetAsync(
+            user.Email!,
+            $"{user.FirstName} {user.LastName}",
+            resetLink);
+
+        return true;
+    }
+
+    public async Task<bool> ResetPasswordAsync(ResetPasswordDto dto)
+    {
+        var user = await _userManager.FindByEmailAsync(dto.Email)
+            ?? throw new Exception("User not found");
+
+        var decodedToken = Uri.UnescapeDataString(dto.Token);
+        var result = await _userManager.ResetPasswordAsync(user, decodedToken, dto.NewPassword);
+
+        if (!result.Succeeded)
+            throw new Exception(string.Join(", ", result.Errors.Select(e => e.Description)));
+
+        return true;
+    }
+
+    private async Task<AuthResponseDto> GenerateAuthResponseAsync(User user, long? profileId, string? ipAddress = null)
+    {
+        var refreshToken = GenerateRefreshToken(user.Id, ipAddress);
+        _context.RefreshTokens.Add(refreshToken);
+        await _context.SaveChangesAsync();
+
+        return await GenerateJwtResponseAsync(user, profileId, refreshToken);
+    }
+
+    private async Task<AuthResponseDto> GenerateJwtResponseAsync(User user, long? profileId, RefreshToken refreshToken)
     {
         var roles = await _userManager.GetRolesAsync(user);
         var expiration = DateTime.UtcNow.AddMinutes(
@@ -185,6 +337,8 @@ public class AuthService : IAuthService
         return new AuthResponseDto
         {
             Token = new JwtSecurityTokenHandler().WriteToken(token),
+            RefreshToken = refreshToken.Token,
+            RefreshTokenExpiresAt = refreshToken.ExpiresAt,
             Email = user.Email!,
             FullName = $"{user.FirstName} {user.LastName}",
             Role = user.Role,
@@ -192,5 +346,39 @@ public class AuthService : IAuthService
             ProfileId = profileId,
             ExpiresAt = expiration
         };
+    }
+
+    private static RefreshToken GenerateRefreshToken(long userId, string? ipAddress)
+    {
+        var randomBytes = RandomNumberGenerator.GetBytes(64);
+        return new RefreshToken
+        {
+            UserId = userId,
+            Token = Convert.ToBase64String(randomBytes),
+            ExpiresAt = DateTime.UtcNow.AddDays(7),
+            CreatedAt = DateTime.UtcNow,
+            CreatedByIp = ipAddress
+        };
+    }
+
+    private async Task RevokeDescendantTokensAsync(RefreshToken token, string ipAddress, string reason)
+    {
+        if (!string.IsNullOrEmpty(token.ReplacedByToken))
+        {
+            var childToken = await _context.RefreshTokens
+                .FirstOrDefaultAsync(rt => rt.Token == token.ReplacedByToken);
+
+            if (childToken != null)
+            {
+                if (childToken.IsActive)
+                {
+                    childToken.RevokedAt = DateTime.UtcNow;
+                    childToken.RevokedByIp = ipAddress;
+                }
+                await RevokeDescendantTokensAsync(childToken, ipAddress, reason);
+            }
+        }
+
+        await _context.SaveChangesAsync();
     }
 }

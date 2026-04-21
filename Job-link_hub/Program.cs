@@ -1,3 +1,5 @@
+using Hangfire;
+using JobLinkHub.API;
 using JobLinkHub.API.Services;
 using JobLinkHub.Data;
 using JobLinkHub.Data.Entities;
@@ -21,11 +23,12 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 builder.Host.UseSerilog();
 
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")));
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-// Step 1 - Identity first
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(connectionString));
+
+// Identity
 builder.Services.AddIdentity<User, IdentityRole<long>>(options =>
 {
     options.Password.RequireDigit           = true;
@@ -33,12 +36,12 @@ builder.Services.AddIdentity<User, IdentityRole<long>>(options =>
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequireUppercase       = true;
     options.User.RequireUniqueEmail         = true;
-    options.SignIn.RequireConfirmedEmail     = false;
+    options.SignIn.RequireConfirmedEmail     = true;
 })
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
 
-// Step 2 - Override Identity's cookie scheme with JWT
+// JWT Authentication
 builder.Services
     .AddAuthentication(options =>
     {
@@ -68,14 +71,27 @@ builder.Services
 
 builder.Services.AddAuthorization();
 
-builder.Services.AddScoped<IOpportunityRepository, OpportunityRepository>();
-builder.Services.AddScoped<IApplicationRepository, ApplicationRepository>();
-builder.Services.AddScoped<ISavedJobRepository,    SavedJobRepository>();
-builder.Services.AddScoped<IOpportunityService,    OpportunityService>();
-builder.Services.AddScoped<IApplicationService,    ApplicationService>();
-builder.Services.AddScoped<ISavedJobService,       SavedJobService>();
-builder.Services.AddScoped<IAuthService,           AuthService>();
-builder.Services.AddScoped<IDashboardService,      DashboardService>();
+// Hangfire
+builder.Services.AddHangfire(config =>
+    config.UseSqlServerStorage(connectionString));
+builder.Services.AddHangfireServer();
+
+// Repositories
+builder.Services.AddScoped<IOpportunityRepository,   OpportunityRepository>();
+builder.Services.AddScoped<IApplicationRepository,    ApplicationRepository>();
+builder.Services.AddScoped<ISavedJobRepository,       SavedJobRepository>();
+builder.Services.AddScoped<INotificationRepository,   NotificationRepository>();
+
+// Services
+builder.Services.AddScoped<IOpportunityService,       OpportunityService>();
+builder.Services.AddScoped<IApplicationService,        ApplicationService>();
+builder.Services.AddScoped<ISavedJobService,           SavedJobService>();
+builder.Services.AddScoped<IAuthService,               AuthService>();
+builder.Services.AddScoped<IDashboardService,          DashboardService>();
+builder.Services.AddScoped<IEmailService,              EmailService>();
+builder.Services.AddScoped<INotificationService,       NotificationService>();
+builder.Services.AddScoped<IRecommendationService,     RecommendationService>();
+builder.Services.AddScoped<IBackgroundJobService,      BackgroundJobService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -122,6 +138,13 @@ app.UseSerilogRequestLogging();
 app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Hangfire Dashboard (admin only in production)
+app.UseHangfireDashboard("/hangfire", new DashboardOptions
+{
+    Authorization = new[] { new HangfireAuthorizationFilter() }
+});
+
 app.MapControllers();
 
 app.MapGet("/test-auth", (HttpContext ctx) => Results.Ok(new
@@ -137,5 +160,26 @@ using (var scope = app.Services.CreateScope())
     db.Database.Migrate();
     await SeedData.InitializeAsync(scope.ServiceProvider);
 }
+
+// Register recurring Hangfire jobs
+RecurringJob.AddOrUpdate<IBackgroundJobService>(
+    "deadline-reminders",
+    x => x.SendDeadlineRemindersAsync(),
+    Cron.Daily);
+
+RecurringJob.AddOrUpdate<IBackgroundJobService>(
+    "weekly-recommendations",
+    x => x.SendWeeklyRecommendationsAsync(),
+    Cron.Weekly);
+
+RecurringJob.AddOrUpdate<IBackgroundJobService>(
+    "cleanup-tokens",
+    x => x.CleanupExpiredTokensAsync(),
+    Cron.Daily);
+
+RecurringJob.AddOrUpdate<IBackgroundJobService>(
+    "application-followup",
+    x => x.SendApplicationFollowUpAsync(),
+    Cron.Daily);
 
 app.Run();

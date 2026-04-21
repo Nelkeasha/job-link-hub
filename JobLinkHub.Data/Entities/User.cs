@@ -15,4 +15,5 @@ public class User : IdentityUser<long>
     public JobSeekerProfile? JobSeekerProfile { get; set; }
     public EmployerProfile? EmployerProfile { get; set; }
     public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
+    public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 }
