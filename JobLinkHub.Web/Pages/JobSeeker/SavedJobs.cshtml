@@ -1,0 +1,64 @@
+﻿@page
+@model JobLinkHub.Web.Pages.JobSeeker.SavedJobsModel
+@{
+    ViewData["Title"] = "Saved Jobs";
+    Layout = "_Layout";
+}
+
+<div style="background:#F8FAFC; min-height:100vh; padding:2rem 1rem;">
+    <div style="max-width:860px; margin:0 auto;">
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+            <h1 style="font-size:1.25rem; font-weight:700; color:#0F172A; margin:0;">Saved Jobs</h1>
+            <a href="/JobSeeker/OpportunitiesListing" style="font-size:0.875rem; color:#2563EB; text-decoration:none;">Browse more →</a>
+        </div>
+
+        @if (!Model.SavedJobs.Any())
+        {
+            <div style="background:white; border:1px solid #E2E8F0; border-radius:12px; padding:3rem; text-align:center;">
+                <p style="color:#94A3B8; font-size:0.875rem; margin:0 0 1rem;">No saved jobs yet.</p>
+                <a href="/JobSeeker/OpportunitiesListing"
+                       style="background:#2563EB; color:white; padding:.5rem 1.25rem; border-radius:8px; font-size:0.875rem; text-decoration:none;">
+                    Browse Opportunities
+                </a>
+            </div>
+        }
+
+        <div style="display:flex; flex-direction:column; gap:.75rem;">
+            @foreach (var j in Model.SavedJobs)
+            {
+                <div style="background:white; border:1px solid #E2E8F0; border-radius:12px; padding:1.25rem; display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div style="flex:1;">
+                        <div style="display:flex; gap:.5rem; margin-bottom:.4rem;">
+                            <span style="font-size:0.7rem; background:#DBEAFE; color:#1E40AF; padding:.2rem .6rem; border-radius:999px;">@j.Type</span>
+                        </div>
+                        <h3 style="font-size:1rem; font-weight:600; color:#0F172A; margin:0 0 .2rem;">@j.Title</h3>
+                        <p style="font-size:0.8rem; color:#64748B; margin:0;">
+                            @j.CompanyName @(j.Location != null ? "· " + j.Location : "")
+                        </p>
+                        @if (j.Deadline.HasValue)
+                        {
+                            <p style="font-size:0.75rem; color:#F59E0B; margin:.3rem 0 0;">Deadline: @j.Deadline.Value.ToString("MMM dd, yyyy")</p>
+                        }
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:.5rem; margin-left:1rem; align-items:flex-end;">
+                        <a href="/JobSeeker/OpportunityDetails?id=@j.OpportunityId"
+                           style="font-size:0.8rem; color:#2563EB; text-decoration:none;">View →</a>
+                        <a href="/JobSeeker/Apply?id=@j.OpportunityId"
+                               style="background:#14B8A6; color:white; padding:.35rem .9rem; border-radius:6px; font-size:0.8rem; text-decoration:none;">
+                            Apply
+                        </a>
+                        <form method="post" asp-page-handler="Remove" style="margin:0;">
+                            <input type="hidden" name="savedJobId" value="@j.SavedJobId" />
+                            <button type="submit"
+                                    style="background:none; border:none; color:#EF4444; font-size:0.75rem; cursor:pointer; padding:0;">
+                                Remove
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+
+    </div>
+</div>

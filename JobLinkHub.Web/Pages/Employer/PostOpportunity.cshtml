@@ -1,0 +1,87 @@
+@page
+@model JobLinkHub.Web.Pages.PostOpportunityModel
+@{
+    ViewData["Title"] = "Post Opportunity";
+}
+
+<section class="post-opportunity-page">
+    <div class="container post-opportunity-wrapper">
+
+        <div class="post-hero">
+            <div>
+                <span class="post-eyebrow">Opportunity creation</span>
+                <h1>Post a new opportunity</h1>
+                <p>
+                    Create a clear and compelling opportunity to attract the right candidates.
+                </p>
+            </div>
+        </div>
+
+        <div class="post-opportunity-card">
+            <form class="post-opportunity-form">
+                <div class="post-form-grid">
+                    <div class="form-group">
+                        <label for="title">Opportunity Title</label>
+                        <input id="title" type="text" placeholder="e.g. Frontend Developer Intern" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="type">Opportunity Type</label>
+                        <select id="type">
+                            <option selected disabled>Select opportunity type</option>
+                            <option>Job</option>
+                            <option>Internship</option>
+                            <option>Training</option>
+                            <option>Gig</option>
+                            <option>Mentorship</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category">Category</label>
+                        <input id="category" type="text" placeholder="e.g. Technology, Design, Data" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="location">Location</label>
+                        <input id="location" type="text" placeholder="e.g. Kigali, Remote, Hybrid" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="deadline">Application Deadline</label>
+                        <input id="deadline" type="date" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="qualification">Qualification Required</label>
+                        <input id="qualification" type="text" placeholder="e.g. Diploma, Degree, Open to students" />
+                    </div>
+                </div>
+
+                <div class="form-group full-width-group">
+                    <label for="skills">Required Skills</label>
+                    <input id="skills" type="text" placeholder="e.g. HTML, CSS, JavaScript, UI Design" />
+                </div>
+
+                <div class="form-group full-width-group">
+                    <label for="description">Opportunity Description</label>
+                    <textarea id="description" rows="6" placeholder="Write a detailed description of the opportunity, expectations, and responsibilities."></textarea>
+                </div>
+
+                <div class="form-group full-width-group">
+                    <label for="status">Status</label>
+                    <select id="status">
+                        <option>Live</option>
+                        <option>Draft</option>
+                    </select>
+                </div>
+
+                <div class="post-form-actions">
+                    <a asp-page="/Employer/ManageOpportunities" class="post-cancel-btn">Cancel</a>
+                    <button type="submit" class="post-submit-btn">Publish Opportunity</button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</section>

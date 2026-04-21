@@ -1,0 +1,63 @@
+﻿@page
+@model JobLinkHub.Web.Pages.Admin.AdminDashboardModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    Layout = "_Layout";
+}
+
+<div style="background:#F8FAFC; min-height:100vh; padding:2rem 1rem;">
+    <div style="max-width:1000px; margin:0 auto;">
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
+            <div>
+                <h1 style="font-size:1.5rem; font-weight:700; color:#0F172A; margin:0;">Admin Dashboard</h1>
+                <p style="font-size:0.875rem; color:#64748B; margin:.25rem 0 0;">Platform overview</p>
+            </div>
+            <a href="/Logout" style="font-size:0.875rem; color:#EF4444; border:1px solid #FECACA; padding:.4rem 1rem; border-radius:8px; text-decoration:none;">
+                Logout
+            </a>
+        </div>
+
+        <!-- Stats -->
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-bottom:2rem;">
+            @{
+                var stats = new[] {
+          ("Total Users", Model.TotalUsers.ToString(), "#0F172A"),
+          ("Job Seekers", Model.TotalJobSeekers.ToString(), "#2563EB"),
+          ("Employers", Model.TotalEmployers.ToString(), "#7C3AED"),
+          ("Active Opportunities", Model.TotalOpportunities.ToString(), "#14B8A6"),
+          ("Total Applications", Model.TotalApplications.ToString(), "#0F172A"),
+          ("New This Month", Model.NewUsersThisMonth.ToString(), "#F59E0B"),
+        };
+            }
+            @foreach (var (label, value, color) in stats)
+            {
+                <div style="background:white; border:1px solid #E2E8F0; border-radius:12px; padding:1.25rem;">
+                    <p style="font-size:0.75rem; color:#64748B; text-transform:uppercase; letter-spacing:.05em; margin:0 0 .4rem;">@label</p>
+                    <p style="font-size:2rem; font-weight:700; color:@color; margin:0;">@value</p>
+                </div>
+            }
+        </div>
+
+        <!-- Navigation -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+            <a href="/Admin/ManageUsers"
+                   style="background:white; border:1px solid #E2E8F0; border-radius:12px; padding:1.5rem; text-decoration:none; display:flex; align-items:center; gap:1rem;">
+                <div style="font-size:2rem;">👥</div>
+                <div>
+                    <p style="font-weight:600; color:#0F172A; margin:0 0 .2rem;">Manage Users</p>
+                    <p style="font-size:0.8rem; color:#64748B; margin:0;">View and manage all registered users</p>
+                </div>
+            </a>
+            <a href="/Admin/ModerateOpportunities"
+                   style="background:white; border:1px solid #E2E8F0; border-radius:12px; padding:1.5rem; text-decoration:none; display:flex; align-items:center; gap:1rem;">
+                <div style="font-size:2rem;">📋</div>
+                <div>
+                    <p style="font-weight:600; color:#0F172A; margin:0 0 .2rem;">Moderate Opportunities</p>
+                    <p style="font-size:0.8rem; color:#64748B; margin:0;">Review and remove job postings</p>
+                </div>
+            </a>
+        </div>
+
+    </div>
+</div>

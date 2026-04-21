@@ -1,0 +1,93 @@
+@page
+@model JobLinkHub.Web.Pages.ViewApplicantsModel
+@{
+    ViewData["Title"] = "View Applicants";
+}
+
+<section class="view-applicants-page">
+    <div class="container view-applicants-wrapper">
+
+        <div class="applicants-hero">
+            <div>
+                <span class="applicants-eyebrow">Applicant management</span>
+                <h1>View applicants</h1>
+                <p>
+                    Review submitted applications across your opportunities and move candidates through your hiring process.
+                </p>
+            </div>
+        </div>
+
+        <div class="applicants-summary-grid">
+            <div class="applicants-summary-card">
+                <p>Total Applications</p>
+                <h2>@Model.TotalApplicationsCount</h2>
+            </div>
+
+            <div class="applicants-summary-card">
+                <p>Pending Review</p>
+                <h2>@Model.PendingReviewCount</h2>
+            </div>
+
+            <div class="applicants-summary-card">
+                <p>Shortlisted</p>
+                <h2>@Model.ShortlistedCount</h2>
+            </div>
+
+            <div class="applicants-summary-card">
+                <p>Rejected</p>
+                <h2>@Model.RejectedCount</h2>
+            </div>
+        </div>
+
+        <div class="view-applicants-panel">
+            <div class="panel-top">
+                <div>
+                    <h3>All Applications</h3>
+                    <p>Track candidate submissions, roles applied for, and review status.</p>
+                </div>
+            </div>
+
+            <div class="applicants-table-wrapper">
+                <table class="applicants-table">
+                    <thead>
+                        <tr>
+                            <th>Applicant</th>
+                            <th>Opportunity</th>
+                            <th>Submitted</th>
+                            <th>Status</th>
+                            <th>Skill Highlight</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var applicant in Model.Applications)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="applicant-name-block">
+                                        <strong>@applicant.FullName</strong>
+                                        <span>@applicant.Email</span>
+                                    </div>
+                                </td>
+                                <td>@applicant.OpportunityTitle</td>
+                                <td>@applicant.SubmittedAt</td>
+                                <td>
+                                    <span class="application-status-badge @(applicant.Status.ToLower().Replace(" ", "-"))">
+                                        @applicant.Status
+                                    </span>
+                                </td>
+                                <td>@applicant.SkillHighlight</td>
+                                <td>
+                                    <a asp-page="/Employer/CandidateProfileReview" asp-route-id="@applicant.ApplicationId" class="review-applicant-btn">
+                                        Review
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</section>

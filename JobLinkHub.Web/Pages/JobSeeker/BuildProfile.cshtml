@@ -1,0 +1,88 @@
+﻿@page
+@model JobLinkHub.Web.Pages.JobSeeker.BuildProfileModel
+@{
+    ViewData["Title"] = "Build My Profile";
+    Layout = "_Layout";
+}
+
+<div style="background:#F8FAFC; min-height:100vh; padding:2rem 1rem;">
+    <div style="max-width:640px; margin:0 auto;">
+
+        <div style="display:flex; align-items:center; gap:1rem; margin-bottom:1.5rem;">
+            <a href="/JobSeeker/Dashboard" style="color:#64748B; text-decoration:none; font-size:0.875rem;">← Dashboard</a>
+            <h1 style="font-size:1.25rem; font-weight:700; color:#0F172A; margin:0;">My Profile</h1>
+        </div>
+
+        @if (Model.Message != null)
+        {
+            <div style="padding:.75rem 1rem; border-radius:8px; margin-bottom:1rem; font-size:0.875rem;
+                background:@(Model.Success ? "#DCFCE7" : "#FEE2E2");
+                color:@(Model.Success ? "#166534" : "#991B1B");
+                border:1px solid @(Model.Success ? "#BBF7D0" : "#FECACA");">
+                @Model.Message
+            </div>
+        }
+
+        <form method="post">
+            <div style="background:white; border:1px solid #E2E8F0; border-radius:12px; padding:1.5rem; margin-bottom:1rem;">
+                <h2 style="font-size:0.95rem; font-weight:600; color:#0F172A; margin:0 0 1rem;">Personal Information</h2>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
+                    <div>
+                        <label style="display:block; font-size:0.8rem; color:#475569; margin-bottom:.35rem;">First Name</label>
+                        <input asp-for="FirstName" type="text"
+                               style="width:100%; border:1px solid #E2E8F0; border-radius:8px; padding:.5rem .75rem; font-size:0.875rem; outline:none; box-sizing:border-box;"
+                               placeholder="John">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:0.8rem; color:#475569; margin-bottom:.35rem;">Last Name</label>
+                            <input asp-for="LastName" type="text"
+                                   style="width:100%; border:1px solid #E2E8F0; border-radius:8px; padding:.5rem .75rem; font-size:0.875rem; outline:none; box-sizing:border-box;"
+                                   placeholder="Doe">
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom:1rem;">
+                            <label style="display:block; font-size:0.8rem; color:#475569; margin-bottom:.35rem;">Bio</label>
+                            <textarea asp-for="Bio" rows="3"
+                                      style="width:100%; border:1px solid #E2E8F0; border-radius:8px; padding:.5rem .75rem; font-size:0.875rem; outline:none; box-sizing:border-box; resize:vertical;"
+                                      placeholder="Tell employers about yourself..."></textarea>
+                        </div>
+
+                        <div style="margin-bottom:1rem;">
+                            <label style="display:block; font-size:0.8rem; color:#475569; margin-bottom:.35rem;">Location</label>
+                            <input asp-for="Location" type="text"
+                                   style="width:100%; border:1px solid #E2E8F0; border-radius:8px; padding:.5rem .75rem; font-size:0.875rem; outline:none; box-sizing:border-box;"
+                                   placeholder="Kigali, Rwanda">
+                            </div>
+
+                            <div style="margin-bottom:1rem;">
+                                <label style="display:block; font-size:0.8rem; color:#475569; margin-bottom:.35rem;">Phone</label>
+                                <input asp-for="Phone" type="tel"
+                                       style="width:100%; border:1px solid #E2E8F0; border-radius:8px; padding:.5rem .75rem; font-size:0.875rem; outline:none; box-sizing:border-box;"
+                                       placeholder="+250 ...">
+                                </div>
+
+                                <div style="margin-bottom:1rem;">
+                                    <label style="display:block; font-size:0.8rem; color:#475569; margin-bottom:.35rem;">LinkedIn URL</label>
+                                    <input asp-for="LinkedInUrl" type="url"
+                                           style="width:100%; border:1px solid #E2E8F0; border-radius:8px; padding:.5rem .75rem; font-size:0.875rem; outline:none; box-sizing:border-box;"
+                                           placeholder="https://linkedin.com/in/...">
+                                    </div>
+
+                                    <div>
+                                        <label style="display:block; font-size:0.8rem; color:#475569; margin-bottom:.35rem;">Portfolio / GitHub</label>
+                                        <input asp-for="PortfolioUrl" type="url"
+                                               style="width:100%; border:1px solid #E2E8F0; border-radius:8px; padding:.5rem .75rem; font-size:0.875rem; outline:none; box-sizing:border-box;"
+                                               placeholder="https://github.com/...">
+                                        </div>
+                                    </div>
+
+                                    <button type="submit"
+                                            style="width:100%; background:#2563EB; color:white; padding:.75rem; border:none; border-radius:8px; font-size:0.95rem; font-weight:600; cursor:pointer;">
+                                        Save Profile
+                                    </button>
+                                </form>
+
+                            </div>
+                        </div>
