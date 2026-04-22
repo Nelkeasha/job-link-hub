@@ -1,4 +1,5 @@
 using Hangfire;
+using Hangfire.SqlServer;
 using JobLinkHub.API;
 using JobLinkHub.API.Services;
 using JobLinkHub.Data;
@@ -24,31 +25,27 @@ Log.Logger = new LoggerConfiguration()
 builder.Host.UseSerilog();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
 
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(connectionString));
-
-// Identity
 builder.Services.AddIdentity<User, IdentityRole<long>>(options =>
 {
-    options.Password.RequireDigit           = true;
-    options.Password.RequiredLength         = 8;
+    options.Password.RequireDigit = true;
+    options.Password.RequiredLength = 8;
     options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequireUppercase       = true;
-    options.User.RequireUniqueEmail         = true;
-    options.SignIn.RequireConfirmedEmail     = true;
+    options.Password.RequireUppercase = true;
+    options.User.RequireUniqueEmail = true;
+    options.SignIn.RequireConfirmedEmail = true;
 })
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
 
-// JWT Authentication
 builder.Services
     .AddAuthentication(options =>
     {
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme    = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultScheme             = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultSignInScheme       = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
     })
     .AddJwtBearer(options =>
     {
@@ -56,45 +53,52 @@ builder.Services
         options.RequireHttpsMetadata = false;
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer           = true,
-            ValidateAudience         = true,
-            ValidateLifetime         = true,
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer              = builder.Configuration["Jwt:Issuer"],
-            ValidAudience            = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey         = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(
-                    builder.Configuration["Jwt:SecretKey"]!)),
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]!)),
             ClockSkew = TimeSpan.Zero
         };
     });
 
 builder.Services.AddAuthorization();
 
-// Hangfire
-builder.Services.AddHangfire(config =>
-    config.UseSqlServerStorage(connectionString));
-builder.Services.AddHangfireServer();
+// Existing BE1/older service registrations.
+builder.Services.AddScoped<IOpportunityRepository, OpportunityRepository>();
+builder.Services.AddScoped<IApplicationRepository, ApplicationRepository>();
+builder.Services.AddScoped<ISavedJobRepository, SavedJobRepository>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<IOpportunityService, OpportunityService>();
+builder.Services.AddScoped<IApplicationService, ApplicationService>();
+builder.Services.AddScoped<ISavedJobService, SavedJobService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<JobLinkHub.Services.Interfaces.IDashboardService, JobLinkHub.Services.Implementations.DashboardService>();
+builder.Services.AddScoped<IBackgroundJobService, BackgroundJobService>();
 
-// Repositories
-builder.Services.AddScoped<IOpportunityRepository,   OpportunityRepository>();
-builder.Services.AddScoped<IApplicationRepository,    ApplicationRepository>();
-builder.Services.AddScoped<ISavedJobRepository,       SavedJobRepository>();
-builder.Services.AddScoped<INotificationRepository,   NotificationRepository>();
-
-// Services
-builder.Services.AddScoped<IOpportunityService,       OpportunityService>();
-builder.Services.AddScoped<IApplicationService,        ApplicationService>();
-builder.Services.AddScoped<ISavedJobService,           SavedJobService>();
-builder.Services.AddScoped<IAuthService,               AuthService>();
-builder.Services.AddScoped<IDashboardService,          DashboardService>();
-builder.Services.AddScoped<IEmailService,              EmailService>();
-builder.Services.AddScoped<INotificationService,       NotificationService>();
-builder.Services.AddScoped<IRecommendationService,     RecommendationService>();
-builder.Services.AddScoped<IBackgroundJobService,      BackgroundJobService>();
+// BE2 service registrations.
+builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+builder.Services.AddScoped<IUserContextService, UserContextService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<JobLinkHub.API.Services.IDashboardService, JobLinkHub.API.Services.DashboardService>();
+builder.Services.AddScoped<IRecommendationService, RecommendationService>();
+builder.Services.AddScoped<IApplicationWorkflowService, ApplicationWorkflowService>();
+builder.Services.AddScoped<NotificationJobs>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddHangfire(config =>
+    config.SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+        .UseSimpleAssemblyNameTypeSerializer()
+        .UseRecommendedSerializerSettings()
+        .UseSqlServerStorage(connectionString, new SqlServerStorageOptions
+        {
+            PrepareSchemaIfNecessary = true
+        }));
+builder.Services.AddHangfireServer();
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -102,10 +106,10 @@ builder.Services.AddSwaggerGen(c =>
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "JWT Authorization header using the Bearer scheme.",
-        Name        = "Authorization",
-        In          = ParameterLocation.Header,
-        Type        = SecuritySchemeType.Http,
-        Scheme      = "bearer",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
         BearerFormat = "JWT"
     });
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -115,7 +119,7 @@ builder.Services.AddSwaggerGen(c =>
             Reference = new OpenApiReference
             {
                 Type = ReferenceType.SecurityScheme,
-                Id   = "Bearer"
+                Id = "Bearer"
             }
         },
         Array.Empty<string>()
@@ -139,7 +143,6 @@ app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Hangfire Dashboard (admin only in production)
 app.UseHangfireDashboard("/hangfire", new DashboardOptions
 {
     Authorization = new[] { new HangfireAuthorizationFilter() }
@@ -150,8 +153,8 @@ app.MapControllers();
 app.MapGet("/test-auth", (HttpContext ctx) => Results.Ok(new
 {
     isAuthenticated = ctx.User.Identity?.IsAuthenticated,
-    name            = ctx.User.Identity?.Name,
-    claims          = ctx.User.Claims.Select(c => new { c.Type, c.Value })
+    name = ctx.User.Identity?.Name,
+    claims = ctx.User.Claims.Select(c => new { c.Type, c.Value })
 })).RequireAuthorization();
 
 using (var scope = app.Services.CreateScope())
@@ -161,25 +164,25 @@ using (var scope = app.Services.CreateScope())
     await SeedData.InitializeAsync(scope.ServiceProvider);
 }
 
-// Register recurring Hangfire jobs
 RecurringJob.AddOrUpdate<IBackgroundJobService>(
     "deadline-reminders",
     x => x.SendDeadlineRemindersAsync(),
     Cron.Daily);
-
 RecurringJob.AddOrUpdate<IBackgroundJobService>(
     "weekly-recommendations",
     x => x.SendWeeklyRecommendationsAsync(),
     Cron.Weekly);
-
 RecurringJob.AddOrUpdate<IBackgroundJobService>(
     "cleanup-tokens",
     x => x.CleanupExpiredTokensAsync(),
     Cron.Daily);
-
 RecurringJob.AddOrUpdate<IBackgroundJobService>(
     "application-followup",
     x => x.SendApplicationFollowUpAsync(),
+    Cron.Daily);
+RecurringJob.AddOrUpdate<NotificationJobs>(
+    "unread-notification-digest",
+    job => job.SendUnreadDigestAsync(),
     Cron.Daily);
 
 app.Run();

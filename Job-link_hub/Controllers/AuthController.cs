@@ -1,211 +1,168 @@
-using JobLinkHub.Services.DTOs;
-using JobLinkHub.Services.Interfaces;
+using JobLinkHub.API.Models.Auth;
+using JobLinkHub.API.Services;
+using JobLinkHub.Data.Entities;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
+using System.Net;
 
 namespace JobLinkHub.API.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
-public class AuthController : ControllerBase
+[Route("api/auth")]
+public class AuthController(
+    UserManager<User> userManager,
+    SignInManager<User> signInManager,
+    IJwtTokenService jwtTokenService) : ControllerBase
 {
-    private readonly IAuthService _authService;
+    private const string TokenProvider = "JobLinkHub";
+    private const string RefreshTokenName = "refresh_token";
 
-    public AuthController(IAuthService authService)
+    [HttpPost("register")]
+    public async Task<IActionResult> Register(RegisterRequest request)
     {
-        _authService = authService;
-    }
+        var role = request.Role.ToUpperInvariant();
+        if (role is not ("CANDIDATE" or "EMPLOYER"))
+        {
+            return BadRequest("Role must be CANDIDATE or EMPLOYER.");
+        }
 
-    [HttpPost("register/candidate")]
-    public async Task<IActionResult> RegisterCandidate([FromBody] RegisterCandidateDto dto)
-    {
-        try
+        var existingUser = await userManager.FindByEmailAsync(request.Email);
+        if (existingUser is not null)
         {
-            var response = await _authService.RegisterCandidateAsync(dto);
-            return Ok(response);
+            return Conflict("Email is already registered.");
         }
-        catch (Exception ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
-    }
 
-    [HttpPost("register/employer")]
-    public async Task<IActionResult> RegisterEmployer([FromBody] RegisterEmployerDto dto)
-    {
-        try
+        var user = new User
         {
-            var response = await _authService.RegisterEmployerAsync(dto);
-            return Ok(response);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
-    }
+            UserName = request.Email,
+            Email = request.Email,
+            FirstName = request.FirstName,
+            LastName = request.LastName,
+            Role = role
+        };
 
-    [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginDto dto)
-    {
-        try
+        var createResult = await userManager.CreateAsync(user, request.Password);
+        if (!createResult.Succeeded)
         {
-            var ipAddress = GetIpAddress();
-            var response = await _authService.LoginAsync(dto, ipAddress);
-            return Ok(response);
+            return BadRequest(createResult.Errors);
         }
-        catch (Exception ex)
-        {
-            return Unauthorized(new { message = ex.Message });
-        }
-    }
 
-    [HttpPut("change-password")]
-    [Authorize]
-    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto dto)
-    {
-        try
-        {
-            var userId = long.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var result = await _authService.ChangePasswordAsync(userId, dto);
-            return result
-                ? Ok(new { message = "Password changed successfully" })
-                : BadRequest(new { message = "Failed to change password" });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
-    }
+        await userManager.AddToRoleAsync(user, role);
+        var emailToken = await userManager.GenerateEmailConfirmationTokenAsync(user);
+        var encodedToken = WebUtility.UrlEncode(emailToken);
 
-    [HttpPost("refresh-token")]
-    public async Task<IActionResult> RefreshToken([FromBody] TokenRequestDto dto)
-    {
-        try
-        {
-            var ipAddress = GetIpAddress();
-            var response = await _authService.RefreshTokenAsync(dto.RefreshToken, ipAddress);
-            return Ok(response);
-        }
-        catch (Exception ex)
-        {
-            return Unauthorized(new { message = ex.Message });
-        }
-    }
-
-    [HttpPost("revoke-token")]
-    [Authorize]
-    public async Task<IActionResult> RevokeToken([FromBody] TokenRequestDto dto)
-    {
-        try
-        {
-            var ipAddress = GetIpAddress();
-            await _authService.RevokeTokenAsync(dto.RefreshToken, ipAddress);
-            return Ok(new { message = "Token revoked" });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
-    }
-
-    [HttpPost("logout")]
-    [Authorize]
-    public async Task<IActionResult> Logout([FromBody] TokenRequestDto dto)
-    {
-        try
-        {
-            var ipAddress = GetIpAddress();
-            await _authService.LogoutAsync(dto.RefreshToken, ipAddress);
-            return Ok(new { message = "Logged out successfully" });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
-    }
-
-    [HttpPost("verify-email")]
-    public async Task<IActionResult> VerifyEmail([FromQuery] string userId, [FromQuery] string token)
-    {
-        try
-        {
-            var result = await _authService.VerifyEmailAsync(userId, token);
-            return result
-                ? Ok(new { message = "Email verified successfully" })
-                : BadRequest(new { message = "Invalid or expired verification token" });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
-    }
-
-    [HttpPost("forgot-password")]
-    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto dto)
-    {
-        try
-        {
-            await _authService.ForgotPasswordAsync(dto.Email);
-            return Ok(new { message = "If the email exists, a password reset link has been sent" });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
-    }
-
-    [HttpPost("reset-password")]
-    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
-    {
-        try
-        {
-            await _authService.ResetPasswordAsync(dto);
-            return Ok(new { message = "Password reset successfully" });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
-    }
-
-    [HttpPost("resend-verification")]
-    [Authorize]
-    public async Task<IActionResult> ResendVerification()
-    {
-        try
-        {
-            var userId = long.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var result = await _authService.SendEmailVerificationAsync(userId);
-            return result
-                ? Ok(new { message = "Verification email sent" })
-                : BadRequest(new { message = "Failed to send verification email" });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
-    }
-
-    [HttpGet("me")]
-    [Authorize]
-    public IActionResult Me()
-    {
         return Ok(new
         {
-            UserId = User.FindFirstValue(ClaimTypes.NameIdentifier),
-            Email = User.FindFirstValue(ClaimTypes.Email),
-            FirstName = User.FindFirstValue(ClaimTypes.GivenName),
-            LastName = User.FindFirstValue(ClaimTypes.Surname),
-            Role = User.FindFirstValue(ClaimTypes.Role),
-            ProfileId = User.FindFirstValue("ProfileId")
+            message = "Registration successful. Verify email with the token below.",
+            emailVerification = new
+            {
+                userId = user.Id,
+                token = encodedToken
+            }
         });
     }
 
-    private string GetIpAddress()
+    [HttpGet("confirm-email")]
+    public async Task<IActionResult> ConfirmEmail([FromQuery] long userId, [FromQuery] string token)
     {
-        if (Request.Headers.ContainsKey("X-Forwarded-For"))
-            return Request.Headers["X-Forwarded-For"].ToString();
-        return HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString() ?? "unknown";
+        var user = await userManager.FindByIdAsync(userId.ToString());
+        if (user is null) return NotFound("User not found.");
+
+        var decodedToken = WebUtility.UrlDecode(token);
+        var result = await userManager.ConfirmEmailAsync(user, decodedToken!);
+        if (!result.Succeeded) return BadRequest(result.Errors);
+
+        return Ok("Email verified successfully.");
+    }
+
+    [HttpPost("login")]
+    public async Task<IActionResult> Login(LoginRequest request)
+    {
+        var user = await userManager.FindByEmailAsync(request.Email);
+        if (user is null) return Unauthorized("Invalid credentials.");
+
+        var passwordResult = await signInManager.CheckPasswordSignInAsync(user, request.Password, lockoutOnFailure: true);
+        if (!passwordResult.Succeeded) return Unauthorized("Invalid credentials.");
+
+        var roles = await userManager.GetRolesAsync(user);
+        var accessToken = jwtTokenService.GenerateAccessToken(user, roles);
+        var refreshToken = jwtTokenService.GenerateRefreshToken();
+        await userManager.SetAuthenticationTokenAsync(user, TokenProvider, RefreshTokenName, refreshToken);
+
+        var expiresAt = DateTime.UtcNow.AddMinutes(60);
+        return Ok(new AuthResponse
+        {
+            AccessToken = accessToken,
+            RefreshToken = refreshToken,
+            ExpiresAtUtc = expiresAt
+        });
+    }
+
+    [HttpPost("refresh")]
+    public async Task<IActionResult> RefreshToken(RefreshTokenRequest request)
+    {
+        var user = await userManager.FindByEmailAsync(request.Email);
+        if (user is null) return Unauthorized();
+
+        var storedToken = await userManager.GetAuthenticationTokenAsync(user, TokenProvider, RefreshTokenName);
+        if (storedToken != request.RefreshToken) return Unauthorized("Invalid refresh token.");
+
+        var newRefreshToken = jwtTokenService.GenerateRefreshToken();
+        await userManager.SetAuthenticationTokenAsync(user, TokenProvider, RefreshTokenName, newRefreshToken);
+
+        var roles = await userManager.GetRolesAsync(user);
+        return Ok(new AuthResponse
+        {
+            AccessToken = jwtTokenService.GenerateAccessToken(user, roles),
+            RefreshToken = newRefreshToken,
+            ExpiresAtUtc = DateTime.UtcNow.AddMinutes(60)
+        });
+    }
+
+    [Authorize]
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout()
+    {
+        var userId = User.FindFirst("sub")?.Value ?? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
+
+        var user = await userManager.FindByIdAsync(userId);
+        if (user is null) return Unauthorized();
+
+        await userManager.RemoveAuthenticationTokenAsync(user, TokenProvider, RefreshTokenName);
+        await signInManager.SignOutAsync();
+        return Ok("Logged out successfully.");
+    }
+
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest request)
+    {
+        var user = await userManager.FindByEmailAsync(request.Email);
+        if (user is null)
+        {
+            return Ok("If the account exists, a reset token has been generated.");
+        }
+
+        var token = await userManager.GeneratePasswordResetTokenAsync(user);
+        return Ok(new
+        {
+            message = "Password reset token generated.",
+            email = user.Email,
+            token = WebUtility.UrlEncode(token)
+        });
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword(ResetPasswordRequest request)
+    {
+        var user = await userManager.FindByEmailAsync(request.Email);
+        if (user is null) return BadRequest("Invalid reset request.");
+
+        var token = WebUtility.UrlDecode(request.Token);
+        var result = await userManager.ResetPasswordAsync(user, token!, request.NewPassword);
+        if (!result.Succeeded) return BadRequest(result.Errors);
+
+        return Ok("Password reset successful.");
     }
 }
