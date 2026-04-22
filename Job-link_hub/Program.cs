@@ -1,5 +1,8 @@
 using JobLinkHub.Data;
 using JobLinkHub.Data.Entities;
+using JobLinkHub.API.Services;
+using Hangfire;
+using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -56,8 +59,25 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddAuthorization();
+builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+builder.Services.AddScoped<IUserContextService, UserContextService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<IRecommendationService, RecommendationService>();
+builder.Services.AddScoped<IApplicationWorkflowService, ApplicationWorkflowService>();
+builder.Services.AddScoped<NotificationJobs>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddHangfire(config =>
+    config.SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+        .UseSimpleAssemblyNameTypeSerializer()
+        .UseRecommendedSerializerSettings()
+        .UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection"), new SqlServerStorageOptions
+        {
+            PrepareSchemaIfNecessary = true
+        }));
+builder.Services.AddHangfireServer();
 
 // Swagger with JWT support
 builder.Services.AddSwaggerGen(c =>
@@ -100,6 +120,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.UseHangfireDashboard("/hangfire");
 
 // Auto-migrate and seed on startup
 using (var scope = app.Services.CreateScope())
@@ -108,5 +129,10 @@ using (var scope = app.Services.CreateScope())
     db.Database.Migrate();
     await SeedData.InitializeAsync(scope.ServiceProvider);
 }
+
+RecurringJob.AddOrUpdate<NotificationJobs>(
+    "unread-notification-digest",
+    job => job.SendUnreadDigestAsync(),
+    Cron.Daily);
 
 app.Run();
