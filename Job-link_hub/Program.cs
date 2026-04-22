@@ -1,5 +1,13 @@
+using Hangfire;
+using Hangfire.SqlServer;
+using JobLinkHub.API;
+using JobLinkHub.API.Services;
 using JobLinkHub.Data;
 using JobLinkHub.Data.Entities;
+using JobLinkHub.Data.Repositories;
+using JobLinkHub.Data.Repositories.Interfaces;
+using JobLinkHub.Services.Implementations;
+using JobLinkHub.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -10,18 +18,15 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Serilog
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .WriteTo.File("logs/joblinkhub-.txt", rollingInterval: RollingInterval.Day)
     .CreateLogger();
 builder.Host.UseSerilog();
 
-// Database
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
 
-// Identity
 builder.Services.AddIdentity<User, IdentityRole<long>>(options =>
 {
     options.Password.RequireDigit = true;
@@ -29,53 +34,92 @@ builder.Services.AddIdentity<User, IdentityRole<long>>(options =>
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequireUppercase = true;
     options.User.RequireUniqueEmail = true;
-    options.SignIn.RequireConfirmedEmail = false;
+    options.SignIn.RequireConfirmedEmail = true;
 })
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
 
-// JWT
-var jwtKey = builder.Configuration["Jwt:SecretKey"]!;
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
+builder.Services
+    .AddAuthentication(options =>
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
-    };
-});
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.SaveToken = true;
+        options.RequireHttpsMetadata = false;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]!)),
+            ClockSkew = TimeSpan.Zero
+        };
+    });
 
 builder.Services.AddAuthorization();
+
+// Existing BE1/older service registrations.
+builder.Services.AddScoped<IOpportunityRepository, OpportunityRepository>();
+builder.Services.AddScoped<IApplicationRepository, ApplicationRepository>();
+builder.Services.AddScoped<ISavedJobRepository, SavedJobRepository>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<IOpportunityService, OpportunityService>();
+builder.Services.AddScoped<IApplicationService, ApplicationService>();
+builder.Services.AddScoped<ISavedJobService, SavedJobService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<JobLinkHub.Services.Interfaces.IDashboardService, JobLinkHub.Services.Implementations.DashboardService>();
+builder.Services.AddScoped<IBackgroundJobService, BackgroundJobService>();
+
+// BE2 service registrations.
+builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+builder.Services.AddScoped<IUserContextService, UserContextService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<JobLinkHub.API.Services.IDashboardService, JobLinkHub.API.Services.DashboardService>();
+builder.Services.AddScoped<IRecommendationService, RecommendationService>();
+builder.Services.AddScoped<IApplicationWorkflowService, ApplicationWorkflowService>();
+builder.Services.AddScoped<NotificationJobs>();
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddHangfire(config =>
+    config.SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+        .UseSimpleAssemblyNameTypeSerializer()
+        .UseRecommendedSerializerSettings()
+        .UseSqlServerStorage(connectionString, new SqlServerStorageOptions
+        {
+            PrepareSchemaIfNecessary = true
+        }));
+builder.Services.AddHangfireServer();
 
-// Swagger with JWT support
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "JobLink Hub API", Version = "v1" });
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Description = "Enter: Bearer {your token}",
+        Description = "JWT Authorization header using the Bearer scheme.",
         Name = "Authorization",
         In = ParameterLocation.Header,
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT"
     });
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement {{
-        new OpenApiSecurityScheme {
-            Reference = new OpenApiReference {
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {{
+        new OpenApiSecurityScheme
+        {
+            Reference = new OpenApiReference
+            {
                 Type = ReferenceType.SecurityScheme,
-                Id   = "Bearer"
+                Id = "Bearer"
             }
         },
         Array.Empty<string>()
@@ -96,17 +140,49 @@ if (app.Environment.IsDevelopment())
 
 app.UseSerilogRequestLogging();
 app.UseCors("AllowAll");
-app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseHangfireDashboard("/hangfire", new DashboardOptions
+{
+    Authorization = new[] { new HangfireAuthorizationFilter() }
+});
+
 app.MapControllers();
 
-// Auto-migrate and seed on startup
+app.MapGet("/test-auth", (HttpContext ctx) => Results.Ok(new
+{
+    isAuthenticated = ctx.User.Identity?.IsAuthenticated,
+    name = ctx.User.Identity?.Name,
+    claims = ctx.User.Claims.Select(c => new { c.Type, c.Value })
+})).RequireAuthorization();
+
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.Migrate();
     await SeedData.InitializeAsync(scope.ServiceProvider);
 }
+
+RecurringJob.AddOrUpdate<IBackgroundJobService>(
+    "deadline-reminders",
+    x => x.SendDeadlineRemindersAsync(),
+    Cron.Daily);
+RecurringJob.AddOrUpdate<IBackgroundJobService>(
+    "weekly-recommendations",
+    x => x.SendWeeklyRecommendationsAsync(),
+    Cron.Weekly);
+RecurringJob.AddOrUpdate<IBackgroundJobService>(
+    "cleanup-tokens",
+    x => x.CleanupExpiredTokensAsync(),
+    Cron.Daily);
+RecurringJob.AddOrUpdate<IBackgroundJobService>(
+    "application-followup",
+    x => x.SendApplicationFollowUpAsync(),
+    Cron.Daily);
+RecurringJob.AddOrUpdate<NotificationJobs>(
+    "unread-notification-digest",
+    job => job.SendUnreadDigestAsync(),
+    Cron.Daily);
 
 app.Run();

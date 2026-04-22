@@ -1,0 +1,92 @@
+﻿@page
+@model JobLinkHub.Web.Pages.Admin.ManageUsersModel
+@{
+    ViewData["Title"] = "Manage Users";
+    Layout = "_Layout";
+}
+
+<div style="background:#F8FAFC; min-height:100vh; padding:2rem 1rem;">
+    <div style="max-width:1100px; margin:0 auto;">
+
+        <div style="display:flex; align-items:center; gap:1rem; margin-bottom:1.5rem;">
+            <a href="/Admin/AdminDashboard" style="color:#64748B; text-decoration:none; font-size:0.875rem;">← Dashboard</a>
+            <h1 style="font-size:1.25rem; font-weight:700; color:#0F172A; margin:0;">Manage Users</h1>
+        </div>
+
+        <!-- Search -->
+        <form method="get" style="background:white; border:1px solid #E2E8F0; border-radius:12px; padding:1rem; margin-bottom:1.25rem;">
+            <div style="display:grid; grid-template-columns:1fr 1fr auto; gap:.75rem; align-items:end;">
+                <div>
+                    <label style="display:block; font-size:0.75rem; color:#475569; margin-bottom:.3rem;">Search</label>
+                    <input asp-for="SearchQ" type="text"
+                           style="width:100%; border:1px solid #E2E8F0; border-radius:8px; padding:.5rem .75rem; font-size:0.875rem; outline:none; box-sizing:border-box;"
+                           placeholder="Name or email...">
+                    </div>
+                    <div>
+                        <label style="display:block; font-size:0.75rem; color:#475569; margin-bottom:.3rem;">Role</label>
+                        <select asp-for="FilterRole"
+                                style="width:100%; border:1px solid #E2E8F0; border-radius:8px; padding:.5rem .75rem; font-size:0.875rem; outline:none; background:white;">
+                            <option value="">All Roles</option>
+                            <option value="JobSeeker">Job Seeker</option>
+                            <option value="Employer">Employer</option>
+                            <option value="Admin">Admin</option>
+                        </select>
+                    </div>
+                    <button type="submit"
+                            style="background:#2563EB; color:white; padding:.5rem 1.25rem; border:none; border-radius:8px; font-size:0.875rem; font-weight:500; cursor:pointer;">
+                        Search
+                    </button>
+                </div>
+            </form>
+
+            <!-- Table -->
+            <div style="background:white; border:1px solid #E2E8F0; border-radius:12px; overflow:hidden;">
+                <table style="width:100%; border-collapse:collapse; font-size:0.875rem;">
+                    <thead>
+                        <tr style="background:#F8FAFC; border-bottom:1px solid #E2E8F0;">
+                            <th style="text-align:left; padding:.75rem 1rem; font-size:0.75rem; color:#64748B; font-weight:500; text-transform:uppercase; letter-spacing:.05em;">Name</th>
+                            <th style="text-align:left; padding:.75rem 1rem; font-size:0.75rem; color:#64748B; font-weight:500; text-transform:uppercase; letter-spacing:.05em;">Email</th>
+                            <th style="text-align:left; padding:.75rem 1rem; font-size:0.75rem; color:#64748B; font-weight:500; text-transform:uppercase; letter-spacing:.05em;">Role</th>
+                            <th style="text-align:left; padding:.75rem 1rem; font-size:0.75rem; color:#64748B; font-weight:500; text-transform:uppercase; letter-spacing:.05em;">Joined</th>
+                            <th style="text-align:left; padding:.75rem 1rem; font-size:0.75rem; color:#64748B; font-weight:500; text-transform:uppercase; letter-spacing:.05em;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.Users.Any())
+                        {
+                            <tr>
+                                <td colspan="5" style="padding:2rem; text-align:center; color:#94A3B8; font-size:0.875rem;">No users found.</td>
+                            </tr>
+                        }
+                        @foreach (var u in Model.Users)
+                        {
+                            <tr style="border-bottom:1px solid #F1F5F9;">
+                                <td style="padding:.75rem 1rem; font-weight:500; color:#0F172A;">@u.FullName</td>
+                                <td style="padding:.75rem 1rem; color:#475569;">@u.Email</td>
+                                <td style="padding:.75rem 1rem;">
+                                    @{
+                                        var roleBg = u.Role == "Admin" ? "#FEF3C7" : u.Role == "Employer" ? "#EDE9FE" : "#DBEAFE";
+                                        var roleColor = u.Role == "Admin" ? "#92400E" : u.Role == "Employer" ? "#5B21B6" : "#1E40AF";
+                                    }
+                                    <span style="font-size:0.75rem; padding:.2rem .65rem; border-radius:999px; background:@roleBg; color:@roleColor;">
+                                        @u.Role
+                                    </span>
+                                </td>
+                                <td style="padding:.75rem 1rem; color:#64748B; font-size:0.8rem;">
+                                    @(u.CreatedAt?.ToString("MMM dd, yyyy") ?? "—")
+                                </td>
+                                <td style="padding:.75rem 1rem;">
+                                    <span style="font-size:0.75rem; padding:.2rem .65rem; border-radius:999px;
+                                        background:@(u.IsActive ? "#DCFCE7" : "#F1F5F9");
+                                        color:@(u.IsActive ? "#166534" : "#64748B");">
+                                        @(u.IsActive ? "Active" : "Inactive")
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>

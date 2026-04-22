@@ -295,6 +295,49 @@ namespace JobLinkHub.Data.Migrations
                     b.ToTable("OpportunitySkills");
                 });
 
+            modelBuilder.Entity("JobLinkHub.Data.Entities.RefreshToken", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedByIp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ReplacedByToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("RevokedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RevokedByIp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Token")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RefreshTokens");
+                });
+
             modelBuilder.Entity("JobLinkHub.Data.Entities.SavedJob", b =>
                 {
                     b.Property<long>("Id")
@@ -706,6 +749,17 @@ namespace JobLinkHub.Data.Migrations
                     b.Navigation("Skill");
                 });
 
+            modelBuilder.Entity("JobLinkHub.Data.Entities.RefreshToken", b =>
+                {
+                    b.HasOne("JobLinkHub.Data.Entities.User", "User")
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("JobLinkHub.Data.Entities.SavedJob", b =>
                 {
                     b.HasOne("JobLinkHub.Data.Entities.JobSeekerProfile", "JobSeekerProfile")
@@ -829,6 +883,8 @@ namespace JobLinkHub.Data.Migrations
                     b.Navigation("JobSeekerProfile");
 
                     b.Navigation("Notifications");
+
+                    b.Navigation("RefreshTokens");
                 });
 #pragma warning restore 612, 618
         }

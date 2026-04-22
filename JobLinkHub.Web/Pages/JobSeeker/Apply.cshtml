@@ -1,0 +1,75 @@
+﻿@page
+@model JobLinkHub.Web.Pages.JobSeeker.ApplyModel
+@{
+    ViewData["Title"] = "Apply";
+    Layout = "_Layout";
+}
+
+<div style="background:#F8FAFC; min-height:100vh; padding:2rem 1rem;">
+    <div style="max-width:600px; margin:0 auto;">
+
+        <a href="javascript:history.back()"
+               style="font-size:0.875rem; color:#64748B; text-decoration:none; display:inline-block; margin-bottom:1.5rem;">
+            ← Back
+        </a>
+
+        @if (Model.NotFound != null)
+        {
+            <p style="color:#EF4444;">@Model.NotFound</p>
+        }
+        else if (Model.Success)
+        {
+            <div style="background:white; border:1px solid #E2E8F0; border-radius:12px; padding:3rem; text-align:center;">
+                <div style="font-size:3rem; margin-bottom:1rem;">✅</div>
+                <h2 style="font-size:1.2rem; font-weight:700; color:#0F172A; margin:0 0 .5rem;">Application Submitted!</h2>
+                <p style="font-size:0.875rem; color:#64748B; margin:0 0 1.5rem;">
+                    Your application for <strong>@Model.JobTitle</strong> has been sent.
+                </p>
+                <a href="/JobSeeker/MyApplications"
+                       style="background:#2563EB; color:white; padding:.6rem 1.5rem; border-radius:8px; font-size:0.875rem; font-weight:500; text-decoration:none;">
+                    View My Applications
+                </a>
+            </div>
+        }
+        else
+        {
+            <div style="background:white; border:1px solid #E2E8F0; border-radius:12px; padding:1.75rem;">
+                <h1 style="font-size:1.1rem; font-weight:700; color:#0F172A; margin:0 0 .25rem;">
+                    Apply for @Model.JobTitle
+                </h1>
+                <p style="font-size:0.8rem; color:#64748B; margin:0 0 1.5rem;">@Model.CompanyName</p>
+
+                @if (Model.Message != null)
+                {
+                    <div style="padding:.75rem 1rem; border-radius:8px; margin-bottom:1rem; font-size:0.875rem; background:#FEE2E2; color:#991B1B;">
+                        @Model.Message
+                    </div>
+                }
+
+                <!-- Applicant preview -->
+                <div style="background:#F8FAFC; border-radius:8px; padding:1rem; margin-bottom:1.25rem;">
+                    <p style="font-size:0.75rem; color:#64748B; text-transform:uppercase; letter-spacing:.05em; margin:0 0 .4rem;">Applying as</p>
+                    <p style="font-size:0.875rem; font-weight:500; color:#0F172A; margin:0;">@Model.ApplicantName</p>
+                    <p style="font-size:0.8rem; color:#64748B; margin:.1rem 0 0;">@Model.ApplicantEmail</p>
+                </div>
+
+                <form method="post">
+                    <input type="hidden" asp-for="OpportunityId" />
+                    <div style="margin-bottom:1.25rem;">
+                        <label style="display:block; font-size:0.8rem; color:#475569; margin-bottom:.35rem;">
+                            Cover Note <span style="color:#94A3B8;">(optional)</span>
+                        </label>
+                        <textarea asp-for="CoverNote" rows="5"
+                                  style="width:100%; border:1px solid #E2E8F0; border-radius:8px; padding:.5rem .75rem; font-size:0.875rem; outline:none; box-sizing:border-box; resize:vertical;"
+                                  placeholder="Tell the employer why you're a great fit..."></textarea>
+                    </div>
+                    <button type="submit"
+                            style="width:100%; background:#2563EB; color:white; padding:.75rem; border:none; border-radius:8px; font-size:0.95rem; font-weight:600; cursor:pointer;">
+                        Submit Application
+                    </button>
+                </form>
+            </div>
+        }
+
+    </div>
+</div>

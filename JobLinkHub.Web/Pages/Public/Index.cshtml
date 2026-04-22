@@ -1,0 +1,103 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home";
+}
+
+<section class="hero-section">
+    <div class="container hero-wrapper">
+        <div class="hero-text">
+            <span class="hero-badge">Skill-first careers</span>
+            <h1>Your skills deserve more than a CV</h1>
+            <p>
+                Build a profile that shows what you can do, validate your abilities with real
+                evidence, and connect to opportunities that match your potential.
+            </p>
+
+            <div class="hero-actions">
+               <a asp-page="/Auth/ChooseRole" class="btn btn-primary-custom">Get Started</a>
+                <a asp-page="/Public/Opportunities" class="btn btn-outline-custom">Explore Opportunities</a>
+            </div>
+
+            <div class="hero-highlights">
+                <span class="highlight-chip">Skill-first profiles</span>
+                <span class="highlight-chip">Evidence-backed applications</span>
+                <span class="highlight-chip">Smart matching</span>
+            </div>
+        </div>
+
+        <div class="hero-visual">
+            <div class="dashboard-card main-card">
+                <div class="main-card-header">
+                    <h3>Career Snapshot</h3>
+                    <span class="status-pill">Ready to apply</span>
+                </div>
+
+                <div class="metric-row">
+                    <div>
+                        <p class="metric-label">Profile Strength</p>
+                        <h4>85%</h4>
+                    </div>
+                    <div>
+                        <p class="metric-label">Match Score</p>
+                        <h4>92%</h4>
+                    </div>
+                </div>
+
+                <div class="skill-tags">
+                    <span>UI/UX Design</span>
+                    <span>Frontend</span>
+                    <span>Portfolio</span>
+                    <span>Figma</span>
+                </div>
+            </div>
+
+            <div class="floating-card top-card">
+                <p class="small-label">Featured Opportunity</p>
+                <h4>UI/UX Internship</h4>
+                <p>Kigali • Remote Friendly</p>
+                <span class="match-pill">92% Match</span>
+            </div>
+
+            <div class="floating-card bottom-left-card">
+                <p class="small-label">Skill Evidence</p>
+                <ul>
+                    <li>Portfolio uploaded</li>
+                    <li>Certificate added</li>
+                    <li>GitHub linked</li>
+                </ul>
+            </div>
+
+            <div class="floating-card bottom-right-card">
+                <p class="small-label">This Week</p>
+                <h4>24 New Opportunities</h4>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="features-section">
+    <div class="container">
+        <div class="section-header">
+            <h2>Why JobLink Hub?</h2>
+            <p>Built to help early-career talent stand out through skills, potential, and career readiness.</p>
+        </div>
+
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h3>Build a Skill-First Profile</h3>
+                <p>Create a profile that highlights what you can do, not just what is written on your CV.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>Discover Relevant Opportunities</h3>
+                <p>Explore jobs, internships, gigs, mentorships, and training opportunities in one place.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>Prove Your Readiness</h3>
+                <p>Upload certificates, portfolio links, and project evidence to strengthen your visibility.</p>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,88 @@
+﻿@page
+@model JobLinkHub.Web.Pages.LoginModel
+@{
+    ViewData["Title"] = "Login";
+}
+
+<section class="login-page">
+    <div class="container login-wrapper">
+        <div class="login-showcase">
+            <span class="login-eyebrow">Welcome back</span>
+            <h1>Continue where opportunity meets potential.</h1>
+            <p>
+                Sign in to manage your profile, track opportunities, review applicants,
+                and keep building meaningful career connections on JobLink Hub.
+            </p>
+
+            <div class="login-showcase-points">
+                <div class="showcase-point">
+                    <div class="point-icon">✓</div>
+                    <div>
+                        <h3>Track progress clearly</h3>
+                        <p>Stay on top of applications, matches, and opportunity updates.</p>
+                    </div>
+                </div>
+
+                <div class="showcase-point">
+                    <div class="point-icon">✓</div>
+                    <div>
+                        <h3>Access role-based tools</h3>
+                        <p>Employers and job seekers get focused experiences built for their goals.</p>
+                    </div>
+                </div>
+
+                <div class="showcase-point">
+                    <div class="point-icon">✓</div>
+                    <div>
+                        <h3>Keep everything in one place</h3>
+                        <p>Profiles, opportunities, applications, and reviews all live in one hub.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="login-card-shell">
+            <div class="login-card">
+                <div class="login-card-top">
+                    <h2>Log in</h2>
+                    <p>Enter your details to access your JobLink Hub account.</p>
+                </div>
+
+                <form class="login-form">
+                    <div class="form-group">
+                        <label for="email">Email address</label>
+                        <input id="email" type="email" placeholder="example@example.com" />
+                    </div>
+
+                    <div class="form-group">
+                        <div class="password-label-row">
+                            <label for="password">Password</label>
+                            <a asp-page="/Auth/ForgotPassword" class="forgot-link">Forgot password?</a>
+                        </div>
+                        <input id="password" type="password" placeholder="Enter your password" />
+                    </div>
+
+                    <div class="form-options">
+                        <label class="remember-me">
+                            <input type="checkbox" />
+                            <span>Remember me</span>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="login-submit-btn">Sign In</button>
+                </form>
+
+                <div class="login-divider">
+                    <span>or</span>
+                </div>
+
+                <button class="google-login-btn" type="button">Continue with Google</button>
+
+                <div class="login-bottom-text">
+                    <span>Don’t have an account?</span>
+                    <a asp-page="/Auth/ChooseRole">Create one</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

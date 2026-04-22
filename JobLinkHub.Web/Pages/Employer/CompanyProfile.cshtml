@@ -1,0 +1,112 @@
+@page
+@model JobLinkHub.Web.Pages.CompanyProfileModel
+@{
+    ViewData["Title"] = "Company Profile";
+}
+
+<section class="company-profile-page">
+    <div class="container company-profile-wrapper">
+
+        <div class="company-profile-hero">
+            <div>
+                <span class="company-profile-eyebrow">Employer profile</span>
+                <h1>Company profile</h1>
+                <p>
+                    Manage your company information so applicants can better understand your organization and opportunities.
+                </p>
+            </div>
+        </div>
+
+        <div class="company-profile-grid">
+
+            <div class="company-profile-main">
+                <div class="company-profile-card">
+                    <div class="company-card-header">
+                        <div class="company-avatar">@Model.CompanyInitials</div>
+                        <div>
+                            <h2>@Model.CompanyName</h2>
+                            <p>@Model.Industry</p>
+                        </div>
+                    </div>
+
+                    <form class="company-profile-form">
+                        <div class="company-form-grid">
+                            <div class="form-group">
+                                <label for="companyName">Company Name</label>
+                                <input id="companyName" type="text" value="@Model.CompanyName" />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="companyType">Company Type</label>
+                                <input id="companyType" type="text" value="@Model.CompanyType" />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="industry">Industry</label>
+                                <input id="industry" type="text" value="@Model.Industry" />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="location">Location</label>
+                                <input id="location" type="text" value="@Model.Location" />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="website">Website</label>
+                                <input id="website" type="text" value="@Model.Website" />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="email">Contact Email</label>
+                                <input id="email" type="email" value="@Model.ContactEmail" />
+                            </div>
+                        </div>
+
+                        <div class="form-group full-width-group">
+                            <label for="description">Company Description</label>
+                            <textarea id="description" rows="6">@Model.CompanyDescription</textarea>
+                        </div>
+
+                        <div class="company-profile-actions">
+                            <button type="submit" class="company-save-btn">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="company-profile-sidebar">
+                <div class="company-profile-card sidebar-card">
+                    <h3>Profile Preview</h3>
+
+                    <div class="company-preview-block">
+                        <h4>@Model.CompanyName</h4>
+                        <p>@Model.CompanyType • @Model.Industry</p>
+                        <span>@Model.Location</span>
+                    </div>
+
+                    <div class="company-preview-details">
+                        <div>
+                            <span>Website</span>
+                            <strong>@Model.Website</strong>
+                        </div>
+                        <div>
+                            <span>Contact</span>
+                            <strong>@Model.ContactEmail</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="company-profile-card sidebar-card">
+                    <h3>Tips</h3>
+                    <div class="company-tips-list">
+                        <div class="company-tip-item">Keep your company description clear and concise.</div>
+                        <div class="company-tip-item">Use a professional email and website.</div>
+                        <div class="company-tip-item">Make sure your location and industry are accurate.</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</section>

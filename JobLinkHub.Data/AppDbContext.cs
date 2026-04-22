@@ -19,6 +19,7 @@ public class AppDbContext : IdentityDbContext<User, IdentityRole<long>, long>
     public DbSet<Application> Applications { get; set; }
     public DbSet<SavedJob> SavedJobs { get; set; }
     public DbSet<Notification> Notifications { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -60,6 +61,17 @@ public class AppDbContext : IdentityDbContext<User, IdentityRole<long>, long>
             .WithMany(o => o.SavedJobs)
             .HasForeignKey(s => s.OpportunityId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        // RefreshToken config
+        builder.Entity<RefreshToken>()
+            .HasOne(rt => rt.User)
+            .WithMany(u => u.RefreshTokens)
+            .HasForeignKey(rt => rt.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<RefreshToken>()
+            .HasIndex(rt => rt.Token)
+            .IsUnique();
 
         // Indexes
         builder.Entity<User>().HasIndex(u => u.Email).IsUnique();
