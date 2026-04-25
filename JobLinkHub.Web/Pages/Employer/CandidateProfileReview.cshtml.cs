@@ -1,16 +1,45 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+using JobLinkHub.Data;
+using JobLinkHub.Services.Interfaces;
+using JobLinkHub.Services.DTOs;
 
 namespace JobLinkHub.Web.Pages
 {
+    [Authorize(Roles = "EMPLOYER")]
     public class CandidateProfileReviewModel : PageModel
     {
-        public int? Id { get; set; }
+        private readonly IApplicationService _applications;
+        private readonly IUserProfileService _profiles;
+        private readonly IOpportunityService _opportunities;
+        private readonly AppDbContext _db;
+
+        public CandidateProfileReviewModel(
+            IApplicationService applications,
+            IUserProfileService profiles,
+            IOpportunityService opportunities,
+            AppDbContext db)
+        {
+            _applications = applications;
+            _profiles = profiles;
+            _opportunities = opportunities;
+            _db = db;
+        }
+
+        public long? Id { get; set; }
+        [BindProperty] public string? RejectionReason { get; set; }
 
         public string CandidateInitials { get; set; } = string.Empty;
         public string CandidateName { get; set; } = string.Empty;
         public string CandidateEmail { get; set; } = string.Empty;
         public string ApplicationStatus { get; set; } = string.Empty;
+        public long OpportunityId { get; set; }
+        public string? ResumeUrl { get; set; }
+        public string? ResumeFileName { get; set; }
+        public string? PortfolioUrl { get; set; }
+        public string? LinkedInUrl { get; set; }
 
         public string OpportunityTitle { get; set; } = string.Empty;
         public string OpportunityLocation { get; set; } = string.Empty;
@@ -19,62 +48,99 @@ namespace JobLinkHub.Web.Pages
 
         public string ProfileSummary { get; set; } = string.Empty;
         public string Education { get; set; } = string.Empty;
+        public string Institution { get; set; } = string.Empty;
         public string ExperienceLevel { get; set; } = string.Empty;
         public string CoverLetter { get; set; } = string.Empty;
+        public string? RejectionReasonDisplay { get; set; }
 
         public List<string> Skills { get; set; } = new();
         public List<EvidenceItem> SkillEvidence { get; set; } = new();
 
-        public void OnGet(int? id)
+        public async Task OnGetAsync(long? id)
         {
             Id = id;
+            if (id == null) return;
+            await LoadApplicationAsync(id.Value);
+        }
 
-            // Temporary mock data for UI development.
-            // Backend can later replace this using the passed application ID.
-            CandidateInitials = "EA";
-            CandidateName = "Emma A.";
-            CandidateEmail = "emma@example.com";
-            ApplicationStatus = "Pending Review";
+        public async Task<IActionResult> OnPostShortlistAsync(long id)
+        {
+            await _applications.UpdateStatusAsync(id, new UpdateApplicationStatusDto { Status = "SHORTLISTED" });
+            return RedirectToPage(new { id });
+        }
 
-            OpportunityTitle = "Frontend Developer Intern";
-            OpportunityLocation = "Kigali";
-            OpportunityType = "Internship";
-            ApplicationDate = "18 Apr 2026, 10:24 AM";
-
-            ProfileSummary = "Motivated early-career frontend developer with a strong interest in building responsive web interfaces and creating user-friendly digital experiences. Has completed personal and academic projects demonstrating practical ability in modern web development.";
-
-            Education = "Bachelor’s Degree in Software Engineering";
-            ExperienceLevel = "Entry Level / Internship";
-            CoverLetter = "I am excited to apply for the Frontend Developer Intern opportunity because it aligns with my passion for creating intuitive and accessible digital products. Through academic projects and hands-on practice, I have developed skills in frontend development and collaborative problem-solving. I am eager to contribute, learn from your team, and continue growing in a professional environment.";
-
-            Skills = new List<string>
+        public async Task<IActionResult> OnPostRejectAsync(long id)
+        {
+            await _applications.UpdateStatusAsync(id, new UpdateApplicationStatusDto
             {
-                "HTML",
-                "CSS",
-                "JavaScript",
-                "Responsive Design",
-                "Git",
-                "Frontend Development"
-            };
+                Status = "REJECTED",
+                RejectionReason = RejectionReason
+            });
+            return RedirectToPage(new { id });
+        }
 
-            SkillEvidence = new List<EvidenceItem>
+        public async Task<IActionResult> OnPostAcceptAsync(long id)
+        {
+            await _applications.UpdateStatusAsync(id, new UpdateApplicationStatusDto { Status = "ACCEPTED" });
+            return RedirectToPage(new { id });
+        }
+
+        private async Task LoadApplicationAsync(long id)
+        {
+            var application = await _applications.GetByIdAsync(id);
+            if (application == null) return;
+
+            CandidateName = application.CandidateName;
+            CandidateEmail = application.CandidateEmail;
+            CandidateInitials = GetInitials(application.CandidateName);
+            ApplicationStatus = application.Status;
+            OpportunityTitle = application.OpportunityTitle;
+            OpportunityId = application.OpportunityId;
+            CoverLetter = application.CoverLetter ?? string.Empty;
+            RejectionReasonDisplay = application.RejectionReason;
+            ApplicationDate = application.ApplicationDate.ToString("dd MMM yyyy, hh:mm tt");
+
+            var opportunity = await _opportunities.GetByIdAsync(application.OpportunityId);
+            if (opportunity != null)
             {
-                new EvidenceItem
-                {
-                    Title = "Portfolio Project",
-                    Description = "Responsive personal portfolio showcasing design and frontend projects."
-                },
-                new EvidenceItem
-                {
-                    Title = "Certificate",
-                    Description = "Frontend Web Development certificate from an online learning platform."
-                },
-                new EvidenceItem
-                {
-                    Title = "GitHub Repository",
-                    Description = "Source code for personal and academic frontend projects."
-                }
-            };
+                OpportunityLocation = opportunity.Location ?? string.Empty;
+                OpportunityType = opportunity.OpportunityType;
+            }
+
+            var candidate = await _profiles.GetCandidateByIdAsync(application.JobSeekerProfileId);
+            if (candidate != null)
+            {
+                ProfileSummary = candidate.Bio ?? string.Empty;
+                Education = candidate.EducationLevel ?? string.Empty;
+                Institution = candidate.Institution ?? string.Empty;
+                ExperienceLevel = candidate.CareerInterest ?? string.Empty;
+                ResumeUrl = candidate.ResumeUrl;
+                ResumeFileName = candidate.ResumeUrl != null ? Path.GetFileName(candidate.ResumeUrl) : null;
+                PortfolioUrl = candidate.PortfolioUrl;
+                LinkedInUrl = candidate.LinkedInUrl;
+                Skills = candidate.Skills;
+
+                SkillEvidence = await _db.SkillEvidences
+                    .Include(se => se.JobSeekerSkill)
+                        .ThenInclude(jss => jss.Skill)
+                    .Where(se => se.JobSeekerSkill.JobSeekerProfileId == candidate.Id)
+                    .OrderByDescending(se => se.Id)
+                    .Select(se => new EvidenceItem
+                    {
+                        Title = se.JobSeekerSkill.Skill.Name + " â€” " + se.EvidenceType,
+                        Description = se.Description ?? string.Empty
+                    })
+                    .ToListAsync();
+            }
+        }
+
+        private static string GetInitials(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name)) return "?";
+            var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            return parts.Length >= 2
+                ? $"{parts[0][0]}{parts[^1][0]}".ToUpper()
+                : parts[0][0].ToString().ToUpper();
         }
 
         public class EvidenceItem

@@ -20,6 +20,12 @@ public class ApplicationService : IApplicationService
         return applications.Select(MapToDto);
     }
 
+    public async Task<IEnumerable<ApplicationDto>> GetByEmployerAsync(long employerProfileId)
+    {
+        var applications = await _repo.GetByEmployerAsync(employerProfileId);
+        return applications.Select(MapToDto);
+    }
+
     public async Task<IEnumerable<ApplicationDto>> GetByJobSeekerAsync(long jobSeekerProfileId)
     {
         var applications = await _repo.GetByJobSeekerAsync(jobSeekerProfileId);

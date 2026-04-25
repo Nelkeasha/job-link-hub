@@ -1,0 +1,90 @@
+@page
+@model JobLinkHub.Web.Pages.Employer.EditOpportunityModel
+@{
+    ViewData["Title"] = "Edit Opportunity";
+    Layout = "_DashboardLayout";
+    ViewData["DashboardRole"] = "Employer";
+    ViewData["ActivePage"] = "MyListings";
+}
+
+<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem;">
+    <div>
+        <p class="dash-header-label">MY LISTINGS</p>
+        <h1 class="dash-greeting">Edit Opportunity</h1>
+        <p class="dash-greeting-sub">Update the details of your job posting.</p>
+    </div>
+    <a href="/Employer/ManageOpportunities" class="dash-cancel-btn">
+        <i class="fa-solid fa-arrow-left"></i> Back to Listings
+    </a>
+</div>
+
+@if (Model.NotFound)
+{
+    <div class="alert alert-danger">Opportunity not found.</div>
+}
+else
+{
+    @if (Model.Message != null)
+    {
+        <div class="alert alert-danger" style="margin-bottom:1rem;">@Model.Message</div>
+    }
+
+    <div class="dash-form-card">
+        <form method="post">
+            @Html.AntiForgeryToken()
+            <div class="dash-form-grid">
+                <div class="form-field">
+                    <label>Job Title *</label>
+                    <input asp-for="Title" type="text" placeholder="e.g. Frontend Developer" required />
+                    <span asp-validation-for="Title" style="color:#ef4444;font-size:0.8rem;margin-top:0.25rem;display:block;"></span>
+                </div>
+                <div class="form-field">
+                    <label>Opportunity Type *</label>
+                    <select asp-for="OpportunityType">
+                        <option value="Job">Job</option>
+                        <option value="Internship">Internship</option>
+                        <option value="Freelance">Freelance</option>
+                        <option value="Mentorship">Mentorship</option>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label>Location</label>
+                    <input asp-for="Location" type="text" placeholder="e.g. Kigali, Rwanda" />
+                </div>
+                <div class="form-field">
+                    <label>Application Deadline</label>
+                    <input asp-for="Deadline" type="date" min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                    <span asp-validation-for="Deadline" style="color:#ef4444;font-size:0.8rem;margin-top:0.25rem;display:block;"></span>
+                </div>
+                <div class="form-field">
+                    <label>Qualification Required</label>
+                    <input asp-for="QualificationRequired" type="text" placeholder="e.g. Bachelor's degree" />
+                </div>
+                <div class="form-field">
+                    <label>Status</label>
+                    <select asp-for="Status">
+                        <option value="Active">Active</option>
+                        <option value="Draft">Draft</option>
+                        <option value="Closed">Closed</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-field">
+                <label>Description *</label>
+                <textarea asp-for="Description" rows="6" placeholder="Describe the role, responsibilities, and what you're looking for..." required></textarea>
+                <span asp-validation-for="Description" style="color:#ef4444;font-size:0.8rem;margin-top:0.25rem;display:block;"></span>
+            </div>
+            <div class="dash-form-actions">
+                <a href="/Employer/ManageOpportunities" class="dash-cancel-btn">Cancel</a>
+                <button type="submit" class="dash-submit-btn">
+                    <i class="fa-solid fa-floppy-disk"></i> Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+}
+
+@section Scripts {
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

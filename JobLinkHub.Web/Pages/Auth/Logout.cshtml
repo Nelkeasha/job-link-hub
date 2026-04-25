@@ -1,0 +1,26 @@
+@page
+@model JobLinkHub.Web.Pages.Auth.LogoutModel
+@{
+    ViewData["Title"] = "Signed Out";
+    Layout = "_AuthLayout";
+}
+
+<section class="auth-page">
+    <div class="auth-container">
+        <div style="display:flex;justify-content:center;padding:4rem 0;">
+            <div class="auth-card" style="max-width:480px;text-align:center;">
+                <div style="width:64px;height:64px;background:var(--color-accent-light);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.2rem;font-size:1.5rem;color:var(--color-accent);">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <h2 class="auth-card-title">You've been signed out</h2>
+                <p class="auth-card-subtitle">Thanks for using JobLink Hub. Come back anytime.</p>
+                <div style="display:flex;flex-direction:column;gap:0.8rem;margin-top:1.5rem;">
+                    <a href="/Auth/Login" class="form-submit-btn" style="display:flex;align-items:center;justify-content:center;gap:0.5rem;text-decoration:none;">
+                        <i class="fa-solid fa-right-to-bracket"></i> Sign In Again
+                    </a>
+                    <a href="/" style="color:var(--color-text-light);font-size:0.88rem;">Return to Home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

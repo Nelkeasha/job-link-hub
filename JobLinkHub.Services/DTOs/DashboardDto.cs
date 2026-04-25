@@ -11,6 +11,7 @@ public class AdminDashboardDto
     public int PendingApplications { get; set; }
     public int AcceptedApplications { get; set; }
     public int RejectedApplications { get; set; }
+    public int NewUsersThisMonth { get; set; }
     public List<MonthlyStatDto> ApplicationsPerMonth { get; set; } = new();
     public List<MonthlyStatDto> OpportunitiesPerMonth { get; set; } = new();
     public List<TypeStatDto> OpportunitiesByType { get; set; } = new();
@@ -20,6 +21,7 @@ public class CandidateDashboardDto
 {
     public int TotalApplications { get; set; }
     public int PendingApplications { get; set; }
+    public int ShortlistedApplications { get; set; }
     public int AcceptedApplications { get; set; }
     public int RejectedApplications { get; set; }
     public int SavedJobs { get; set; }
@@ -32,6 +34,7 @@ public class EmployerDashboardDto
     public int ActiveOpportunities { get; set; }
     public int TotalApplications { get; set; }
     public int PendingApplications { get; set; }
+    public int ShortlistedApplications { get; set; }
     public int TotalViews { get; set; }
     public List<OpportunityDto> RecentOpportunities { get; set; } = new();
     public List<ApplicationDto> RecentApplications { get; set; } = new();

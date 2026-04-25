@@ -1,80 +1,71 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Collections.Generic;
+using JobLinkHub.Services.Interfaces;
+using JobLinkHub.Services.DTOs;
 
-namespace JobLinkHub.Web.Pages
+namespace JobLinkHub.Web.Pages.Employer
 {
+    [Authorize(Roles = "EMPLOYER")]
     public class ViewApplicantsModel : PageModel
     {
+        private readonly IApplicationService _appService;
+        private readonly IUserProfileService _profiles;
+        private readonly IOpportunityService _opportunities;
+
+        public ViewApplicantsModel(
+            IApplicationService appService,
+            IUserProfileService profiles,
+            IOpportunityService opportunities)
+        {
+            _appService = appService;
+            _profiles = profiles;
+            _opportunities = opportunities;
+        }
+
+        [BindProperty(SupportsGet = true)] public long? OpportunityId { get; set; }
+        [BindProperty(SupportsGet = true)] public string? FilterStatus { get; set; }
+
         public int TotalApplicationsCount { get; set; }
         public int PendingReviewCount { get; set; }
         public int ShortlistedCount { get; set; }
         public int RejectedCount { get; set; }
+        public List<ApplicationDto> Applications { get; set; } = new();
+        public List<OpportunityDto> EmployerOpportunities { get; set; } = new();
 
-        public List<ApplicationRow> Applications { get; set; } = new();
-
-        public void OnGet()
+        public async Task OnGetAsync()
         {
-            // Temporary mock data for frontend development.
-            // Backend can later replace this with real service/database data.
-            TotalApplicationsCount = 124;
-            PendingReviewCount = 11;
-            ShortlistedCount = 19;
-            RejectedCount = 7;
+            var userIdStr = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (!long.TryParse(userIdStr, out var userId)) return;
 
-            Applications = new List<ApplicationRow>
-            {
-                new ApplicationRow
-                {
-                    ApplicationId = 1,
-                    FullName = "Emma A.",
-                    Email = "emma@example.com",
-                    OpportunityTitle = "Frontend Developer Intern",
-                    SubmittedAt = "18 Apr 2026, 10:24 AM",
-                    Status = "Pending Review",
-                    SkillHighlight = "HTML, CSS, JavaScript"
-                },
-                new ApplicationRow
-                {
-                    ApplicationId = 2,
-                    FullName = "Mitchelle K.",
-                    Email = "mitchelle@example.com",
-                    OpportunityTitle = "UI/UX Design Trainee",
-                    SubmittedAt = "18 Apr 2026, 08:10 AM",
-                    Status = "Shortlisted",
-                    SkillHighlight = "Figma, User Research"
-                },
-                new ApplicationRow
-                {
-                    ApplicationId = 3,
-                    FullName = "James O.",
-                    Email = "james@example.com",
-                    OpportunityTitle = "Backend Developer",
-                    SubmittedAt = "17 Apr 2026, 04:42 PM",
-                    Status = "Pending Review",
-                    SkillHighlight = "C#, .NET, SQL"
-                },
-                new ApplicationRow
-                {
-                    ApplicationId = 4,
-                    FullName = "Linda T.",
-                    Email = "linda@example.com",
-                    OpportunityTitle = "Data Analyst Intern",
-                    SubmittedAt = "17 Apr 2026, 11:18 AM",
-                    Status = "Rejected",
-                    SkillHighlight = "Excel, Power BI"
-                }
-            };
+            var profile = await _profiles.GetEmployerByUserIdAsync(userId);
+            if (profile == null) return;
+
+            // Load employer's opportunities for the filter dropdown
+            EmployerOpportunities = (await _opportunities.GetByEmployerAsync(profile.Id)).ToList();
+
+            // Load applications: by specific opportunity or all for this employer
+            List<ApplicationDto> all;
+            if (OpportunityId.HasValue)
+                all = (await _appService.GetByOpportunityAsync(OpportunityId.Value)).ToList();
+            else
+                all = (await _appService.GetByEmployerAsync(profile.Id)).ToList();
+
+            TotalApplicationsCount = all.Count;
+            PendingReviewCount  = all.Count(a => a.Status.Equals("PENDING",      StringComparison.OrdinalIgnoreCase));
+            ShortlistedCount    = all.Count(a => a.Status.Equals("SHORTLISTED",  StringComparison.OrdinalIgnoreCase));
+            RejectedCount       = all.Count(a => a.Status.Equals("REJECTED",     StringComparison.OrdinalIgnoreCase));
+
+            Applications = (string.IsNullOrWhiteSpace(FilterStatus)
+                ? all
+                : all.Where(a => a.Status.Equals(FilterStatus, StringComparison.OrdinalIgnoreCase)))
+                .ToList();
         }
 
-        public class ApplicationRow
+        public async Task<IActionResult> OnPostUpdateStatusAsync(long appId, string status)
         {
-            public int ApplicationId { get; set; }
-            public string FullName { get; set; } = string.Empty;
-            public string Email { get; set; } = string.Empty;
-            public string OpportunityTitle { get; set; } = string.Empty;
-            public string SubmittedAt { get; set; } = string.Empty;
-            public string Status { get; set; } = string.Empty;
-            public string SkillHighlight { get; set; } = string.Empty;
+            await _appService.UpdateStatusAsync(appId, new UpdateApplicationStatusDto { Status = status });
+            return RedirectToPage(new { OpportunityId, FilterStatus });
         }
     }
 }

@@ -1,67 +1,38 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Authorization;
-using System.Data.Common;
-using Microsoft.EntityFrameworkCore;
-using JobLinkHub.Data;
+using JobLinkHub.Services.Interfaces;
+using JobLinkHub.Services.DTOs;
 
 namespace JobLinkHub.Web.Pages.Admin
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "ADMIN")]
     public class ManageUsersModel : PageModel
     {
-        private readonly AppDbContext _db;
-        public ManageUsersModel(AppDbContext db) { _db = db; }
+        private readonly IAdminService _admin;
+        public ManageUsersModel(IAdminService admin) { _admin = admin; }
 
         [BindProperty(SupportsGet = true)] public string? SearchQ { get; set; }
         [BindProperty(SupportsGet = true)] public string? FilterRole { get; set; }
 
-        public List<UserItem> Users { get; set; } = new();
+        public List<UserListDto> Users { get; set; } = new();
+        public string? Message { get; set; }
 
-        public class UserItem
+        public async Task OnGetAsync()
         {
-            public string Id { get; set; } = "";
-            public string FullName { get; set; } = "";
-            public string Email { get; set; } = "";
-            public string Role { get; set; } = "";
-            public DateTime? CreatedAt { get; set; }
-            public bool IsActive { get; set; }
+            Users = (await _admin.GetAllUsersAsync(FilterRole, SearchQ)).ToList();
         }
 
-        public void OnGet()
+        public async Task<IActionResult> OnPostToggleStatusAsync(long userId, bool isActive)
         {
-            using var conn = _db.Database.GetDbConnection();
-            conn.Open();
+            await _admin.SetUserActiveStatusAsync(userId, !isActive);
+            return RedirectToPage(new { SearchQ, FilterRole });
+        }
 
-            var query = @"
-                SELECT u.Id, u.FirstName, u.LastName, u.Email, r.Name AS Role, u.CreatedAt, u.IsActive
-                FROM AspNetUsers u
-                LEFT JOIN AspNetUserRoles ur ON u.Id = ur.UserId
-                LEFT JOIN AspNetRoles r ON ur.RoleId = r.Id
-                WHERE (@Search IS NULL OR u.Email LIKE '%'+@Search+'%'
-                                       OR u.FirstName LIKE '%'+@Search+'%'
-                                       OR u.LastName LIKE '%'+@Search+'%')
-                AND (@Role IS NULL OR r.Name = @Role)
-                ORDER BY u.CreatedAt DESC";
-
-            using var cmd = conn.CreateCommand();
-            cmd.CommandText = query;
-            var pSearch = cmd.CreateParameter(); pSearch.ParameterName = "@Search"; pSearch.Value = string.IsNullOrEmpty(SearchQ) ? (object)DBNull.Value : SearchQ; cmd.Parameters.Add(pSearch);
-            var pRole = cmd.CreateParameter(); pRole.ParameterName = "@Role"; pRole.Value = string.IsNullOrEmpty(FilterRole) ? (object)DBNull.Value : FilterRole; cmd.Parameters.Add(pRole);
-
-            using var reader = cmd.ExecuteReader();
-            while (reader.Read())
-            {
-                Users.Add(new UserItem
-                {
-                    Id = reader["Id"].ToString()!,
-                    FullName = $"{reader["FirstName"]} {reader["LastName"]}".Trim(),
-                    Email = reader["Email"].ToString()!,
-                    Role = reader["Role"]?.ToString() ?? "—",
-                    CreatedAt = reader["CreatedAt"] == DBNull.Value ? null : (DateTime?)reader["CreatedAt"],
-                    IsActive = reader["IsActive"] != DBNull.Value && Convert.ToBoolean(reader["IsActive"])
-                });
-            }
+        public async Task<IActionResult> OnPostDeleteAsync(long userId)
+        {
+            await _admin.DeleteUserAsync(userId);
+            return RedirectToPage(new { SearchQ, FilterRole });
         }
     }
 }

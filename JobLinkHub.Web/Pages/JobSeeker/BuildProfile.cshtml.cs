@@ -1,90 +1,104 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Authorization;
-using System.Data.Common;
-using Microsoft.EntityFrameworkCore;
-using JobLinkHub.Data;
+using JobLinkHub.Services.Interfaces;
+using JobLinkHub.Services.DTOs;
+using System.ComponentModel.DataAnnotations;
 
 namespace JobLinkHub.Web.Pages.JobSeeker
 {
-    [Authorize(Roles = "JobSeeker")]
+    [Authorize(Roles = "CANDIDATE")]
     public class BuildProfileModel : PageModel
     {
-        private readonly AppDbContext _db;
-        public BuildProfileModel(AppDbContext db) { _db = db; }
+        private readonly IUserProfileService _profiles;
+        private readonly ISkillService _skills;
+        private readonly IWebHostEnvironment _env;
 
-        [BindProperty] public string? FirstName { get; set; }
-        [BindProperty] public string? LastName { get; set; }
-        [BindProperty] public string? Bio { get; set; }
+        public BuildProfileModel(IUserProfileService profiles, ISkillService skills, IWebHostEnvironment env)
+        {
+            _profiles = profiles;
+            _skills = skills;
+            _env = env;
+        }
+
+        [BindProperty, Required(ErrorMessage = "First name is required"), StringLength(50)]
+        public string FirstName { get; set; } = "";
+
+        [BindProperty, Required(ErrorMessage = "Last name is required"), StringLength(50)]
+        public string LastName { get; set; } = "";
+
+        [BindProperty, StringLength(1000, ErrorMessage = "Bio cannot exceed 1000 characters")]
+        public string? Bio { get; set; }
+
         [BindProperty] public string? Location { get; set; }
-        [BindProperty] public string? Phone { get; set; }
+        [BindProperty] public string? PhoneNumber { get; set; }
         [BindProperty] public string? LinkedInUrl { get; set; }
         [BindProperty] public string? PortfolioUrl { get; set; }
+        [BindProperty] public string? CareerInterest { get; set; }
+        [BindProperty] public string? EducationLevel { get; set; }
+        [BindProperty] public string? Institution { get; set; }
 
+        [BindProperty, Range(1950, 2030, ErrorMessage = "Please enter a valid graduation year (1950-2030)")]
+        public int? GraduationYear { get; set; }
+        [BindProperty] public List<long> SelectedSkillIds { get; set; } = new();
+        [BindProperty] public IFormFile? ResumeFile { get; set; }
+
+        public string? ExistingResumeUrl { get; set; }
+        public string? ExistingResumeFileName { get; set; }
+        public List<SkillCategoryDto> SkillsByCategory { get; set; } = new();
+        public List<string> CurrentSkills { get; set; } = new();
         public string? Message { get; set; }
         public bool Success { get; set; }
 
-        public void OnGet()
+        public async Task OnGetAsync()
         {
-            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            using var conn = _db.Database.GetDbConnection();
-            conn.Open();
-
-            using var cmd = conn.CreateCommand();
-            cmd.CommandText = @"
-                SELECT u.FirstName, u.LastName, p.Bio, p.Location, p.Phone, p.LinkedInUrl, p.PortfolioUrl
-                FROM AspNetUsers u
-                LEFT JOIN JobSeekerProfiles p ON p.UserId = u.Id
-                WHERE u.Id = @UserId";
-            var p = cmd.CreateParameter(); p.ParameterName = "@UserId"; p.Value = userId ?? (object)DBNull.Value; cmd.Parameters.Add(p);
-
-            using var reader = cmd.ExecuteReader();
-            if (reader.Read())
-            {
-                FirstName = reader["FirstName"]?.ToString();
-                LastName = reader["LastName"]?.ToString();
-                Bio = reader["Bio"]?.ToString();
-                Location = reader["Location"]?.ToString();
-                Phone = reader["Phone"]?.ToString();
-                LinkedInUrl = reader["LinkedInUrl"]?.ToString();
-                PortfolioUrl = reader["PortfolioUrl"]?.ToString();
-            }
+            await LoadAsync();
         }
 
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPostAsync()
         {
-            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (!ModelState.IsValid)
+            {
+                await LoadAsync();
+                return Page();
+            }
+
+            var userIdStr = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (!long.TryParse(userIdStr, out var userId)) return Page();
+
             try
             {
-                using var conn = _db.Database.GetDbConnection();
-                conn.Open();
+                var currentProfile = await _profiles.GetCandidateByUserIdAsync(userId);
+                var resumeUrl = currentProfile?.ResumeUrl;
 
-                // Update user name
-                using var cmd1 = conn.CreateCommand();
-                cmd1.CommandText = "UPDATE AspNetUsers SET FirstName=@First, LastName=@Last WHERE Id=@UserId";
-                var pp1 = cmd1.CreateParameter(); pp1.ParameterName = "@First"; pp1.Value = FirstName ?? ""; cmd1.Parameters.Add(pp1);
-                var pp2 = cmd1.CreateParameter(); pp2.ParameterName = "@Last"; pp2.Value = LastName ?? ""; cmd1.Parameters.Add(pp2);
-                var pp3 = cmd1.CreateParameter(); pp3.ParameterName = "@UserId"; pp3.Value = userId ?? (object)DBNull.Value; cmd1.Parameters.Add(pp3);
-                cmd1.ExecuteNonQuery();
+                if (ResumeFile != null && ResumeFile.Length > 0)
+                {
+                    var uploadedUrl = await SaveResumeAsync(ResumeFile, userId);
+                    if (uploadedUrl == null)
+                    {
+                        Message = "Invalid file. Please upload a PDF, DOC, or DOCX file (max 5 MB).";
+                        await LoadAsync();
+                        return Page();
+                    }
+                    resumeUrl = uploadedUrl;
+                }
 
-                // Upsert profile
-                using var cmd2 = conn.CreateCommand();
-                cmd2.CommandText = @"
-                    IF EXISTS (SELECT 1 FROM JobSeekerProfiles WHERE UserId = @UserId)
-                        UPDATE JobSeekerProfiles
-                        SET Bio=@Bio, Location=@Location, Phone=@Phone,
-                            LinkedInUrl=@LinkedIn, PortfolioUrl=@Portfolio
-                        WHERE UserId=@UserId
-                    ELSE
-                        INSERT INTO JobSeekerProfiles (UserId, Bio, Location, Phone, LinkedInUrl, PortfolioUrl)
-                        VALUES (@UserId, @Bio, @Location, @Phone, @LinkedIn, @Portfolio)";
-                var q1 = cmd2.CreateParameter(); q1.ParameterName = "@UserId"; q1.Value = userId ?? (object)DBNull.Value; cmd2.Parameters.Add(q1);
-                var q2 = cmd2.CreateParameter(); q2.ParameterName = "@Bio"; q2.Value = Bio ?? ""; cmd2.Parameters.Add(q2);
-                var q3 = cmd2.CreateParameter(); q3.ParameterName = "@Location"; q3.Value = Location ?? ""; cmd2.Parameters.Add(q3);
-                var q4 = cmd2.CreateParameter(); q4.ParameterName = "@Phone"; q4.Value = Phone ?? ""; cmd2.Parameters.Add(q4);
-                var q5 = cmd2.CreateParameter(); q5.ParameterName = "@LinkedIn"; q5.Value = LinkedInUrl ?? ""; cmd2.Parameters.Add(q5);
-                var q6 = cmd2.CreateParameter(); q6.ParameterName = "@Portfolio"; q6.Value = PortfolioUrl ?? ""; cmd2.Parameters.Add(q6);
-                cmd2.ExecuteNonQuery();
+                await _profiles.UpdateCandidateAsync(userId, new UpdateCandidateProfileDto
+                {
+                    FirstName = FirstName,
+                    LastName = LastName,
+                    PhoneNumber = PhoneNumber,
+                    Bio = Bio,
+                    CareerInterest = CareerInterest,
+                    EducationLevel = EducationLevel,
+                    Institution = Institution,
+                    GraduationYear = GraduationYear,
+                    LinkedInUrl = LinkedInUrl,
+                    PortfolioUrl = PortfolioUrl,
+                    ResumeUrl = resumeUrl,
+                    Location = Location,
+                    SkillIds = SelectedSkillIds
+                });
 
                 Success = true;
                 Message = "Profile saved successfully!";
@@ -93,7 +107,57 @@ namespace JobLinkHub.Web.Pages.JobSeeker
             {
                 Message = "Error: " + ex.Message;
             }
+
+            await LoadAsync();
             return Page();
+        }
+
+        private async Task<string?> SaveResumeAsync(IFormFile file, long userId)
+        {
+            var allowed = new[] { ".pdf", ".doc", ".docx" };
+            var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+            if (!allowed.Contains(ext)) return null;
+            if (file.Length > 5 * 1024 * 1024) return null;
+
+            var uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "resumes");
+            Directory.CreateDirectory(uploadsFolder);
+
+            var fileName = $"{userId}_{Guid.NewGuid():N}{ext}";
+            var filePath = Path.Combine(uploadsFolder, fileName);
+
+            using var stream = new FileStream(filePath, FileMode.Create);
+            await file.CopyToAsync(stream);
+
+            return $"/uploads/resumes/{fileName}";
+        }
+
+        private async Task LoadAsync()
+        {
+            SkillsByCategory = (await _skills.GetGroupedByCategoryAsync()).ToList();
+
+            var userIdStr = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (!long.TryParse(userIdStr, out var userId)) return;
+
+            var profile = await _profiles.GetCandidateByUserIdAsync(userId);
+            if (profile == null) return;
+
+            FirstName = profile.FirstName;
+            LastName = profile.LastName;
+            PhoneNumber = profile.PhoneNumber;
+            Bio = profile.Bio;
+            Location = profile.Location;
+            CareerInterest = profile.CareerInterest;
+            EducationLevel = profile.EducationLevel;
+            Institution = profile.Institution;
+            GraduationYear = profile.GraduationYear;
+            LinkedInUrl = profile.LinkedInUrl;
+            PortfolioUrl = profile.PortfolioUrl;
+            ExistingResumeUrl = profile.ResumeUrl;
+            ExistingResumeFileName = profile.ResumeUrl != null
+                ? Path.GetFileName(profile.ResumeUrl)
+                : null;
+            CurrentSkills = profile.Skills;
+            SelectedSkillIds = profile.SkillIds;
         }
     }
 }

@@ -1,86 +1,61 @@
-﻿@page
-@model JobLinkHub.Web.Pages.LoginModel
+@page
+@model JobLinkHub.Web.Pages.Auth.LoginModel
 @{
     ViewData["Title"] = "Login";
+    Layout = "_AuthLayout";
 }
 
-<section class="login-page">
-    <div class="container login-wrapper">
-        <div class="login-showcase">
-            <span class="login-eyebrow">Welcome back</span>
-            <h1>Continue where opportunity meets potential.</h1>
-            <p>
-                Sign in to manage your profile, track opportunities, review applicants,
-                and keep building meaningful career connections on JobLink Hub.
-            </p>
-
-            <div class="login-showcase-points">
-                <div class="showcase-point">
-                    <div class="point-icon">✓</div>
-                    <div>
-                        <h3>Track progress clearly</h3>
-                        <p>Stay on top of applications, matches, and opportunity updates.</p>
-                    </div>
-                </div>
-
-                <div class="showcase-point">
-                    <div class="point-icon">✓</div>
-                    <div>
-                        <h3>Access role-based tools</h3>
-                        <p>Employers and job seekers get focused experiences built for their goals.</p>
-                    </div>
-                </div>
-
-                <div class="showcase-point">
-                    <div class="point-icon">✓</div>
-                    <div>
-                        <h3>Keep everything in one place</h3>
-                        <p>Profiles, opportunities, applications, and reviews all live in one hub.</p>
-                    </div>
-                </div>
+<section class="auth-page">
+    <div class="auth-container">
+        <div class="auth-grid">
+            <div class="auth-showcase">
+                <h1>Continue where <span style="color:var(--color-accent);">opportunity</span> meets potential.</h1>
+                <p>
+                    Sign in to manage your profile, track opportunities, review applicants,
+                    and keep building meaningful career connections on JobLink Hub.
+                </p>
             </div>
-        </div>
+            <div class="auth-card">
+                <h2 class="auth-card-title">Log in</h2>
+                <p class="auth-card-subtitle">Enter your details to access your account.</p>
 
-        <div class="login-card-shell">
-            <div class="login-card">
-                <div class="login-card-top">
-                    <h2>Log in</h2>
-                    <p>Enter your details to access your JobLink Hub account.</p>
-                </div>
-
-                <form class="login-form">
-                    <div class="form-group">
+                @if (TempData["SuccessMessage"] is string successMsg)
+                {
+                    <div class="alert alert-success" style="margin-bottom:1rem;">
+                        <i class="fa-solid fa-circle-check"></i> @successMsg
+                    </div>
+                }
+                <form method="post">
+                    @Html.AntiForgeryToken()
+                    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                    {
+                        <div class="alert alert-danger">@Model.ErrorMessage</div>
+                    }
+                    <div class="form-field">
                         <label for="email">Email address</label>
-                        <input id="email" type="email" placeholder="example@example.com" />
+                        <input id="email" name="Email" type="email" value="@Model.Email" placeholder="example@example.com" required />
                     </div>
-
-                    <div class="form-group">
-                        <div class="password-label-row">
+                    <div class="form-field">
+                        <div class="form-row-between">
                             <label for="password">Password</label>
-                            <a asp-page="/Auth/ForgotPassword" class="forgot-link">Forgot password?</a>
+                            <a asp-page="/Auth/ForgotPassword" class="form-link">Forgot password?</a>
                         </div>
-                        <input id="password" type="password" placeholder="Enter your password" />
+                        <input id="password" name="Password" type="password" placeholder="Enter your password" required />
                     </div>
-
-                    <div class="form-options">
-                        <label class="remember-me">
-                            <input type="checkbox" />
+                    <div style="margin-bottom: 1rem;">
+                        <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.88rem; cursor: pointer;">
+                            <input type="checkbox" name="RememberMe" value="true" />
                             <span>Remember me</span>
                         </label>
                     </div>
-
-                    <button type="submit" class="login-submit-btn">Sign In</button>
+                    <button type="submit" class="form-submit-btn">Sign In</button>
                 </form>
-
-                <div class="login-divider">
-                    <span>or</span>
-                </div>
-
-                <button class="google-login-btn" type="button">Continue with Google</button>
-
-                <div class="login-bottom-text">
-                    <span>Don’t have an account?</span>
-                    <a asp-page="/Auth/ChooseRole">Create one</a>
+                <div class="form-divider"><span>or</span></div>
+                <button type="button" class="form-submit-btn" style="background: var(--color-bg); color: var(--color-text); border: 1px solid var(--color-border);">
+                    Continue with Google
+                </button>
+                <div class="form-bottom-text">
+                    Don't have an account? <a asp-page="/Auth/ChooseRole">Create one</a>
                 </div>
             </div>
         </div>

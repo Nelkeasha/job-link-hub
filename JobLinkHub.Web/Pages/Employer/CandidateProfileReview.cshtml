@@ -2,134 +2,232 @@
 @model JobLinkHub.Web.Pages.CandidateProfileReviewModel
 @{
     ViewData["Title"] = "Candidate Profile Review";
+    Layout = "_DashboardLayout";
+    ViewData["DashboardRole"] = "Employer";
+    ViewData["ActivePage"] = "Applicants";
 }
 
-<section class="candidate-review-page">
-    <div class="container candidate-review-wrapper">
+@{
+    var statusCls = Model.ApplicationStatus?.ToUpper() switch {
+        "SHORTLISTED" or "ACCEPTED" => "badge-green",
+        "REJECTED" => "badge-red",
+        _ => "badge-amber"
+    };
+    var statusLabel = Model.ApplicationStatus?.ToUpper() switch {
+        "PENDING" => "Pending",
+        "SHORTLISTED" => "Shortlisted",
+        "REJECTED" => "Rejected",
+        "ACCEPTED" => "Accepted",
+        "WITHDRAWN" => "Withdrawn",
+        _ => Model.ApplicationStatus
+    };
+}
 
-        <div class="candidate-review-hero">
-            <div>
-                <span class="candidate-review-eyebrow">Application review</span>
-                <h1>Review candidate application</h1>
-                <p>
-                    Review the applicant’s profile, qualifications, supporting documents, and application details before making a decision.
-                </p>
+<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem;">
+    <div>
+        <p class="dash-header-label">APPLICATION REVIEW</p>
+        <h1 class="dash-greeting">Review Candidate</h1>
+        <p class="dash-greeting-sub">Assess the applicant's profile, qualifications, and supporting evidence.</p>
+    </div>
+    <a href="/Employer/ViewApplicants@(Model.OpportunityId > 0 ? "?OpportunityId=" + Model.OpportunityId : "")" class="dash-cancel-btn">
+        <i class="fa-solid fa-arrow-left"></i> Back to Applicants
+    </a>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 320px;gap:1.2rem;align-items:start;">
+
+    <!-- Main -->
+    <div style="display:flex;flex-direction:column;gap:1rem;">
+
+        <!-- Candidate header -->
+        <div class="dash-form-card">
+            <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+                <div class="panel-item-avatar" style="width:56px;height:56px;font-size:1.2rem;background:var(--color-accent-light);color:var(--color-accent);">
+                    @Model.CandidateInitials
+                </div>
+                <div style="flex:1;">
+                    <h2 style="font-size:1.1rem;font-weight:700;margin-bottom:0.15rem;">@Model.CandidateName</h2>
+                    <p style="font-size:0.85rem;color:var(--color-text-light);margin-bottom:0.4rem;">@Model.CandidateEmail</p>
+                    <span class="badge @statusCls">@statusLabel</span>
+                </div>
             </div>
+            @if (!string.IsNullOrEmpty(Model.RejectionReasonDisplay))
+            {
+                <div style="margin-top:0.8rem;padding:0.6rem 0.8rem;background:#fef2f2;border-radius:6px;color:#991b1b;font-size:0.85rem;">
+                    <strong>Rejection reason:</strong> @Model.RejectionReasonDisplay
+                </div>
+            }
+        </div>
 
-            <div class="candidate-review-actions-top">
-                <a asp-page="/Employer/ViewApplicants" class="review-secondary-btn">Back to Applicants</a>
+        <!-- Opportunity info -->
+        <div class="dash-form-card">
+            <h3 class="panel-title" style="margin-bottom:0.8rem;">Opportunity Applied For</h3>
+            <div class="dash-form-grid">
+                <div>
+                    <p style="font-size:0.72rem;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.2rem;">Job Title</p>
+                    <strong>@Model.OpportunityTitle</strong>
+                </div>
+                <div>
+                    <p style="font-size:0.72rem;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.2rem;">Application Date</p>
+                    <strong>@Model.ApplicationDate</strong>
+                </div>
+                <div>
+                    <p style="font-size:0.72rem;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.2rem;">Location</p>
+                    <strong>@(string.IsNullOrEmpty(Model.OpportunityLocation) ? "â€”" : Model.OpportunityLocation)</strong>
+                </div>
+                <div>
+                    <p style="font-size:0.72rem;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.2rem;">Type</p>
+                    <strong>@Model.OpportunityType</strong>
+                </div>
             </div>
         </div>
 
-        <div class="candidate-review-grid">
+        <!-- Profile summary -->
+        @if (!string.IsNullOrEmpty(Model.ProfileSummary))
+        {
+            <div class="dash-form-card">
+                <h3 class="panel-title" style="margin-bottom:0.6rem;">Profile Summary</h3>
+                <p style="color:var(--color-text-light);line-height:1.7;font-size:0.92rem;">@Model.ProfileSummary</p>
+            </div>
+        }
 
-            <div class="candidate-review-main">
-                <div class="candidate-review-card">
-                    <div class="review-card-header">
-                        <div class="candidate-overview">
-                            <div class="candidate-avatar-lg">@Model.CandidateInitials</div>
-                            <div>
-                                <h2>@Model.CandidateName</h2>
-                                <p>@Model.CandidateEmail</p>
-                                <span class="candidate-status-badge @(Model.ApplicationStatus.ToLower().Replace(" ", "-"))">
-                                    @Model.ApplicationStatus
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="review-section">
-                        <h3>Opportunity Applied For</h3>
-                        <div class="review-info-grid">
-                            <div class="review-info-item">
-                                <span>Job Title</span>
-                                <strong>@Model.OpportunityTitle</strong>
-                            </div>
-                            <div class="review-info-item">
-                                <span>Application Date</span>
-                                <strong>@Model.ApplicationDate</strong>
-                            </div>
-                            <div class="review-info-item">
-                                <span>Location</span>
-                                <strong>@Model.OpportunityLocation</strong>
-                            </div>
-                            <div class="review-info-item">
-                                <span>Type</span>
-                                <strong>@Model.OpportunityType</strong>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="review-section">
-                        <h3>Profile Summary</h3>
-                        <p class="review-paragraph">@Model.ProfileSummary</p>
-                    </div>
-
-                    <div class="review-section">
-                        <h3>Qualifications</h3>
-                        <div class="review-info-grid">
-                            <div class="review-info-item">
-                                <span>Education</span>
-                                <strong>@Model.Education</strong>
-                            </div>
-                            <div class="review-info-item">
-                                <span>Experience Level</span>
-                                <strong>@Model.ExperienceLevel</strong>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="review-section">
-                        <h3>Skills and Evidence</h3>
-                        <div class="candidate-skill-tags">
-                            @foreach (var skill in Model.Skills)
-                            {
-                                <span>@skill</span>
-                            }
-                        </div>
-
-                        <div class="evidence-list">
-                            @foreach (var item in Model.SkillEvidence)
-                            {
-                                <div class="evidence-item">
-                                    <strong>@item.Title</strong>
-                                    <p>@item.Description</p>
-                                </div>
-                            }
-                        </div>
-                    </div>
-
-                    <div class="review-section">
-                        <h3>Cover Letter</h3>
-                        <p class="review-paragraph">@Model.CoverLetter</p>
-                    </div>
+        <!-- Qualifications -->
+        <div class="dash-form-card">
+            <h3 class="panel-title" style="margin-bottom:0.8rem;">Qualifications</h3>
+            <div class="dash-form-grid">
+                <div>
+                    <p style="font-size:0.72rem;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.2rem;">Education</p>
+                    <strong>@(string.IsNullOrEmpty(Model.Education) ? "Not specified" : Model.Education)</strong>
+                </div>
+                <div>
+                    <p style="font-size:0.72rem;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.2rem;">Institution</p>
+                    <strong>@(string.IsNullOrEmpty(Model.Institution) ? "Not specified" : Model.Institution)</strong>
+                </div>
+                <div>
+                    <p style="font-size:0.72rem;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.2rem;">Career Interest</p>
+                    <strong>@(string.IsNullOrEmpty(Model.ExperienceLevel) ? "Not specified" : Model.ExperienceLevel)</strong>
                 </div>
             </div>
+        </div>
 
-            <div class="candidate-review-sidebar">
-                <div class="candidate-review-card sidebar-card">
-                    <h3>Documents & Links</h3>
-
-                    <div class="document-link-list">
-                        <a href="#" class="document-link-item">View CV / Resume</a>
-                        <a href="#" class="document-link-item">Open Portfolio</a>
-                        <a href="#" class="document-link-item">View LinkedIn Profile</a>
-                        <a href="#" class="document-link-item">Open GitHub</a>
+        <!-- Skills -->
+        @if (Model.Skills.Any() || Model.SkillEvidence.Any())
+        {
+            <div class="dash-form-card">
+                <h3 class="panel-title" style="margin-bottom:0.8rem;">Skills &amp; Evidence</h3>
+                @if (Model.Skills.Any())
+                {
+                    <div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1rem;">
+                        @foreach (var skill in Model.Skills)
+                        {
+                            <span class="badge badge-gray">@skill</span>
+                        }
                     </div>
-                </div>
-
-                <div class="candidate-review-card sidebar-card">
-                    <h3>Decision Actions</h3>
-
-                    <div class="decision-action-group">
-                        <button class="decision-btn shortlist-btn" type="button">Shortlist Candidate</button>
-                        <button class="decision-btn review-btn" type="button">Mark as Reviewed</button>
-                        <button class="decision-btn reject-btn" type="button">Reject Application</button>
+                }
+                @foreach (var item in Model.SkillEvidence)
+                {
+                    <div class="panel-item">
+                        <div class="panel-item-avatar" style="background:var(--color-accent-light);color:var(--color-accent);">
+                            <i class="fa-solid fa-certificate"></i>
+                        </div>
+                        <div class="panel-item-info">
+                            <div class="panel-item-title">@item.Title</div>
+                            <div class="panel-item-sub">@item.Description</div>
+                        </div>
                     </div>
-                </div>
+                }
             </div>
+        }
 
+        <!-- Cover letter -->
+        @if (!string.IsNullOrEmpty(Model.CoverLetter))
+        {
+            <div class="dash-form-card">
+                <h3 class="panel-title" style="margin-bottom:0.6rem;">Cover Letter</h3>
+                <p style="color:var(--color-text-light);line-height:1.7;font-size:0.92rem;white-space:pre-wrap;">@Model.CoverLetter</p>
+            </div>
+        }
+
+    </div>
+
+    <!-- Sidebar -->
+    <div style="display:flex;flex-direction:column;gap:1rem;">
+
+        <!-- Documents & Links -->
+        <div class="dash-panel">
+            <h3 class="panel-title" style="margin-bottom:0.8rem;">Documents &amp; Links</h3>
+            @if (!string.IsNullOrEmpty(Model.ResumeUrl))
+            {
+                <a href="@Model.ResumeUrl" target="_blank"
+                   style="display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0.7rem;border:1px solid var(--color-border);border-radius:8px;margin-bottom:0.6rem;text-decoration:none;color:inherit;font-size:0.85rem;font-weight:600;">
+                    <i class="fa-solid fa-file-pdf" style="color:#ef4444;font-size:1.1rem;flex-shrink:0;"></i>
+                    <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;">@(Model.ResumeFileName ?? "View CV / Resume")</span>
+                    <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.75rem;opacity:0.5;"></i>
+                </a>
+            }
+            else
+            {
+                <div style="padding:0.6rem 0.7rem;border:1px dashed var(--color-border);border-radius:8px;margin-bottom:0.6rem;font-size:0.85rem;color:var(--color-text-muted);">
+                    <i class="fa-solid fa-file-pdf" style="margin-right:0.4rem;opacity:0.4;"></i> No resume uploaded
+                </div>
+            }
+            <div class="quick-actions-grid">
+                @if (!string.IsNullOrEmpty(Model.PortfolioUrl))
+                {
+                    <a href="@Model.PortfolioUrl" target="_blank" class="quick-action-link"><i class="fa-solid fa-briefcase"></i> Portfolio</a>
+                }
+                @if (!string.IsNullOrEmpty(Model.LinkedInUrl))
+                {
+                    <a href="@Model.LinkedInUrl" target="_blank" class="quick-action-link"><i class="fa-brands fa-linkedin"></i> LinkedIn</a>
+                }
+            </div>
+        </div>
+
+        <!-- Decision -->
+        <div class="dash-panel">
+            <h3 class="panel-title" style="margin-bottom:0.8rem;">Decision</h3>
+            <div style="display:flex;flex-direction:column;gap:0.6rem;">
+
+                @if (Model.ApplicationStatus?.ToUpper() != "SHORTLISTED" && Model.ApplicationStatus?.ToUpper() != "REJECTED")
+                {
+                    <form method="post" asp-page-handler="Shortlist" asp-route-id="@Model.Id">
+                        <button type="submit" class="dash-submit-btn" style="width:100%;justify-content:center;">
+                            <i class="fa-solid fa-star"></i> Shortlist Candidate
+                        </button>
+                    </form>
+                }
+
+                @if (Model.ApplicationStatus?.ToUpper() == "SHORTLISTED")
+                {
+                    <form method="post" asp-page-handler="Accept" asp-route-id="@Model.Id">
+                        <button type="submit" class="dash-submit-btn" style="width:100%;justify-content:center;background:#16a34a;">
+                            <i class="fa-solid fa-circle-check"></i> Accept Application
+                        </button>
+                    </form>
+                }
+
+                @if (Model.ApplicationStatus?.ToUpper() != "REJECTED")
+                {
+                    <form method="post" asp-page-handler="Reject" asp-route-id="@Model.Id" onsubmit="return confirm('Reject this application?');">
+                        <div class="form-field" style="margin-bottom:0.5rem;">
+                            <input asp-for="RejectionReason" type="text" placeholder="Rejection reason (optional)" style="font-size:0.82rem;" />
+                        </div>
+                        <button type="submit" class="dash-cancel-btn" style="width:100%;text-align:center;color:#ef4444;border-color:#fecaca;">
+                            <i class="fa-solid fa-xmark"></i> Reject Application
+                        </button>
+                    </form>
+                }
+
+                @if (Model.ApplicationStatus?.ToUpper() == "REJECTED" || Model.ApplicationStatus?.ToUpper() == "ACCEPTED")
+                {
+                    <div style="font-size:0.82rem;color:var(--color-text-muted);text-align:center;padding:0.4rem 0;">
+                        Decision already made. Go back to change.
+                    </div>
+                }
+
+            </div>
         </div>
 
     </div>
-</section>
+
+</div>

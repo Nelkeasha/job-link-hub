@@ -81,6 +81,8 @@ builder.Services.AddScoped<IOpportunityRepository,   OpportunityRepository>();
 builder.Services.AddScoped<IApplicationRepository,    ApplicationRepository>();
 builder.Services.AddScoped<ISavedJobRepository,       SavedJobRepository>();
 builder.Services.AddScoped<INotificationRepository,   NotificationRepository>();
+builder.Services.AddScoped<IUserProfileRepository,    UserProfileRepository>();
+builder.Services.AddScoped<ISkillRepository,          SkillRepository>();
 
 // Services
 builder.Services.AddScoped<IOpportunityService,       OpportunityService>();
@@ -92,6 +94,9 @@ builder.Services.AddScoped<IEmailService,              EmailService>();
 builder.Services.AddScoped<INotificationService,       NotificationService>();
 builder.Services.AddScoped<IRecommendationService,     RecommendationService>();
 builder.Services.AddScoped<IBackgroundJobService,      BackgroundJobService>();
+builder.Services.AddScoped<IUserProfileService,        UserProfileService>();
+builder.Services.AddScoped<ISkillService,              SkillService>();
+builder.Services.AddScoped<IAdminService,              AdminService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

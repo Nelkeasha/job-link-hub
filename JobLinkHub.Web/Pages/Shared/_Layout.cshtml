@@ -1,62 +1,124 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - JobLink Hub</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Pirata+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/JobLinkHub.Web.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-lg custom-navbar">
-            <div class="container">
-                <a class="navbar-brand brand-logo" asp-area="" asp-page="/Index">JobLink Hub</a>
+    <header class="site-header">
+        <nav class="main-nav">
+            <a href="/" class="nav-brand">
+                <span class="brand-icon-pub">
+                    <i class="fa-solid fa-briefcase"></i>
+                </span>
+                <span class="brand-text-pub">Job<span class="brand-accent-pub">Link</span><span class="brand-suffix"> Hub</span></span>
+            </a>
 
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
-                        aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+            <button class="nav-hamburger" id="navHamburger">
+                <span></span><span></span><span></span>
+            </button>
 
-                <div class="collapse navbar-collapse" id="mainNav">
-                    <ul class="navbar-nav mx-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-page="/Public/Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-page="/Public/Opportunities">Opportunities</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-page="/Public/ForEmployers">For Employers</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-page="/Public/About">About</a>
-                        </li>
-                    </ul>
+            <div class="nav-links" id="navLinks">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/Public/Opportunities" class="nav-link">Jobs</a>
+                <a href="/Public/Candidates" class="nav-link">Candidates</a>
+                <a href="/Public/Employers" class="nav-link">Employers</a>
+                <a href="/Public/Blog" class="nav-link">Blog</a>
+                <a href="/Public/Contact" class="nav-link">Contact</a>
+            </div>
 
-                    <div class="nav-actions">
-                        <a href="/Auth/Login" class="login-link">Login</a>
-                        <a href="/Auth/ChooseRole" class="signup-btn">Sign Up</a>
-                    </div>
-                </div>
+            <div class="nav-actions-pub">
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    @if (User.IsInRole("CANDIDATE"))
+                    {
+                        <a href="/JobSeeker/Dashboard" class="nav-login">DASHBOARD</a>
+                    }
+                    else if (User.IsInRole("EMPLOYER"))
+                    {
+                        <a href="/Employer/EmployerDashboard" class="nav-login">DASHBOARD</a>
+                    }
+                    else if (User.IsInRole("ADMIN"))
+                    {
+                        <a href="/Admin/AdminDashboard" class="nav-login">DASHBOARD</a>
+                    }
+                    <a href="/Auth/Logout" class="nav-signup">SIGN OUT</a>
+                }
+                else
+                {
+                    <a href="/Auth/ChooseRole" class="nav-signup">SIGN UP</a>
+                    <a href="/Auth/Login" class="nav-login">LOGIN</a>
+                    <a href="/Public/Opportunities" class="nav-apply-btn">APPLY NOW <i class="fa-solid fa-arrow-right"></i></a>
+                }
             </div>
         </nav>
     </header>
 
-    <main role="main">
+    <main>
         @RenderBody()
     </main>
 
-    <footer class="custom-footer">
-        <div class="container">
-            <p>&copy; 2026 JobLink Hub. All rights reserved.</p>
+    <footer class="site-footer">
+        <div class="footer-inner" style="flex-direction:column;gap:0;padding:3rem 1.5rem 1.5rem;">
+            <!-- Footer columns -->
+            <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:2.5rem;margin-bottom:2.5rem;max-width:1280px;width:100%;">
+                <div>
+                    <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1rem;">
+                        <span class="brand-icon" style="width:32px;height:32px;font-size:0.9rem;">J</span>
+                        <span style="font-family:'Outfit',sans-serif;font-weight:800;font-size:1.1rem;color:#fff;">Job<span style="color:var(--color-accent);">Link</span> Hub</span>
+                    </div>
+                    <p style="color:rgba(255,255,255,0.45);font-size:0.85rem;line-height:1.7;max-width:260px;">
+                        A skill-first platform connecting emerging talent with meaningful opportunities.
+                    </p>
+                </div>
+                <div>
+                    <p style="color:rgba(255,255,255,0.3);font-size:0.75rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:1rem;">Platform</p>
+                    <div style="display:flex;flex-direction:column;gap:0.6rem;">
+                        <a href="/Public/Opportunities" style="color:rgba(255,255,255,0.55);font-size:0.87rem;">Browse Jobs</a>
+                        <a href="/Public/Candidates" style="color:rgba(255,255,255,0.55);font-size:0.87rem;">Find Candidates</a>
+                        <a href="/Public/ForEmployers" style="color:rgba(255,255,255,0.55);font-size:0.87rem;">For Employers</a>
+                        <a href="/Public/Pricing" style="color:rgba(255,255,255,0.55);font-size:0.87rem;">Pricing</a>
+                    </div>
+                </div>
+                <div>
+                    <p style="color:rgba(255,255,255,0.3);font-size:0.75rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:1rem;">Company</p>
+                    <div style="display:flex;flex-direction:column;gap:0.6rem;">
+                        <a href="/Public/About" style="color:rgba(255,255,255,0.55);font-size:0.87rem;">About Us</a>
+                        <a href="/Public/Blog" style="color:rgba(255,255,255,0.55);font-size:0.87rem;">Blog</a>
+                        <a href="/Public/Contact" style="color:rgba(255,255,255,0.55);font-size:0.87rem;">Contact</a>
+                        <a href="/Privacy" style="color:rgba(255,255,255,0.55);font-size:0.87rem;">Privacy Policy</a>
+                    </div>
+                </div>
+                <div>
+                    <p style="color:rgba(255,255,255,0.3);font-size:0.75rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:1rem;">Account</p>
+                    <div style="display:flex;flex-direction:column;gap:0.6rem;">
+                        <a href="/Auth/Login" style="color:rgba(255,255,255,0.55);font-size:0.87rem;">Log In</a>
+                        <a href="/Auth/ChooseRole" style="color:rgba(255,255,255,0.55);font-size:0.87rem;">Create Account</a>
+                        <a href="/Auth/ForgotPassword" style="color:rgba(255,255,255,0.55);font-size:0.87rem;">Reset Password</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Bottom bar -->
+            <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(255,255,255,0.08);padding-top:1.2rem;max-width:1280px;width:100%;flex-wrap:wrap;gap:0.8rem;">
+                <span style="color:rgba(255,255,255,0.35);font-size:0.82rem;">&copy; 2026 <strong style="color:var(--color-accent);">JOBLINK HUB</strong>. All rights reserved.</span>
+                <a href="#top" class="footer-top-btn"><i class="fa-solid fa-chevron-up"></i> TOP</a>
+            </div>
         </div>
     </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        document.getElementById('navHamburger')?.addEventListener('click', function() {
+            document.getElementById('navLinks').classList.toggle('open');
+            this.classList.toggle('active');
+        });
+    </script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

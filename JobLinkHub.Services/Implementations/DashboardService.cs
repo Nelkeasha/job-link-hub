@@ -51,6 +51,9 @@ public class DashboardService : IDashboardService
             .Select(g => new TypeStatDto { Type = g.Key, Count = g.Count() })
             .ToList();
 
+        var firstOfMonth = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+        var newUsersThisMonth = await _context.Users.CountAsync(u => u.CreatedAt >= firstOfMonth);
+
         return new AdminDashboardDto
         {
             TotalUsers = totalUsers,
@@ -64,7 +67,8 @@ public class DashboardService : IDashboardService
             RejectedApplications = applications.Count(a => a.Status == "REJECTED"),
             ApplicationsPerMonth = appsPerMonth,
             OpportunitiesPerMonth = oppsPerMonth,
-            OpportunitiesByType = oppsByType
+            OpportunitiesByType = oppsByType,
+            NewUsersThisMonth = newUsersThisMonth
         };
     }
 
@@ -95,6 +99,7 @@ public class DashboardService : IDashboardService
         {
             TotalApplications = applications.Count,
             PendingApplications = applications.Count(a => a.Status == "PENDING"),
+            ShortlistedApplications = applications.Count(a => a.Status == "SHORTLISTED"),
             AcceptedApplications = applications.Count(a => a.Status == "ACCEPTED"),
             RejectedApplications = applications.Count(a => a.Status == "REJECTED"),
             SavedJobs = savedCount,
@@ -148,6 +153,7 @@ public class DashboardService : IDashboardService
             ActiveOpportunities = opportunities.Count(o => o.Status == "Active"),
             TotalApplications = applications.Count,
             PendingApplications = applications.Count(a => a.Status == "PENDING"),
+            ShortlistedApplications = applications.Count(a => a.Status == "SHORTLISTED"),
             TotalViews = opportunities.Sum(o => o.Views),
             RecentOpportunities = recentOpps,
             RecentApplications = recentApps

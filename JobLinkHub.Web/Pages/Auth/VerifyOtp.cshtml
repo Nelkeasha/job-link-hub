@@ -1,0 +1,49 @@
+@page
+@model JobLinkHub.Web.Pages.Auth.VerifyOtpModel
+@{
+    ViewData["Title"] = "Enter Login Code";
+    Layout = "_AuthLayout";
+}
+
+<section class="auth-page">
+    <div class="auth-container">
+        <div class="auth-grid">
+            <div class="auth-showcase">
+                <h1>Secure your <span style="color:var(--color-accent);">account</span> with a one-time code.</h1>
+                <p>We sent a 6-digit code to your email. Enter it below to complete your sign-in.</p>
+            </div>
+            <div class="auth-card">
+                <h2 class="auth-card-title">Check your email</h2>
+                <p class="auth-card-subtitle">
+                    We sent a 6-digit code to <strong>@Model.MaskedEmail</strong>. It expires in 10 minutes.
+                </p>
+
+                @if (Model.ErrorMessage != null)
+                {
+                    <div class="alert alert-danger" style="margin-bottom:1rem;">@Model.ErrorMessage</div>
+                }
+
+                <form method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="form-field">
+                        <label for="code">Verification code</label>
+                        <input id="code"
+                               name="Code"
+                               type="text"
+                               inputmode="numeric"
+                               maxlength="6"
+                               placeholder="000000"
+                               autocomplete="one-time-code"
+                               style="letter-spacing:0.4em;font-size:1.4rem;text-align:center;"
+                               required />
+                    </div>
+                    <button type="submit" class="form-submit-btn">Verify &amp; Sign In</button>
+                </form>
+
+                <div class="form-bottom-text" style="margin-top:1rem;">
+                    Wrong account? <a asp-page="/Auth/Login">Back to Login</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

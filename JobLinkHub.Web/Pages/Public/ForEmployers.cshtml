@@ -4,98 +4,103 @@
     ViewData["Title"] = "For Employers";
 }
 
-<section class="for-employers-page">
-    <div class="container for-employers-wrapper">
-
-        <div class="for-employers-hero">
-            <div class="for-employers-hero-text">
-                <span class="for-employers-eyebrow">For Employers</span>
-                <h1>Hire emerging talent with more confidence</h1>
-                <p>
+<section style="padding:4rem 0 2rem;background:var(--color-bg);">
+    <div class="section-container">
+        <div style="display:grid;grid-template-columns:1fr auto;gap:2.5rem;align-items:center;flex-wrap:wrap;">
+            <div>
+                <span class="badge badge-blue" style="margin-bottom:1rem;">For Employers</span>
+                <h1 class="hero-title">Hire emerging talent with more confidence</h1>
+                <p class="hero-sub">
                     JobLink Hub helps employers discover, review, and manage applicants through a structured,
-                    skill-aware hiring experience built for today’s evolving workforce.
+                    skill-aware hiring experience built for today's evolving workforce.
                 </p>
-
-                <div class="for-employers-hero-actions">
-                    <a asp-page="/Auth/ChooseRole" class="employers-primary-btn">Create Employer Account</a>
-                    <a asp-page="/Auth/Login" class="employers-secondary-btn">Log In</a>
+                <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:1.5rem;">
+                    <a asp-page="/Auth/ChooseRole" class="cta-btn"><i class="fa-solid fa-building"></i> Create Employer Account</a>
+                    <a asp-page="/Auth/Login" class="dash-cancel-btn">Log In</a>
                 </div>
             </div>
-
-            <div class="for-employers-hero-card">
-                <h3>What employers can do</h3>
-                <ul>
-                    <li>Post jobs, internships, and training opportunities</li>
-                    <li>Review applicants in one hiring workspace</li>
-                    <li>Track opportunities and hiring activity</li>
-                    <li>Access applicant details beyond the CV</li>
+            <div class="feature-card" style="min-width:240px;">
+                <h3 style="font-family:'Outfit',sans-serif;font-weight:700;margin-bottom:0.8rem;">What employers can do</h3>
+                <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:0.5rem;">
+                    <li><i class="fa-solid fa-check" style="color:var(--color-primary);margin-right:0.5rem;"></i>Post jobs, internships, and training opportunities</li>
+                    <li><i class="fa-solid fa-check" style="color:var(--color-primary);margin-right:0.5rem;"></i>Review applicants in one hiring workspace</li>
+                    <li><i class="fa-solid fa-check" style="color:var(--color-primary);margin-right:0.5rem;"></i>Track opportunities and hiring activity</li>
+                    <li><i class="fa-solid fa-check" style="color:var(--color-primary);margin-right:0.5rem;"></i>Access applicant details beyond the CV</li>
                 </ul>
             </div>
         </div>
+    </div>
+</section>
 
-        <div class="for-employers-benefits-grid">
-            <div class="employer-benefit-card">
+<section class="features-section">
+    <div class="section-container">
+        <div class="section-title-row">
+            <h2 class="section-title">Why employers choose JobLink Hub</h2>
+        </div>
+        <div class="features-grid" style="margin-top:1.5rem;">
+            <div class="feature-card">
+                <div class="category-icon"><i class="fa-solid fa-pen-to-square"></i></div>
                 <h3>Post opportunities easily</h3>
-                <p>
-                    Create and manage opportunities in one place, including jobs, internships, mentorships, gigs, and training programmes.
-                </p>
+                <p>Create and manage opportunities in one place, including jobs, internships, mentorships, gigs, and training programmes.</p>
             </div>
-
-            <div class="employer-benefit-card">
+            <div class="feature-card">
+                <div class="category-icon"><i class="fa-solid fa-users"></i></div>
                 <h3>Review candidates efficiently</h3>
-                <p>
-                    Access applicant profiles, opportunity details, supporting documents, and structured review flows.
-                </p>
+                <p>Access applicant profiles, opportunity details, supporting documents, and structured review flows.</p>
             </div>
-
-            <div class="employer-benefit-card">
+            <div class="feature-card">
+                <div class="category-icon"><i class="fa-solid fa-chart-bar"></i></div>
                 <h3>Manage hiring activity</h3>
-                <p>
-                    Track active roles, pending reviews, applicant numbers, and current recruitment progress from a dedicated dashboard.
-                </p>
+                <p>Track active roles, pending reviews, applicant numbers, and current recruitment progress from a dedicated dashboard.</p>
             </div>
         </div>
+    </div>
+</section>
 
-        <div class="for-employers-process-card">
-            <div class="section-header left-header">
-                <h2>How it works for employers</h2>
-                <p>JobLink Hub helps employers move from posting to decision-making through a clear and simple process.</p>
+<section style="padding:3rem 0;background:var(--color-surface);">
+    <div class="section-container">
+        <div class="section-title-row">
+            <h2 class="section-title">How it works for employers</h2>
+        </div>
+        <p style="color:var(--color-text-light);text-align:center;margin-bottom:2rem;">
+            JobLink Hub helps employers move from posting to decision-making through a clear and simple process.
+        </p>
+        <div class="features-grid" style="margin-top:1rem;">
+            <div class="feature-card" style="position:relative;">
+                <span style="position:absolute;top:1rem;right:1rem;font-size:2rem;font-weight:900;color:var(--color-primary);opacity:0.15;">01</span>
+                <div class="category-icon"><i class="fa-solid fa-id-card"></i></div>
+                <h3>Create your company profile</h3>
+                <p>Set up your organization details so applicants can understand who you are and what you offer.</p>
             </div>
-
-            <div class="employer-process-grid">
-                <div class="process-step-card">
-                    <span class="step-number">01</span>
-                    <h3>Create your company profile</h3>
-                    <p>Set up your organization details so applicants can understand who you are and what you offer.</p>
-                </div>
-
-                <div class="process-step-card">
-                    <span class="step-number">02</span>
-                    <h3>Post an opportunity</h3>
-                    <p>Publish roles with the right details, deadlines, and requirements to attract relevant applicants.</p>
-                </div>
-
-                <div class="process-step-card">
-                    <span class="step-number">03</span>
-                    <h3>Review applicants</h3>
-                    <p>Assess applications through structured pages that combine candidate details, qualifications, and supporting documents.</p>
-                </div>
+            <div class="feature-card" style="position:relative;">
+                <span style="position:absolute;top:1rem;right:1rem;font-size:2rem;font-weight:900;color:var(--color-primary);opacity:0.15;">02</span>
+                <div class="category-icon"><i class="fa-solid fa-bullhorn"></i></div>
+                <h3>Post an opportunity</h3>
+                <p>Publish roles with the right details, deadlines, and requirements to attract relevant applicants.</p>
+            </div>
+            <div class="feature-card" style="position:relative;">
+                <span style="position:absolute;top:1rem;right:1rem;font-size:2rem;font-weight:900;color:var(--color-primary);opacity:0.15;">03</span>
+                <div class="category-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+                <h3>Review applicants</h3>
+                <p>Assess applications through structured pages that combine candidate details, qualifications, and supporting documents.</p>
             </div>
         </div>
+    </div>
+</section>
 
-        <div class="for-employers-cta-card">
-            <div>
-                <h2>Start hiring through JobLink Hub</h2>
-                <p>
+<section style="padding:3rem 0 4rem;background:var(--color-bg);">
+    <div class="section-container">
+        <div class="feature-card" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1.5rem;border-left:4px solid var(--color-primary);padding:2rem 2.5rem;">
+            <div style="flex:1;min-width:240px;">
+                <h2 style="font-family:'Outfit',sans-serif;font-size:1.5rem;font-weight:800;margin-bottom:0.5rem;">Start hiring through JobLink Hub</h2>
+                <p style="color:var(--color-text-light);">
                     Join the platform to connect with students, graduates, and emerging professionals in a more intentional and skill-aware way.
                 </p>
             </div>
-
-            <div class="for-employers-cta-actions">
-                <a asp-page="/Auth/ChooseRole" class="employers-primary-btn">Get Started</a>
-                <a asp-page="Auth/PostOpportunity" class="employers-secondary-btn">Post Opportunity</a>
+            <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+                <a asp-page="/Auth/ChooseRole" class="cta-btn"><i class="fa-solid fa-rocket"></i> Get Started</a>
+                <a asp-page="/Employer/PostOpportunity" class="dash-cancel-btn">Post Opportunity</a>
             </div>
         </div>
-
     </div>
 </section>

@@ -14,6 +14,7 @@ public class OpportunityDto
     public DateTime? Deadline { get; set; }
     public DateTime CreatedAt { get; set; }
     public string CompanyName { get; set; } = string.Empty;
+    public string? CompanyDescription { get; set; }
     public string? CompanyLogo { get; set; }
     public long EmployerProfileId { get; set; }
     public int ApplicationCount { get; set; }

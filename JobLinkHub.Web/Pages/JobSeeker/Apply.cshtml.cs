@@ -1,114 +1,178 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Authorization;
-using System.Data.Common;
-using Microsoft.EntityFrameworkCore;
-using JobLinkHub.Data;
+using JobLinkHub.Services.Interfaces;
+using JobLinkHub.Services.DTOs;
 
 namespace JobLinkHub.Web.Pages.JobSeeker
 {
-    [Authorize(Roles = "JobSeeker")]
+    [Authorize(Roles = "CANDIDATE")]
     public class ApplyModel : PageModel
     {
-        private readonly AppDbContext _db;
-        public ApplyModel(AppDbContext db) { _db = db; }
+        private readonly IOpportunityService _opportunities;
+        private readonly IApplicationService _applications;
+        private readonly IUserProfileService _profiles;
+        private readonly IWebHostEnvironment _env;
+
+        public ApplyModel(
+            IOpportunityService opportunities,
+            IApplicationService applications,
+            IUserProfileService profiles,
+            IWebHostEnvironment env)
+        {
+            _opportunities = opportunities;
+            _applications = applications;
+            _profiles = profiles;
+            _env = env;
+        }
 
         [BindProperty] public string? CoverNote { get; set; }
-        [BindProperty] public int OpportunityId { get; set; }
+        [BindProperty] public IFormFile? ResumeFile { get; set; }
+        [BindProperty] public long OpportunityId { get; set; }
 
         public string JobTitle { get; set; } = "";
         public string CompanyName { get; set; } = "";
         public string ApplicantName { get; set; } = "";
         public string ApplicantEmail { get; set; } = "";
+        public string? ApplicantLocation { get; set; }
+        public string? ExistingResumeUrl { get; set; }
+        public string? ExistingResumeFileName { get; set; }
+        public bool ProfileIncomplete { get; set; }
         public string? Message { get; set; }
         public bool Success { get; set; }
-        public string? NotFound { get; set; }
+        public string? NotFoundMessage { get; set; }
 
-        public void OnGet(int id)
+        public async Task OnGetAsync(long id)
         {
             OpportunityId = id;
-            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            using var conn = _db.Database.GetDbConnection();
-            conn.Open();
 
-            using var cmd = conn.CreateCommand();
-            cmd.CommandText = @"
-                SELECT o.Title, ep.CompanyName FROM Opportunities o
-                INNER JOIN EmployerProfiles ep ON o.EmployerProfileId = ep.Id
-                WHERE o.Id = @Id AND o.IsActive = 1";
-            var p = cmd.CreateParameter(); p.ParameterName = "@Id"; p.Value = id; cmd.Parameters.Add(p);
-            using var r = cmd.ExecuteReader();
-            if (!r.Read()) { NotFound = "Opportunity not found."; return; }
-            JobTitle = r["Title"].ToString()!;
-            CompanyName = r["CompanyName"].ToString()!;
-            r.Close();
+            var opportunity = await _opportunities.GetByIdAsync(id);
+            if (opportunity == null) { NotFoundMessage = "Opportunity not found."; return; }
+            JobTitle = opportunity.Title;
+            CompanyName = opportunity.CompanyName;
 
-            using var cmd2 = conn.CreateCommand();
-            cmd2.CommandText = "SELECT FirstName, LastName, Email FROM AspNetUsers WHERE Id = @UserId";
-            var p2 = cmd2.CreateParameter(); p2.ParameterName = "@UserId"; p2.Value = userId ?? (object)DBNull.Value; cmd2.Parameters.Add(p2);
-            using var r2 = cmd2.ExecuteReader();
-            if (r2.Read())
+            var userIdStr = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (!long.TryParse(userIdStr, out var userId)) return;
+
+            var candidate = await _profiles.GetCandidateByUserIdAsync(userId);
+            if (candidate != null)
             {
-                ApplicantName = $"{r2["FirstName"]} {r2["LastName"]}".Trim();
-                ApplicantEmail = r2["Email"]?.ToString() ?? "";
+                ApplicantName = $"{candidate.FirstName} {candidate.LastName}".Trim();
+                ApplicantEmail = candidate.Email;
+                ApplicantLocation = candidate.Location;
+                ExistingResumeUrl = candidate.ResumeUrl;
+                ExistingResumeFileName = candidate.ResumeUrl != null
+                    ? Path.GetFileName(candidate.ResumeUrl)
+                    : null;
+                ProfileIncomplete = string.IsNullOrEmpty(candidate.Bio)
+                    || string.IsNullOrEmpty(candidate.EducationLevel)
+                    || !candidate.Skills.Any();
             }
         }
 
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPostAsync()
         {
-            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            var userIdStr = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (!long.TryParse(userIdStr, out var userId)) return Page();
+
             try
             {
-                using var conn = _db.Database.GetDbConnection();
-                conn.Open();
+                var candidate = await _profiles.GetCandidateByUserIdAsync(userId);
+                if (candidate == null) { Message = "Please complete your profile before applying."; return Page(); }
 
-                // Get seeker profile ID
-                using var cmd1 = conn.CreateCommand();
-                cmd1.CommandText = "SELECT Id FROM JobSeekerProfiles WHERE UserId = @UserId";
-                var pp = cmd1.CreateParameter(); pp.ParameterName = "@UserId"; pp.Value = userId ?? (object)DBNull.Value; cmd1.Parameters.Add(pp);
-                var profileIdObj = cmd1.ExecuteScalar();
-                if (profileIdObj == null) { Message = "Please complete your profile before applying."; return Page(); }
-                int profileId = Convert.ToInt32(profileIdObj);
-
-                // Check already applied
-                using var cmdCheck = conn.CreateCommand();
-                cmdCheck.CommandText = "SELECT COUNT(*) FROM Applications WHERE JobSeekerProfileId=@PId AND OpportunityId=@OId";
-                var cp1 = cmdCheck.CreateParameter(); cp1.ParameterName = "@PId"; cp1.Value = profileId; cmdCheck.Parameters.Add(cp1);
-                var cp2 = cmdCheck.CreateParameter(); cp2.ParameterName = "@OId"; cp2.Value = OpportunityId; cmdCheck.Parameters.Add(cp2);
-                if (Convert.ToInt32(cmdCheck.ExecuteScalar()) > 0)
+                if (await _applications.HasAppliedAsync(candidate.Id, OpportunityId))
                 {
                     Message = "You have already applied for this opportunity.";
+                    await ReloadPageDataAsync(userId);
                     return Page();
                 }
 
-                // Insert application
-                using var cmd2 = conn.CreateCommand();
-                cmd2.CommandText = @"
-                    INSERT INTO Applications (JobSeekerProfileId, OpportunityId, CoverNote, Status, AppliedAt)
-                    VALUES (@PId, @OId, @Cover, 'Pending', GETDATE())";
-                var ip1 = cmd2.CreateParameter(); ip1.ParameterName = "@PId"; ip1.Value = profileId; cmd2.Parameters.Add(ip1);
-                var ip2 = cmd2.CreateParameter(); ip2.ParameterName = "@OId"; ip2.Value = OpportunityId; cmd2.Parameters.Add(ip2);
-                var ip3 = cmd2.CreateParameter(); ip3.ParameterName = "@Cover"; ip3.Value = CoverNote ?? ""; cmd2.Parameters.Add(ip3);
-                cmd2.ExecuteNonQuery();
+                // Resolve resume: new upload > existing on profile
+                string? resumeUrl = candidate.ResumeUrl;
+
+                if (ResumeFile != null && ResumeFile.Length > 0)
+                {
+                    var uploaded = await SaveResumeAsync(ResumeFile, userId);
+                    if (uploaded == null)
+                    {
+                        Message = "Invalid file. Please upload a PDF, DOC, or DOCX (max 5 MB).";
+                        await ReloadPageDataAsync(userId);
+                        return Page();
+                    }
+                    resumeUrl = uploaded;
+
+                    // Persist the newly uploaded resume to the candidate profile
+                    await _profiles.UpdateCandidateAsync(userId, new UpdateCandidateProfileDto
+                    {
+                        FirstName = candidate.FirstName,
+                        LastName = candidate.LastName,
+                        PhoneNumber = candidate.PhoneNumber,
+                        Bio = candidate.Bio,
+                        CareerInterest = candidate.CareerInterest,
+                        EducationLevel = candidate.EducationLevel,
+                        Institution = candidate.Institution,
+                        GraduationYear = candidate.GraduationYear,
+                        LinkedInUrl = candidate.LinkedInUrl,
+                        PortfolioUrl = candidate.PortfolioUrl,
+                        Location = candidate.Location,
+                        ResumeUrl = resumeUrl,
+                        SkillIds = candidate.SkillIds
+                    });
+                }
+
+                await _applications.CreateAsync(candidate.Id, new CreateApplicationDto
+                {
+                    OpportunityId = OpportunityId,
+                    CoverLetter = CoverNote,
+                    ResumeUsed = resumeUrl
+                });
 
                 Success = true;
                 Message = "Application submitted successfully!";
             }
             catch (Exception ex) { Message = "Error: " + ex.Message; }
 
-            // Reload job info for display
-            using var conn2 = _db.Database.GetDbConnection();
-            conn2.Open();
-            using var cmd3 = conn2.CreateCommand();
-            cmd3.CommandText = @"
-                SELECT o.Title, ep.CompanyName FROM Opportunities o
-                INNER JOIN EmployerProfiles ep ON o.EmployerProfileId = ep.Id
-                WHERE o.Id = @Id";
-            var rp = cmd3.CreateParameter(); rp.ParameterName = "@Id"; rp.Value = OpportunityId; cmd3.Parameters.Add(rp);
-            using var r3 = cmd3.ExecuteReader();
-            if (r3.Read()) { JobTitle = r3["Title"].ToString()!; CompanyName = r3["CompanyName"].ToString()!; }
+            var opp = await _opportunities.GetByIdAsync(OpportunityId);
+            if (opp != null) { JobTitle = opp.Title; CompanyName = opp.CompanyName; }
 
             return Page();
+        }
+
+        private async Task<string?> SaveResumeAsync(IFormFile file, long userId)
+        {
+            var allowed = new[] { ".pdf", ".doc", ".docx" };
+            var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+            if (!allowed.Contains(ext)) return null;
+            if (file.Length > 5 * 1024 * 1024) return null;
+
+            var uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "resumes");
+            Directory.CreateDirectory(uploadsFolder);
+
+            var fileName = $"{userId}_{Guid.NewGuid():N}{ext}";
+            var filePath = Path.Combine(uploadsFolder, fileName);
+
+            using var stream = new FileStream(filePath, FileMode.Create);
+            await file.CopyToAsync(stream);
+
+            return $"/uploads/resumes/{fileName}";
+        }
+
+        private async Task ReloadPageDataAsync(long userId)
+        {
+            var opp = await _opportunities.GetByIdAsync(OpportunityId);
+            if (opp != null) { JobTitle = opp.Title; CompanyName = opp.CompanyName; }
+
+            var candidate = await _profiles.GetCandidateByUserIdAsync(userId);
+            if (candidate != null)
+            {
+                ApplicantName = $"{candidate.FirstName} {candidate.LastName}".Trim();
+                ApplicantEmail = candidate.Email;
+                ApplicantLocation = candidate.Location;
+                ExistingResumeUrl = candidate.ResumeUrl;
+                ExistingResumeFileName = candidate.ResumeUrl != null
+                    ? Path.GetFileName(candidate.ResumeUrl)
+                    : null;
+            }
         }
     }
 }

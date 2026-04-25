@@ -5,6 +5,7 @@ namespace JobLinkHub.Services.Interfaces;
 public interface IApplicationService
 {
     Task<IEnumerable<ApplicationDto>> GetByOpportunityAsync(long opportunityId);
+    Task<IEnumerable<ApplicationDto>> GetByEmployerAsync(long employerProfileId);
     Task<IEnumerable<ApplicationDto>> GetByJobSeekerAsync(long jobSeekerProfileId);
     Task<ApplicationDto?> GetByIdAsync(long id);
     Task<ApplicationDto> CreateAsync(long jobSeekerProfileId, CreateApplicationDto dto);

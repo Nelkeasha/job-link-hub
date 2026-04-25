@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - JobLink Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body style="background:linear-gradient(135deg,#0b1120 0%,#0f172a 60%,#1a3a5c 100%);min-height:100vh;">
+
+    <!-- Minimal auth header - just brand -->
+    <header style="padding:1.2rem 2rem;display:flex;align-items:center;justify-content:space-between;max-width:1280px;margin:0 auto;">
+        <a href="/" style="display:flex;align-items:center;gap:0.6rem;text-decoration:none;">
+            <span class="brand-icon" style="background:var(--color-primary);">J</span>
+            <span style="font-family:'Outfit',sans-serif;font-weight:800;font-size:1.15rem;color:#fff;">
+                Job<span style="color:var(--color-accent);">Link</span> Hub
+            </span>
+        </a>
+        <a href="/" style="color:rgba(255,255,255,0.45);font-size:0.85rem;text-decoration:none;display:flex;align-items:center;gap:0.4rem;">
+            <i class="fa-solid fa-arrow-left" style="font-size:0.75rem;"></i> Back to site
+        </a>
+    </header>
+
+    <main>
+        @RenderBody()
+    </main>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,98 @@
+Claude Code Prompt — Complete JobLink Hub Project
+Copy everything below and paste it into Claude Code terminal:
+
+I need you to complete my ASP.NET Razor Pages project "JobLink Hub" at c:\Users\os\source\repos\Job-link_hub
+## PROJECT OVERVIEW
+JobLink Hub is a career platform connecting job seekers with employers. It uses ASP.NET Core 8, Entity Framework Core, SQL Server, and Razor Pages. The project has 3 user roles: Job Seeker (Candidate), Employer, and Admin.
+## ARCHITECTURE (4-layer, already built)
+- JobLinkHub.Data — Entities, AppDbContext, Repositories (11 entities: User, JobSeekerProfile, EmployerProfile, Skill, JobSeekerSkill, SkillEvidence, Opportunity, OpportunitySkill, Application, SavedJob, Notification)
+- JobLinkHub.Services — Business logic services (AdminService, ApplicationService, DashboardService, EmailService, NotificationService, OpportunityService, RecommendationService, SavedJobService, SkillService, UserProfileService, BackgroundJobService)
+- JobLinkHub.Web — Razor Pages frontend (40 .cshtml pages across Public, Auth, JobSeeker, Employer, Admin folders)
+- Job-link_hub (API project) — Program.cs entry point with DI, auth config
+## WHAT IS ALREADY DONE
+Backend: Full data layer (entities, migrations, repositories), all service interfaces and implementations, authentication with cookie-based auth, role-based authorization ([Authorize(Roles="CANDIDATE/EMPLOYER/ADMIN")]), seeded admin account (admin@joblinkhub.com / Admin@12345).
+Frontend: 17 pages already redesigned with a modern dark-slate/cyan theme matching https://job-portal-front-topaz.vercel.app/. Design system includes:
+- Pages/Shared/_Layout.cshtml (dark navbar, "JobLink Hub" branding, dark footer, Google Fonts Inter+Outfit, Font Awesome 6.5)
+- Pages/Shared/_DashboardLayout.cshtml (dark sidebar navigation, role-based menus for Candidate/Employer/Admin)
+- wwwroot/css/site.css (~1200 lines design system with CSS variables, components)
+- Redesigned pages: Index, Login, ChooseRole, RegisterCandidate, RegisterEmployer, JobSeeker/Dashboard, MyApplications, SavedJobs, BuildProfile, Employer/EmployerDashboard, PostOpportunity, ManageOpportunities, ViewApplicants, CompanyProfile, Admin/AdminDashboard, ManageUsers, ModerateOpportunities
+## FINAL PROJECT REQUIREMENTS (GRADING CRITERIA)
+These are the requirements I must meet for submission:
+1. **Minimum 5 Tables with Connections** — DONE (11 entities with FK relationships)
+2. **Landing Page** — DONE (dark hero + search + categories + job cards)
+3. **Authentication** — DONE (login, register, logout)
+4. **Authorization** — NEEDS VERIFICATION & COMPLETION:
+   - Restrict page access based on role (Admin, Employer, Candidate) — partially done via [Authorize] attributes
+   - Restrict functionality based on role (Edit/Delete buttons visible only to correct role) — NEEDS WORK on some pages
+   - Restrict URL access based on role — Done via [Authorize(Roles=...)]
+   - Restrict user actions based on role — NEEDS VERIFICATION
+5. **CRUD Operations** — NEEDS COMPLETION:
+   - Create a record — Done (PostOpportunity, RegisterCandidate, RegisterEmployer, Apply)
+   - Display records — Must NEVER display foreign key IDs, always show descriptive names — VERIFY ALL TABLES
+   - Update record with auto-populated form — NEEDS WORK (edit opportunity, edit profile with pre-filled data)
+   - Delete a record — Partially done (admin can delete opportunities)
+   - (Better to have) Import records from Excel — NOT DONE
+6. **Reporting** — NOT DONE:
+   - Tables and Graphs on dashboard pages
+   - Filter reports (by date, name, etc.)
+   - Export reports to Excel and PDF
+7. **(Better to have) Email Integration** — EmailService exists but may not be wired up
+8. **Informational messages/notifications on success or failure** — Partially done, needs consistency
+9. **User-friendly design** — DONE (modern dark-slate/cyan theme)
+10. **Avoid default Bootstrap designs** — DONE (custom CSS design system)
+## WHAT NEEDS TO BE DONE (PRIORITIZED)
+### PRIORITY 1: Complete remaining page redesigns (use existing design system)
+These pages still use old styles or inline styles — update them to use _DashboardLayout and CSS classes from site.css:
+- Pages/JobSeeker/OpportunitiesListing.cshtml → use _DashboardLayout, Candidate sidebar
+- Pages/JobSeeker/OpportunityDetails.cshtml → use _DashboardLayout, Candidate sidebar
+- Pages/JobSeeker/Apply.cshtml → use _DashboardLayout, Candidate sidebar
+- Pages/JobSeeker/UploadSkillEvidence.cshtml → use _DashboardLayout, Candidate sidebar
+- Pages/Employer/CandidateProfileReview.cshtml → use _DashboardLayout, Employer sidebar
+- Pages/Auth/ForgotPassword.cshtml → use auth-page styling like Login.cshtml
+- Pages/Auth/ResetPassword.cshtml → use auth-page styling
+- Pages/Auth/Logout.cshtml
+- Pages/Public/About.cshtml, Contact.cshtml, Blog.cshtml, Candidates.cshtml, Employers.cshtml, ForEmployers.cshtml, Pricing.cshtml
+- Pages/Error.cshtml, Privacy.cshtml
+### PRIORITY 2: Reporting — Tables, Graphs, Export (CRITICAL for grading)
+- Add a "Reports" page to the Admin dashboard at Pages/Admin/Reports.cshtml
+  - Display data in styled tables (users by role, applications by status, opportunities by type)
+  - Add Charts.js graphs (bar chart for applications per month, pie chart for opportunity types, line chart for user registrations)
+  - Add filter controls (date range, role filter, status filter)
+  - Add "Export to Excel" button using ClosedXML NuGet package
+  - Add "Export to PDF" button using QuestPDF or iTextSharp NuGet package
+- Add a report section to Employer dashboard (applicant stats, export applicant list)
+- Add a report section to Candidate dashboard (application history export)
+### PRIORITY 3: Complete CRUD operations
+- Edit Opportunity: Create Pages/Employer/EditOpportunity.cshtml that accepts an ID, auto-populates the form with existing data, and updates on submit
+- Edit Profile: Ensure BuildProfile.cshtml auto-populates with existing data on GET (verify the .cshtml.cs loads data)
+- Delete: Add delete buttons for employers on their own opportunities (ManageOpportunities page)
+- Ensure NO foreign key IDs are displayed — always show descriptive names (company name instead of EmployerId, opportunity title instead of OpportunityId)
+### PRIORITY 4: Role-based UI restrictions
+- On Employer pages: show Edit/Delete buttons only for the employer who owns the resource
+- On Admin pages: show appropriate action buttons (activate/deactivate users, delete opportunities)
+- Hide "Apply" button on opportunities if user is an Employer or Admin
+- Show different nav items based on login state (hide Login/SignUp when logged in, show Dashboard link)
+### PRIORITY 5: Success/Error notifications
+- Add toast notifications or alert banners after every action:
+  - After applying for a job → "Application submitted successfully!"
+  - After posting a job → "Opportunity posted!"
+  - After deleting → "Record deleted"
+  - After form validation fails → clear error messages
+- Use TempData for post-redirect-get pattern alerts
+### PRIORITY 6: (Nice to have) Email integration
+- Wire up EmailService to send emails on: new application received (to employer), application status change (to candidate), welcome email on registration
+## CRITICAL RULES
+1. **DO NOT modify .cshtml.cs files unless absolutely necessary for new functionality** (e.g., adding Reports page model)
+2. Keep ALL existing @Model bindings, asp-for, form handlers intact
+3. Branding is "JobLink Hub" — NOT "JobPortal.rw" or "JobPortal"
+4. Dashboard pages use Layout="_DashboardLayout" with ViewData["DashboardRole"] = "Candidate"/"Employer"/"Admin"
+5. Public pages use the default Layout="_Layout"
+6. Use CSS classes from site.css (dash-*, panel-*, form-field, cta-btn, badge-*, dash-table, etc.)
+7. For new NuGet packages, use: dotnet add package [PackageName] --project JobLinkHub.Web
+8. The DB connection string is in Job-link_hub/appsettings.json
+9. Run with: dotnet run --project JobLinkHub.Web (or from Visual Studio)
+## HOW TO START
+1. Read _DashboardLayout.cshtml, _Layout.cshtml, and first 300 lines of site.css to understand the design system
+2. Read one completed page (e.g. Dashboard.cshtml + Dashboard.cshtml.cs) as a pattern reference
+3. Start with Priority 1 (remaining page redesigns), then Priority 2 (reporting with charts and export)
+4. After each batch of changes, run "dotnet build" to verify no compilation errors

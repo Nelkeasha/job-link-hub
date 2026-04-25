@@ -1,96 +1,54 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Collections.Generic;
+using JobLinkHub.Services.Interfaces;
+using JobLinkHub.Services.DTOs;
 
-namespace JobLinkHub.Web.Pages
+namespace JobLinkHub.Web.Pages.Employer
 {
+    [Authorize(Roles = "EMPLOYER")]
     public class EmployerDashboardModel : PageModel
     {
-        public string CompanyName { get; set; } = string.Empty;
+        private readonly IDashboardService _dashboard;
+        private readonly IUserProfileService _profiles;
 
+        public EmployerDashboardModel(IDashboardService dashboard, IUserProfileService profiles)
+        {
+            _dashboard = dashboard;
+            _profiles = profiles;
+        }
+
+        public string CompanyName { get; set; } = string.Empty;
         public int ActiveOpportunitiesCount { get; set; }
         public int TotalApplicantsCount { get; set; }
-        public int ShortlistedCandidatesCount { get; set; }
+        public int TotalViews { get; set; }
         public int PendingReviewsCount { get; set; }
-
+        public int ShortlistedCandidatesCount { get; set; }
         public int ApplicationsReceivedCount { get; set; }
         public int CandidatesShortlistedMetric { get; set; }
         public int RolesClosingSoonCount { get; set; }
+        public List<OpportunityDto> RecentOpportunities { get; set; } = new();
+        public List<ApplicationDto> RecentApplicants { get; set; } = new();
 
-        public List<OpportunityItem> RecentOpportunities { get; set; } = new();
-        public List<ApplicantItem> RecentApplicants { get; set; } = new();
-
-        public void OnGet()
+        public async Task OnGetAsync()
         {
-            // Temporary mock data for UI development.
-            // Backend developers can later replace this with real service/database data.
-            CompanyName = "Acme Studio";
+            var userIdStr = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (!long.TryParse(userIdStr, out var userId)) return;
 
-            ActiveOpportunitiesCount = 8;
-            TotalApplicantsCount = 124;
-            ShortlistedCandidatesCount = 19;
-            PendingReviewsCount = 11;
+            var profile = await _profiles.GetEmployerByUserIdAsync(userId);
+            if (profile == null) return;
 
-            ApplicationsReceivedCount = 43;
-            CandidatesShortlistedMetric = 9;
-            RolesClosingSoonCount = 3;
-
-            RecentOpportunities = new List<OpportunityItem>
-            {
-                new OpportunityItem
-                {
-                    Title = "Frontend Developer Intern",
-                    Meta = "Kigali • Internship • 24 applicants",
-                    Status = "Live"
-                },
-                new OpportunityItem
-                {
-                    Title = "UI/UX Design Trainee",
-                    Meta = "Remote • Training • 18 applicants",
-                    Status = "Live"
-                },
-                new OpportunityItem
-                {
-                    Title = "Backend Developer",
-                    Meta = "Kigali • Full-time • 31 applicants",
-                    Status = "Reviewing"
-                }
-            };
-
-            RecentApplicants = new List<ApplicantItem>
-            {
-                new ApplicantItem
-                {
-                    Initials = "EA",
-                    FullName = "Emma A.",
-                    AppliedRole = "Applied for Frontend Developer Intern"
-                },
-                new ApplicantItem
-                {
-                    Initials = "MK",
-                    FullName = "Mitchelle K.",
-                    AppliedRole = "Applied for UI/UX Design Trainee"
-                },
-                new ApplicantItem
-                {
-                    Initials = "JO",
-                    FullName = "James O.",
-                    AppliedRole = "Applied for Backend Developer"
-                }
-            };
-        }
-
-        public class OpportunityItem
-        {
-            public string Title { get; set; } = string.Empty;
-            public string Meta { get; set; } = string.Empty;
-            public string Status { get; set; } = string.Empty;
-        }
-
-        public class ApplicantItem
-        {
-            public string Initials { get; set; } = string.Empty;
-            public string FullName { get; set; } = string.Empty;
-            public string AppliedRole { get; set; } = string.Empty;
+            CompanyName = profile.CompanyName;
+            var stats = await _dashboard.GetEmployerDashboardAsync(profile.Id);
+            ActiveOpportunitiesCount = stats.ActiveOpportunities;
+            TotalApplicantsCount = stats.TotalApplications;
+            TotalViews = stats.TotalViews;
+            PendingReviewsCount = stats.PendingApplications;
+            ShortlistedCandidatesCount = stats.ShortlistedApplications;
+            ApplicationsReceivedCount = stats.TotalApplications;
+            CandidatesShortlistedMetric = stats.ShortlistedApplications;
+            RolesClosingSoonCount = 0;
+            RecentOpportunities = stats.RecentOpportunities.Take(5).ToList();
+            RecentApplicants = stats.RecentApplications.Take(5).ToList();
         }
     }
 }

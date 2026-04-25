@@ -1,63 +1,63 @@
-﻿@page
+@page
 @model JobLinkHub.Web.Pages.Admin.AdminDashboardModel
 @{
     ViewData["Title"] = "Admin Dashboard";
-    Layout = "_Layout";
+    Layout = "_DashboardLayout";
+    ViewData["DashboardRole"] = "Admin";
+    ViewData["UserName"] = "Admin";
+    ViewData["ActivePage"] = "Overview";
 }
 
-<div style="background:#F8FAFC; min-height:100vh; padding:2rem 1rem;">
-    <div style="max-width:1000px; margin:0 auto;">
+<div style="margin-bottom: 1.5rem;">
+    <p class="dash-header-label">ADMIN PANEL</p>
+    <h1 class="dash-greeting">Admin Dashboard</h1>
+    <p class="dash-greeting-sub">Platform overview and management tools.</p>
+</div>
 
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
-            <div>
-                <h1 style="font-size:1.5rem; font-weight:700; color:#0F172A; margin:0;">Admin Dashboard</h1>
-                <p style="font-size:0.875rem; color:#64748B; margin:.25rem 0 0;">Platform overview</p>
-            </div>
-            <a href="/Logout" style="font-size:0.875rem; color:#EF4444; border:1px solid #FECACA; padding:.4rem 1rem; border-radius:8px; text-decoration:none;">
-                Logout
-            </a>
-        </div>
-
-        <!-- Stats -->
-        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-bottom:2rem;">
-            @{
-                var stats = new[] {
-          ("Total Users", Model.TotalUsers.ToString(), "#0F172A"),
-          ("Job Seekers", Model.TotalJobSeekers.ToString(), "#2563EB"),
-          ("Employers", Model.TotalEmployers.ToString(), "#7C3AED"),
-          ("Active Opportunities", Model.TotalOpportunities.ToString(), "#14B8A6"),
-          ("Total Applications", Model.TotalApplications.ToString(), "#0F172A"),
-          ("New This Month", Model.NewUsersThisMonth.ToString(), "#F59E0B"),
+<div class="dash-stats-row">
+    @{
+        var stats = new[] {
+            ("Total Users", Model.TotalUsers.ToString(), "fa-solid fa-users", "stat-icon-blue"),
+            ("Job Seekers", Model.TotalJobSeekers.ToString(), "fa-solid fa-user", "stat-icon-teal"),
+            ("Employers", Model.TotalEmployers.ToString(), "fa-solid fa-building", "stat-icon-purple"),
+            ("Active Opportunities", Model.TotalOpportunities.ToString(), "fa-solid fa-briefcase", "stat-icon-green"),
+            ("Total Applications", Model.TotalApplications.ToString(), "fa-solid fa-file-lines", "stat-icon-amber"),
+            ("New This Month", Model.NewUsersThisMonth.ToString(), "fa-solid fa-chart-line", "stat-icon-red"),
         };
-            }
-            @foreach (var (label, value, color) in stats)
-            {
-                <div style="background:white; border:1px solid #E2E8F0; border-radius:12px; padding:1.25rem;">
-                    <p style="font-size:0.75rem; color:#64748B; text-transform:uppercase; letter-spacing:.05em; margin:0 0 .4rem;">@label</p>
-                    <p style="font-size:2rem; font-weight:700; color:@color; margin:0;">@value</p>
-                </div>
-            }
+    }
+    @foreach (var (label, value, icon, colorCls) in stats)
+    {
+        <div class="dash-stat-card">
+            <div class="stat-icon @colorCls"><i class="@icon"></i></div>
+            <div class="stat-info">
+                <p class="stat-label">@label</p>
+                <p class="stat-value">@value</p>
+            </div>
         </div>
+    }
+</div>
 
-        <!-- Navigation -->
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
-            <a href="/Admin/ManageUsers"
-                   style="background:white; border:1px solid #E2E8F0; border-radius:12px; padding:1.5rem; text-decoration:none; display:flex; align-items:center; gap:1rem;">
-                <div style="font-size:2rem;">👥</div>
-                <div>
-                    <p style="font-weight:600; color:#0F172A; margin:0 0 .2rem;">Manage Users</p>
-                    <p style="font-size:0.8rem; color:#64748B; margin:0;">View and manage all registered users</p>
-                </div>
-            </a>
-            <a href="/Admin/ModerateOpportunities"
-                   style="background:white; border:1px solid #E2E8F0; border-radius:12px; padding:1.5rem; text-decoration:none; display:flex; align-items:center; gap:1rem;">
-                <div style="font-size:2rem;">📋</div>
-                <div>
-                    <p style="font-weight:600; color:#0F172A; margin:0 0 .2rem;">Moderate Opportunities</p>
-                    <p style="font-size:0.8rem; color:#64748B; margin:0;">Review and remove job postings</p>
-                </div>
-            </a>
+<div class="dash-panels">
+    <a href="/Admin/ManageUsers" class="dash-panel" style="cursor: pointer;">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <div class="stat-icon stat-icon-blue" style="width: 56px; height: 56px; font-size: 1.3rem;">
+                <i class="fa-solid fa-users-gear"></i>
+            </div>
+            <div>
+                <h3 class="panel-title">Manage Users</h3>
+                <p style="color: var(--color-text-light); font-size: 0.88rem; margin: 0;">View and manage all registered users</p>
+            </div>
         </div>
-
-    </div>
+    </a>
+    <a href="/Admin/ModerateOpportunities" class="dash-panel" style="cursor: pointer;">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <div class="stat-icon stat-icon-amber" style="width: 56px; height: 56px; font-size: 1.3rem;">
+                <i class="fa-solid fa-clipboard-check"></i>
+            </div>
+            <div>
+                <h3 class="panel-title">Moderate Opportunities</h3>
+                <p style="color: var(--color-text-light); font-size: 0.88rem; margin: 0;">Review and remove job postings</p>
+            </div>
+        </div>
+    </a>
 </div>

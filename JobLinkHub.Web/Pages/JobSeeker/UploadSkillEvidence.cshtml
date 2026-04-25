@@ -2,116 +2,110 @@
 @model JobLinkHub.Web.Pages.JobSeeker.UploadSkillEvidenceModel
 @{
     ViewData["Title"] = "Skill Evidence";
-    Layout = "_Layout";
+    Layout = "_DashboardLayout";
+    ViewData["DashboardRole"] = "Candidate";
+    ViewData["ActivePage"] = "MyProfile";
 }
 
-<div style="background:#F8FAFC; min-height:100vh; padding:2rem 1rem;">
-    <div style="max-width:640px; margin:0 auto;">
+<div style="margin-bottom:1.5rem;">
+    <p class="dash-header-label">MY PROFILE</p>
+    <h1 class="dash-greeting">Skill Evidence</h1>
+    <p class="dash-greeting-sub">Upload certificates, portfolio links, and proof of your skills.</p>
+</div>
 
-        <div style="display:flex; align-items:center; gap:1rem; margin-bottom:1.5rem;">
-            <a href="/JobSeeker/BuildProfile" style="color:#64748B; text-decoration:none; font-size:0.875rem;">← Profile</a>
-            <h1 style="font-size:1.25rem; font-weight:700; color:#0F172A; margin:0;">Skill Evidence</h1>
-        </div>
+@if (Model.Message != null)
+{
+    <div class="alert @(Model.Success ? "alert-success" : "alert-danger")" style="margin-bottom:1rem;">
+        @Model.Message
+    </div>
+}
 
-        @if (Model.Message != null)
-        {
-            <div style="padding:.75rem 1rem; border-radius:8px; margin-bottom:1rem; font-size:0.875rem;
-                background:@(Model.Success ? "#DCFCE7" : "#FEE2E2");
-                color:@(Model.Success ? "#166534" : "#991B1B");">
-                @Model.Message
+<div class="dash-panels" style="grid-template-columns:1fr 1fr;align-items:start;">
+
+    <!-- Add Evidence Form -->
+    <div class="dash-form-card">
+        <h2 class="panel-title" style="margin-bottom:1rem;">Add New Evidence</h2>
+        <form method="post">
+            <div class="form-field">
+                <label>Skill</label>
+                <select asp-for="SkillId">
+                    <option value="">-- Select a skill --</option>
+                    @foreach (var s in Model.AvailableSkills)
+                    {
+                        <option value="@s.Id">@s.Name</option>
+                    }
+                </select>
             </div>
-        }
-
-        <!-- Add Evidence Form -->
-        <div style="background:white; border:1px solid #E2E8F0; border-radius:12px; padding:1.5rem; margin-bottom:1.5rem;">
-            <h2 style="font-size:0.95rem; font-weight:600; color:#0F172A; margin:0 0 1rem;">Add New Evidence</h2>
-            <form method="post">
-                <div style="margin-bottom:1rem;">
-                    <label style="display:block; font-size:0.8rem; color:#475569; margin-bottom:.35rem;">Skill</label>
-                    <select asp-for="SkillId"
-                            style="width:100%; border:1px solid #E2E8F0; border-radius:8px; padding:.5rem .75rem; font-size:0.875rem; outline:none; background:white;">
-                        <option value="">-- Select a skill --</option>
-                        @foreach (var s in Model.AvailableSkills)
-                        {
-                            <option value="@s.Id">@s.Name</option>
-                        }
+            <div class="form-field-row">
+                <div class="form-field">
+                    <label>Proficiency</label>
+                    <select asp-for="ProficiencyLevel">
+                        <option>Beginner</option>
+                        <option>Intermediate</option>
+                        <option>Advanced</option>
+                        <option>Expert</option>
                     </select>
                 </div>
-
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
-                    <div>
-                        <label style="display:block; font-size:0.8rem; color:#475569; margin-bottom:.35rem;">Proficiency</label>
-                        <select asp-for="ProficiencyLevel"
-                                style="width:100%; border:1px solid #E2E8F0; border-radius:8px; padding:.5rem .75rem; font-size:0.875rem; outline:none; background:white;">
-                            <option>Beginner</option>
-                            <option>Intermediate</option>
-                            <option>Advanced</option>
-                            <option>Expert</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label style="display:block; font-size:0.8rem; color:#475569; margin-bottom:.35rem;">Evidence Type</label>
-                        <select asp-for="EvidenceType"
-                                style="width:100%; border:1px solid #E2E8F0; border-radius:8px; padding:.5rem .75rem; font-size:0.875rem; outline:none; background:white;">
-                            <option>Certificate</option>
-                            <option>Portfolio</option>
-                            <option>Project</option>
-                            <option>Course</option>
-                            <option>Other</option>
-                        </select>
-                    </div>
+                <div class="form-field">
+                    <label>Evidence Type</label>
+                    <select asp-for="EvidenceType">
+                        <option>Certificate</option>
+                        <option>Portfolio</option>
+                        <option>Project</option>
+                        <option>Course</option>
+                        <option>Other</option>
+                    </select>
                 </div>
-
-                <div style="margin-bottom:1rem;">
-                    <label style="display:block; font-size:0.8rem; color:#475569; margin-bottom:.35rem;">URL / Link</label>
-                    <input asp-for="EvidenceUrl" type="url"
-                           style="width:100%; border:1px solid #E2E8F0; border-radius:8px; padding:.5rem .75rem; font-size:0.875rem; outline:none; box-sizing:border-box;"
-                           placeholder="https://...">
-                    </div>
-
-                    <div style="margin-bottom:1rem;">
-                        <label style="display:block; font-size:0.8rem; color:#475569; margin-bottom:.35rem;">Description</label>
-                        <textarea asp-for="Description" rows="2"
-                                  style="width:100%; border:1px solid #E2E8F0; border-radius:8px; padding:.5rem .75rem; font-size:0.875rem; outline:none; box-sizing:border-box; resize:vertical;"
-                                  placeholder="Brief description..."></textarea>
-                    </div>
-
-                    <button type="submit"
-                            style="background:#2563EB; color:white; padding:.6rem 1.5rem; border:none; border-radius:8px; font-size:0.875rem; font-weight:600; cursor:pointer;">
-                        Add Evidence
-                    </button>
-                </form>
             </div>
-
-            <!-- My Evidence List -->
-            <div style="background:white; border:1px solid #E2E8F0; border-radius:12px; padding:1.5rem;">
-                <h2 style="font-size:0.95rem; font-weight:600; color:#0F172A; margin:0 0 1rem;">My Evidence</h2>
-                @if (!Model.MyEvidence.Any())
-                {
-                    <p style="font-size:0.875rem; color:#94A3B8;">No evidence added yet.</p>
-                }
-                @foreach (var e in Model.MyEvidence)
-                {
-                    <div style="padding:.75rem 0; border-bottom:1px solid #F1F5F9;">
-                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                            <div>
-                                <p style="font-size:0.875rem; font-weight:500; color:#0F172A; margin:0;">
-                                    @e.SkillName
-                                    <span style="font-size:0.75rem; color:#64748B; font-weight:400; margin-left:.5rem;">@e.ProficiencyLevel · @e.EvidenceType</span>
-                                </p>
-                                @if (!string.IsNullOrEmpty(e.Description))
-                                {
-                                    <p style="font-size:0.75rem; color:#64748B; margin:.2rem 0 0;">@e.Description</p>
-                                }
-                                @if (!string.IsNullOrEmpty(e.Url))
-                                {
-                                    <a href="@e.Url" target="_blank" style="font-size:0.75rem; color:#2563EB;">View link →</a>
-                                }
-                            </div>
-                        </div>
-                    </div>
-                }
+            <div class="form-field">
+                <label>URL / Link</label>
+                <input asp-for="EvidenceUrl" type="url" placeholder="https://..." />
             </div>
-
-        </div>
+            <div class="form-field">
+                <label>Description</label>
+                <textarea asp-for="Description" rows="2" placeholder="Brief description..."></textarea>
+            </div>
+            <div class="dash-form-actions">
+                <a href="/JobSeeker/BuildProfile" class="dash-cancel-btn">← Back to Profile</a>
+                <button type="submit" class="dash-submit-btn">
+                    <i class="fa-solid fa-plus"></i> Add Evidence
+                </button>
+            </div>
+        </form>
     </div>
+
+    <!-- My Evidence List -->
+    <div class="dash-panel">
+        <div class="panel-header">
+            <h2 class="panel-title">My Evidence</h2>
+        </div>
+        @if (!Model.MyEvidence.Any())
+        {
+            <div class="panel-empty">No evidence added yet.</div>
+        }
+        @foreach (var e in Model.MyEvidence)
+        {
+            <div class="panel-item">
+                <div class="panel-item-avatar" style="background:var(--color-accent-light);color:var(--color-accent);">
+                    <i class="fa-solid fa-certificate"></i>
+                </div>
+                <div class="panel-item-info">
+                    <div class="panel-item-title">@e.SkillName</div>
+                    <div class="panel-item-sub">
+                        <span class="badge badge-blue">@e.ProficiencyLevel</span>
+                        <span class="badge badge-gray">@e.EvidenceType</span>
+                    </div>
+                    @if (!string.IsNullOrEmpty(e.Description))
+                    {
+                        <div style="font-size:0.78rem;color:var(--color-text-light);margin-top:0.2rem;">@e.Description</div>
+                    }
+                    @if (!string.IsNullOrEmpty(e.Url))
+                    {
+                        <a href="@e.Url" target="_blank" class="table-action-link" style="font-size:0.78rem;">View link <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+
+</div>

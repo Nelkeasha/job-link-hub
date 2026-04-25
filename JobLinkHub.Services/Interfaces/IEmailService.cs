@@ -8,4 +8,5 @@ public interface IEmailService
     Task SendApplicationStatusAsync(string to, string userName, string opportunityTitle, string status);
     Task SendNewApplicationNotificationAsync(string to, string companyName, string candidateName, string opportunityTitle);
     Task SendOpportunityMatchAsync(string to, string userName, List<string> opportunityTitles);
+    Task SendLoginOtpAsync(string to, string userName, string otp);
 }

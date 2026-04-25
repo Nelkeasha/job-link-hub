@@ -1,89 +1,87 @@
-﻿@page
+@page
 @model JobLinkHub.Web.Pages.JobSeeker.OpportunityDetailsModel
 @{
     ViewData["Title"] = Model.Title;
-    Layout = "_Layout";
+    Layout = "_DashboardLayout";
+    ViewData["DashboardRole"] = "Candidate";
+    ViewData["ActivePage"] = "";
 }
 
-<div style="background:#F8FAFC; min-height:100vh; padding:2rem 1rem;">
-    <div style="max-width:720px; margin:0 auto;">
-
-        <a href="/JobSeeker/OpportunitiesListing"
-               style="font-size:0.875rem; color:#64748B; text-decoration:none; display:inline-block; margin-bottom:1.5rem;">
-            ← Back to listings
-        </a>
-
-        @if (Model.NotFound != null)
-        {
-            <p style="color:#EF4444;">@Model.NotFound</p>
-        }
-        else
-        {
-            <!-- Header card -->
-            <div style="background:white; border:1px solid #E2E8F0; border-radius:12px; padding:1.5rem; margin-bottom:1rem;">
-                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <div>
-                        <span style="font-size:0.7rem; background:#DBEAFE; color:#1E40AF; padding:.2rem .6rem; border-radius:999px; display:inline-block; margin-bottom:.5rem;">
-                            @Model.Type
-                        </span>
-                        <h1 style="font-size:1.4rem; font-weight:700; color:#0F172A; margin:0 0 .25rem;">@Model.Title</h1>
-                        <p style="font-size:0.875rem; color:#64748B; margin:0;">
-                            @Model.CompanyName @(Model.Location != null ? "· " + Model.Location : "")
-                        </p>
-                        @if (Model.Deadline.HasValue)
-                        {
-                            <p style="font-size:0.8rem; color:#F59E0B; margin:.5rem 0 0;">
-                                Deadline: @Model.Deadline.Value.ToString("MMMM dd, yyyy")
-                            </p>
-                        }
-                    </div>
-                    <div style="display:flex; flex-direction:column; gap:.5rem; margin-left:1rem;">
-                        @if (Model.AlreadyApplied)
-                        {
-                            <span style="background:#DCFCE7; color:#166534; padding:.5rem 1rem; border-radius:8px; font-size:0.8rem; font-weight:500;">
-                                ✓ Applied
-                            </span>
-                        }
-                        else
-                        {
-                            <a href="/JobSeeker/Apply?id=@Model.Id"
-                                   style="background:#2563EB; color:white; padding:.5rem 1.25rem; border-radius:8px; font-size:0.875rem; font-weight:500; text-decoration:none; text-align:center;">
-                                Apply Now
-                            </a>
-                        }
-                    </div>
-                </div>
-            </div>
-
-            <!-- Description -->
-            <div style="background:white; border:1px solid #E2E8F0; border-radius:12px; padding:1.5rem; margin-bottom:1rem;">
-                <h2 style="font-size:0.95rem; font-weight:600; color:#0F172A; margin:0 0 .75rem;">About this opportunity</h2>
-                <p style="font-size:0.875rem; color:#475569; line-height:1.7; margin:0;">@Model.Description</p>
-            </div>
-
-            <!-- Skills -->
-            @if (Model.RequiredSkills.Any())
-            {
-                <div style="background:white; border:1px solid #E2E8F0; border-radius:12px; padding:1.5rem; margin-bottom:1rem;">
-                    <h2 style="font-size:0.95rem; font-weight:600; color:#0F172A; margin:0 0 .75rem;">Required Skills</h2>
-                    <div style="display:flex; flex-wrap:wrap; gap:.5rem;">
-                        @foreach (var s in Model.RequiredSkills)
-                        {
-                            <span style="background:#F1F5F9; color:#334155; font-size:0.8rem; padding:.3rem .8rem; border-radius:6px;">@s</span>
-                        }
-                    </div>
-                </div>
-            }
-
-            <!-- Employer -->
-            @if (!string.IsNullOrEmpty(Model.EmployerDescription))
-            {
-                <div style="background:white; border:1px solid #E2E8F0; border-radius:12px; padding:1.5rem;">
-                    <h2 style="font-size:0.95rem; font-weight:600; color:#0F172A; margin:0 0 .75rem;">About @Model.CompanyName</h2>
-                    <p style="font-size:0.875rem; color:#475569; line-height:1.7; margin:0;">@Model.EmployerDescription</p>
-                </div>
-            }
-        }
-
-    </div>
+<div style="margin-bottom:1.5rem;">
+    <a href="/JobSeeker/OpportunitiesListing" class="table-action-link">
+        <i class="fa-solid fa-arrow-left"></i> Back to listings
+    </a>
 </div>
+
+@if (Model.NotFoundMessage != null)
+{
+    <div class="alert alert-danger">@Model.NotFoundMessage</div>
+}
+else
+{
+    <!-- Header card -->
+    <div class="dash-form-card" style="margin-bottom:1rem;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap;">
+            <div>
+                <span class="badge badge-blue" style="margin-bottom:0.6rem;">@Model.Type</span>
+                <h1 class="dash-greeting" style="font-size:1.5rem;margin-bottom:0.25rem;">@Model.Title</h1>
+                <p style="color:var(--color-accent);font-weight:600;font-size:0.92rem;">
+                    @Model.CompanyName
+                    @if (!string.IsNullOrEmpty(Model.Location))
+                    {
+                        <span style="color:var(--color-text-muted)"> · @Model.Location</span>
+                    }
+                </p>
+                @if (Model.Deadline.HasValue)
+                {
+                    <p style="font-size:0.82rem;color:#d97706;margin-top:0.4rem;">
+                        <i class="fa-regular fa-clock"></i> Deadline: @Model.Deadline.Value.ToString("MMMM dd, yyyy")
+                    </p>
+                }
+            </div>
+            <div>
+                @if (Model.AlreadyApplied)
+                {
+                    <span class="badge badge-green" style="padding:0.5rem 1rem;font-size:0.85rem;">
+                        <i class="fa-solid fa-circle-check"></i> Already Applied
+                    </span>
+                }
+                else
+                {
+                    <a href="/JobSeeker/Apply?id=@Model.Id" class="cta-btn">
+                        Apply Now <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Description -->
+    <div class="dash-form-card" style="margin-bottom:1rem;">
+        <h2 class="panel-title" style="margin-bottom:0.75rem;">About this opportunity</h2>
+        <p style="color:var(--color-text-light);line-height:1.7;font-size:0.92rem;">@Model.Description</p>
+    </div>
+
+    <!-- Skills -->
+    @if (Model.RequiredSkills.Any())
+    {
+        <div class="dash-form-card" style="margin-bottom:1rem;">
+            <h2 class="panel-title" style="margin-bottom:0.75rem;">Required Skills</h2>
+            <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+                @foreach (var s in Model.RequiredSkills)
+                {
+                    <span class="badge badge-gray">@s</span>
+                }
+            </div>
+        </div>
+    }
+
+    <!-- Employer -->
+    @if (!string.IsNullOrEmpty(Model.EmployerDescription))
+    {
+        <div class="dash-form-card">
+            <h2 class="panel-title" style="margin-bottom:0.75rem;">About @Model.CompanyName</h2>
+            <p style="color:var(--color-text-light);line-height:1.7;font-size:0.92rem;">@Model.EmployerDescription</p>
+        </div>
+    }
+}

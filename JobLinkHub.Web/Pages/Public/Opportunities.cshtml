@@ -1,5 +1,5 @@
 @page
-@model JobLinkHub.Web.Pages.OpportunitiesModel
+@model JobLinkHub.Web.Pages.Public.OpportunitiesModel
 @{
     ViewData["Title"] = "Opportunities";
 }
@@ -15,16 +15,16 @@
             </p>
         </div>
 
-        <div class="opportunities-filter-bar">
+        <form method="get" class="opportunities-filter-bar">
             <div class="filter-input-group">
-                <label for="search">Search</label>
-                <input id="search" type="text" placeholder="Search by title, skill, or category" />
+                <label for="SearchQ">Search</label>
+                <input asp-for="SearchQ" type="text" placeholder="Search by title, skill, or keyword" />
             </div>
 
             <div class="filter-input-group">
-                <label for="type">Type</label>
-                <select id="type">
-                    <option>All Types</option>
+                <label for="FilterType">Type</label>
+                <select asp-for="FilterType">
+                    <option value="">All Types</option>
                     <option>Job</option>
                     <option>Internship</option>
                     <option>Training</option>
@@ -34,26 +34,19 @@
             </div>
 
             <div class="filter-input-group">
-                <label for="location">Location</label>
-                <select id="location">
-                    <option>All Locations</option>
+                <label for="FilterLocation">Location</label>
+                <select asp-for="FilterLocation">
+                    <option value="">All Locations</option>
                     <option>Kigali</option>
                     <option>Remote</option>
                     <option>Hybrid</option>
                 </select>
             </div>
 
-            <div class="filter-input-group">
-                <label for="category">Category</label>
-                <select id="category">
-                    <option>All Categories</option>
-                    <option>Technology</option>
-                    <option>Design</option>
-                    <option>Data</option>
-                    <option>Marketing</option>
-                </select>
+            <div class="filter-input-group" style="align-self: flex-end;">
+                <button type="submit" class="public-opportunity-btn">Search</button>
             </div>
-        </div>
+        </form>
 
         <div class="opportunities-results-top">
             <div>
@@ -67,22 +60,24 @@
             {
                 <div class="public-opportunity-card">
                     <div class="public-opportunity-top">
-                        <span class="public-opportunity-type">@item.Type</span>
+                        <span class="public-opportunity-type">@item.OpportunityType</span>
                         <span class="public-opportunity-status">@item.Status</span>
                     </div>
 
                     <h3>@item.Title</h3>
                     <p class="public-opportunity-company">@item.CompanyName</p>
-                    <p class="public-opportunity-description">@item.ShortDescription</p>
+                    <p class="public-opportunity-description">@(item.Description.Length > 150 ? item.Description.Substring(0, 150) + "..." : item.Description)</p>
 
                     <div class="public-opportunity-meta">
                         <span>@item.Location</span>
-                        <span>@item.Category</span>
-                        <span>@item.Deadline</span>
+                        @if (item.Deadline.HasValue)
+                        {
+                            <span>Deadline: @item.Deadline.Value.ToString("dd MMM yyyy")</span>
+                        }
                     </div>
 
                     <div class="public-opportunity-skills">
-                        @foreach (var skill in item.Skills)
+                        @foreach (var skill in item.RequiredSkills)
                         {
                             <span>@skill</span>
                         }
@@ -93,13 +88,12 @@
                                 class="public-opportunity-btn view-details-btn"
                                 data-title="@item.Title"
                                 data-company="@item.CompanyName"
-                                data-type="@item.Type"
+                                data-type="@item.OpportunityType"
                                 data-status="@item.Status"
                                 data-location="@item.Location"
-                                data-category="@item.Category"
-                                data-deadline="@item.Deadline"
+                                data-deadline="@(item.Deadline.HasValue ? item.Deadline.Value.ToString("dd MMM yyyy") : "")"
                                 data-qualification="@item.QualificationRequired"
-                                data-description="@item.FullDescription">
+                                data-description="@item.Description">
                             View Details
                         </button>
                     </div>
@@ -126,10 +120,6 @@
             <div>
                 <span>Location</span>
                 <strong id="modalLocation"></strong>
-            </div>
-            <div>
-                <span>Category</span>
-                <strong id="modalCategory"></strong>
             </div>
             <div>
                 <span>Deadline</span>
@@ -164,7 +154,6 @@
             const modalType = document.getElementById("modalType");
             const modalStatus = document.getElementById("modalStatus");
             const modalLocation = document.getElementById("modalLocation");
-            const modalCategory = document.getElementById("modalCategory");
             const modalDeadline = document.getElementById("modalDeadline");
             const modalQualification = document.getElementById("modalQualification");
             const modalDescription = document.getElementById("modalDescription");
@@ -176,7 +165,6 @@
                     modalType.textContent = this.dataset.type || "";
                     modalStatus.textContent = this.dataset.status || "";
                     modalLocation.textContent = this.dataset.location || "";
-                    modalCategory.textContent = this.dataset.category || "";
                     modalDeadline.textContent = this.dataset.deadline || "";
                     modalQualification.textContent = this.dataset.qualification || "";
                     modalDescription.textContent = this.dataset.description || "";

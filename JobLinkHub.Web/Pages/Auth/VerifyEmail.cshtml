@@ -1,0 +1,39 @@
+@page
+@model JobLinkHub.Web.Pages.Auth.VerifyEmailModel
+@{
+    ViewData["Title"] = "Verify Email";
+    Layout = "_AuthLayout";
+}
+
+<section class="auth-page">
+    <div class="auth-container">
+        <div class="auth-grid">
+            <div class="auth-showcase">
+                <h1>One step closer to your next <span style="color:var(--color-accent);">opportunity.</span></h1>
+                <p>Verifying your email keeps your account secure and ensures you receive important updates.</p>
+            </div>
+            <div class="auth-card" style="text-align:center;">
+                @if (Model.Success)
+                {
+                    <div style="font-size:3rem;color:#16a34a;margin-bottom:1rem;">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+                    <h2 class="auth-card-title">Email verified!</h2>
+                    <p class="auth-card-subtitle" style="margin-bottom:1.5rem;">
+                        Your account is now active. You can log in and start using JobLink Hub.
+                    </p>
+                    <a asp-page="/Auth/Login" class="form-submit-btn" style="display:block;text-decoration:none;">Go to Login</a>
+                }
+                else
+                {
+                    <div style="font-size:3rem;color:#dc2626;margin-bottom:1rem;">
+                        <i class="fa-solid fa-circle-exclamation"></i>
+                    </div>
+                    <h2 class="auth-card-title">Verification failed</h2>
+                    <p class="auth-card-subtitle" style="margin-bottom:1.5rem;">@Model.ErrorMessage</p>
+                    <a asp-page="/Auth/Login" class="form-submit-btn" style="display:block;text-decoration:none;">Back to Login</a>
+                }
+            </div>
+        </div>
+    </div>
+</section>

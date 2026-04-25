@@ -1,0 +1,72 @@
+@page
+@model JobLinkHub.Web.Pages.Public.EmployersModel
+@{
+    ViewData["Title"] = "Browse Companies";
+    Layout = "_Layout";
+}
+
+<section class="opportunities-page">
+
+    <div class="opportunities-hero">
+        <span class="opportunities-eyebrow"><i class="fa-solid fa-building"></i> EMPLOYERS</span>
+        <h1>Browse <em style="color:var(--color-accent);font-style:normal;">Companies</em></h1>
+        <p>Explore employers who are actively hiring on JobLink Hub.</p>
+    </div>
+
+    <form method="get" class="opportunities-filter-bar">
+        <div class="filter-input-group">
+            <label>Keyword</label>
+            <input name="Keyword" value="@Model.Keyword" type="text" placeholder="Search by company or industry..." />
+        </div>
+        <div class="filter-input-group">
+            <label>Location</label>
+            <input name="Location" value="@Model.Location" type="text" placeholder="City..." />
+        </div>
+        <button type="submit" class="public-opportunity-btn">
+            <i class="fa-solid fa-magnifying-glass"></i> Search
+        </button>
+    </form>
+
+    @if (!Model.Employers.Any())
+    {
+        <div style="background:var(--color-card);border:1px solid var(--color-border);border-radius:var(--radius-xl);padding:3rem;text-align:center;">
+            <p style="color:var(--color-text-muted);">No companies found matching your search.</p>
+        </div>
+    }
+
+    <div class="opportunity-card-grid">
+        @foreach (var e in Model.Employers)
+        {
+            var initials = e.CompanyName.Length >= 2 ? e.CompanyName.Substring(0,2).ToUpper() : e.CompanyName.ToUpper();
+            <div class="public-opportunity-card">
+                <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.8rem;">
+                    <div class="job-avatar job-avatar-green" style="border-radius:var(--radius-md);flex-shrink:0;">@initials</div>
+                    <div>
+                        <p style="font-weight:700;font-size:1rem;margin-bottom:0.1rem;">@e.CompanyName</p>
+                        @if (!string.IsNullOrEmpty(e.Industry))
+                        {
+                            <p style="font-size:0.8rem;color:var(--color-text-light);">@e.Industry</p>
+                        }
+                    </div>
+                </div>
+                @if (!string.IsNullOrEmpty(e.Location))
+                {
+                    <p class="public-opportunity-meta"><span><i class="fa-solid fa-location-dot"></i> @e.Location</span></p>
+                }
+                @if (!string.IsNullOrEmpty(e.CompanyDescription))
+                {
+                    <p class="public-opportunity-description">@e.CompanyDescription</p>
+                }
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:0.6rem;">
+                    <span style="font-size:0.82rem;color:var(--color-accent);font-weight:600;">
+                        @e.ActiveOpportunitiesCount open @(e.ActiveOpportunitiesCount == 1 ? "role" : "roles")
+                    </span>
+                    <a href="/Public/EmployerDetail?id=@e.Id" class="public-opportunity-btn" style="font-size:0.82rem;padding:0.45rem 0.9rem;">
+                        View Company <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+
+</section>

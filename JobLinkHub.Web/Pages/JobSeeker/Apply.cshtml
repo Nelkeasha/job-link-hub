@@ -1,75 +1,98 @@
-﻿@page
+@page
 @model JobLinkHub.Web.Pages.JobSeeker.ApplyModel
 @{
     ViewData["Title"] = "Apply";
-    Layout = "_Layout";
+    Layout = "_DashboardLayout";
+    ViewData["DashboardRole"] = "Candidate";
+    ViewData["ActivePage"] = "";
 }
 
-<div style="background:#F8FAFC; min-height:100vh; padding:2rem 1rem;">
-    <div style="max-width:600px; margin:0 auto;">
-
-        <a href="javascript:history.back()"
-               style="font-size:0.875rem; color:#64748B; text-decoration:none; display:inline-block; margin-bottom:1.5rem;">
-            ← Back
-        </a>
-
-        @if (Model.NotFound != null)
-        {
-            <p style="color:#EF4444;">@Model.NotFound</p>
-        }
-        else if (Model.Success)
-        {
-            <div style="background:white; border:1px solid #E2E8F0; border-radius:12px; padding:3rem; text-align:center;">
-                <div style="font-size:3rem; margin-bottom:1rem;">✅</div>
-                <h2 style="font-size:1.2rem; font-weight:700; color:#0F172A; margin:0 0 .5rem;">Application Submitted!</h2>
-                <p style="font-size:0.875rem; color:#64748B; margin:0 0 1.5rem;">
-                    Your application for <strong>@Model.JobTitle</strong> has been sent.
-                </p>
-                <a href="/JobSeeker/MyApplications"
-                       style="background:#2563EB; color:white; padding:.6rem 1.5rem; border-radius:8px; font-size:0.875rem; font-weight:500; text-decoration:none;">
-                    View My Applications
-                </a>
-            </div>
-        }
-        else
-        {
-            <div style="background:white; border:1px solid #E2E8F0; border-radius:12px; padding:1.75rem;">
-                <h1 style="font-size:1.1rem; font-weight:700; color:#0F172A; margin:0 0 .25rem;">
-                    Apply for @Model.JobTitle
-                </h1>
-                <p style="font-size:0.8rem; color:#64748B; margin:0 0 1.5rem;">@Model.CompanyName</p>
-
-                @if (Model.Message != null)
-                {
-                    <div style="padding:.75rem 1rem; border-radius:8px; margin-bottom:1rem; font-size:0.875rem; background:#FEE2E2; color:#991B1B;">
-                        @Model.Message
-                    </div>
-                }
-
-                <!-- Applicant preview -->
-                <div style="background:#F8FAFC; border-radius:8px; padding:1rem; margin-bottom:1.25rem;">
-                    <p style="font-size:0.75rem; color:#64748B; text-transform:uppercase; letter-spacing:.05em; margin:0 0 .4rem;">Applying as</p>
-                    <p style="font-size:0.875rem; font-weight:500; color:#0F172A; margin:0;">@Model.ApplicantName</p>
-                    <p style="font-size:0.8rem; color:#64748B; margin:.1rem 0 0;">@Model.ApplicantEmail</p>
-                </div>
-
-                <form method="post">
-                    <input type="hidden" asp-for="OpportunityId" />
-                    <div style="margin-bottom:1.25rem;">
-                        <label style="display:block; font-size:0.8rem; color:#475569; margin-bottom:.35rem;">
-                            Cover Note <span style="color:#94A3B8;">(optional)</span>
-                        </label>
-                        <textarea asp-for="CoverNote" rows="5"
-                                  style="width:100%; border:1px solid #E2E8F0; border-radius:8px; padding:.5rem .75rem; font-size:0.875rem; outline:none; box-sizing:border-box; resize:vertical;"
-                                  placeholder="Tell the employer why you're a great fit..."></textarea>
-                    </div>
-                    <button type="submit"
-                            style="width:100%; background:#2563EB; color:white; padding:.75rem; border:none; border-radius:8px; font-size:0.95rem; font-weight:600; cursor:pointer;">
-                        Submit Application
-                    </button>
-                </form>
-            </div>
-        }
-
-    </div>
+<div style="margin-bottom:1.5rem;">
+    <a href="javascript:history.back()" class="table-action-link">
+        <i class="fa-solid fa-arrow-left"></i> Back
+    </a>
 </div>
+
+@if (Model.NotFoundMessage != null)
+{
+    <div class="alert alert-danger">@Model.NotFoundMessage</div>
+}
+else if (Model.Success)
+{
+    <div class="dash-cta-card">
+        <div class="cta-icon" style="background:#dcfce7;color:#16a34a;">
+            <i class="fa-solid fa-circle-check"></i>
+        </div>
+        <h3>Application Submitted!</h3>
+        <p>Your application for <strong>@Model.JobTitle</strong> at <strong>@Model.CompanyName</strong> has been sent successfully.</p>
+        <a href="/JobSeeker/MyApplications" class="cta-btn">
+            <i class="fa-solid fa-file-lines"></i> View My Applications
+        </a>
+    </div>
+}
+else
+{
+    <div class="dash-form-card" style="max-width:640px;">
+        <p class="dash-header-label">SUBMIT APPLICATION</p>
+        <h1 class="dash-greeting" style="font-size:1.4rem;margin-bottom:0.2rem;">Apply for @Model.JobTitle</h1>
+        <p style="color:var(--color-accent);font-weight:600;font-size:0.9rem;margin-bottom:1.5rem;">@Model.CompanyName</p>
+
+        @if (Model.Message != null)
+        {
+            <div class="alert alert-danger">@Model.Message</div>
+        }
+
+        @if (Model.ProfileIncomplete)
+        {
+            <div class="alert" style="background:#fef3c7;color:#92400e;border-color:#fde68a;margin-bottom:1rem;">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                Your profile is incomplete. <a href="/JobSeeker/BuildProfile" style="color:#92400e;font-weight:700;">Complete it</a> to strengthen your application.
+            </div>
+        }
+
+        <!-- Applicant preview -->
+        <div class="dash-info-bar" style="margin-bottom:1.25rem;">
+            <p style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.2rem;opacity:0.7;">Applying as</p>
+            <strong>@Model.ApplicantName</strong>
+            <span style="opacity:0.7;margin-left:0.5rem;">@Model.ApplicantEmail</span>
+            @if (!string.IsNullOrEmpty(Model.ApplicantLocation))
+            {
+                <span style="opacity:0.6;margin-left:0.5rem;font-size:0.85rem;"><i class="fa-solid fa-location-dot"></i> @Model.ApplicantLocation</span>
+            }
+        </div>
+
+        <form method="post" enctype="multipart/form-data">
+            <input type="hidden" asp-for="OpportunityId" />
+
+            <div class="form-field">
+                <label>Cover Letter <span style="color:var(--color-text-muted);font-weight:400;">(optional but recommended)</span></label>
+                <textarea asp-for="CoverNote" rows="6" placeholder="Tell the employer why you're a great fit for this role..."></textarea>
+            </div>
+
+            <!-- Resume section -->
+            <div class="form-field">
+                <label>CV / Resume</label>
+                @if (!string.IsNullOrEmpty(Model.ExistingResumeUrl))
+                {
+                    <div style="display:flex;align-items:center;gap:0.8rem;margin-bottom:0.6rem;padding:0.55rem 0.8rem;background:var(--color-bg-subtle,#f8fafc);border:1px solid var(--color-border);border-radius:8px;">
+                        <i class="fa-solid fa-file-pdf" style="color:#ef4444;font-size:1.1rem;"></i>
+                        <span style="font-size:0.85rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">@Model.ExistingResumeFileName</span>
+                        <a href="@Model.ExistingResumeUrl" target="_blank" class="table-action-link" style="white-space:nowrap;">View</a>
+                    </div>
+                    <small style="color:var(--color-text-muted);font-size:0.75rem;">Your saved resume will be attached. Upload a new one to replace it for this application.</small>
+                }
+                else
+                {
+                    <small style="color:var(--color-text-muted);font-size:0.75rem;display:block;margin-bottom:0.3rem;">No resume on file. Upload one to improve your chances.</small>
+                }
+                <input asp-for="ResumeFile" type="file" accept=".pdf,.doc,.docx"
+                       style="margin-top:0.4rem;display:block;width:100%;font-size:0.88rem;" />
+                <small style="color:var(--color-text-muted);font-size:0.75rem;">PDF, DOC or DOCX · Max 5 MB</small>
+            </div>
+
+            <button type="submit" class="dash-submit-btn" style="width:100%;height:48px;font-size:0.95rem;">
+                <i class="fa-solid fa-paper-plane"></i> Submit Application
+            </button>
+        </form>
+    </div>
+}

@@ -1,88 +1,137 @@
-﻿@page
+@page
 @model JobLinkHub.Web.Pages.JobSeeker.BuildProfileModel
 @{
-    ViewData["Title"] = "Build My Profile";
-    Layout = "_Layout";
+    ViewData["Title"] = "My Profile";
+    Layout = "_DashboardLayout";
+    ViewData["DashboardRole"] = "Candidate";
+    ViewData["UserName"] = "Candidate";
+    ViewData["ActivePage"] = "MyProfile";
 }
 
-<div style="background:#F8FAFC; min-height:100vh; padding:2rem 1rem;">
-    <div style="max-width:640px; margin:0 auto;">
+<div style="margin-bottom: 1.5rem;">
+    <h1 class="dash-greeting" style="font-size: 1.4rem;">My Profile</h1>
+    <p class="dash-greeting-sub">Complete your profile to attract employers.</p>
+</div>
 
-        <div style="display:flex; align-items:center; gap:1rem; margin-bottom:1.5rem;">
-            <a href="/JobSeeker/Dashboard" style="color:#64748B; text-decoration:none; font-size:0.875rem;">← Dashboard</a>
-            <h1 style="font-size:1.25rem; font-weight:700; color:#0F172A; margin:0;">My Profile</h1>
-        </div>
+@if (Model.Message != null)
+{
+    <div class="alert @(Model.Success ? "alert-success" : "alert-danger")">@Model.Message</div>
+}
 
-        @if (Model.Message != null)
-        {
-            <div style="padding:.75rem 1rem; border-radius:8px; margin-bottom:1rem; font-size:0.875rem;
-                background:@(Model.Success ? "#DCFCE7" : "#FEE2E2");
-                color:@(Model.Success ? "#166534" : "#991B1B");
-                border:1px solid @(Model.Success ? "#BBF7D0" : "#FECACA");">
-                @Model.Message
+<form method="post" enctype="multipart/form-data">
+
+    <!-- Personal Information -->
+    <div class="dash-form-card" style="margin-bottom:1rem;">
+        <h2 style="font-size: 1rem; font-weight: 700; margin-bottom: 1.2rem;">Personal Information</h2>
+        <div class="dash-form-grid">
+            <div class="form-field">
+                <label asp-for="FirstName">First Name <span style="color:red;">*</span></label>
+                <input asp-for="FirstName" type="text" placeholder="John" required />
             </div>
-        }
+            <div class="form-field">
+                <label asp-for="LastName">Last Name <span style="color:red;">*</span></label>
+                <input asp-for="LastName" type="text" placeholder="Doe" required />
+            </div>
+        </div>
+        <div class="form-field">
+            <label asp-for="Bio">Bio / Summary</label>
+            <textarea asp-for="Bio" rows="3" placeholder="Tell employers about yourself..."></textarea>
+        </div>
+        <div class="dash-form-grid">
+            <div class="form-field">
+                <label asp-for="Location">Location</label>
+                <input asp-for="Location" type="text" placeholder="Kigali, Rwanda" />
+            </div>
+            <div class="form-field">
+                <label asp-for="PhoneNumber">Phone</label>
+                <input asp-for="PhoneNumber" type="tel" placeholder="+250 ..." />
+            </div>
+        </div>
+        <div class="dash-form-grid">
+            <div class="form-field">
+                <label asp-for="CareerInterest">Career Interest / Area</label>
+                <input asp-for="CareerInterest" type="text" placeholder="e.g. Software Engineering" />
+            </div>
+            <div class="form-field">
+                <label asp-for="LinkedInUrl">LinkedIn URL</label>
+                <input asp-for="LinkedInUrl" type="url" placeholder="https://linkedin.com/in/..." />
+            </div>
+            <div class="form-field">
+                <label asp-for="PortfolioUrl">Portfolio / GitHub</label>
+                <input asp-for="PortfolioUrl" type="url" placeholder="https://github.com/..." />
+            </div>
+            <div class="form-field" style="grid-column:1/-1;">
+                <label asp-for="ResumeFile">Upload CV / Resume</label>
+                @if (!string.IsNullOrEmpty(Model.ExistingResumeUrl))
+                {
+                    <div style="display:flex;align-items:center;gap:0.8rem;margin-bottom:0.5rem;padding:0.55rem 0.8rem;background:var(--color-bg-subtle,#f8fafc);border:1px solid var(--color-border);border-radius:8px;">
+                        <i class="fa-solid fa-file-pdf" style="color:#ef4444;font-size:1.1rem;"></i>
+                        <span style="font-size:0.85rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">@Model.ExistingResumeFileName</span>
+                        <a href="@Model.ExistingResumeUrl" target="_blank" class="table-action-link" style="white-space:nowrap;">View</a>
+                    </div>
+                    <small style="color:var(--color-text-muted);font-size:0.75rem;">Upload a new file to replace the existing one.</small>
+                }
+                <input asp-for="ResumeFile" type="file" accept=".pdf,.doc,.docx"
+                       style="margin-top:0.4rem;display:block;width:100%;font-size:0.88rem;" />
+                <small style="color:var(--color-text-muted);font-size:0.75rem;">PDF, DOC or DOCX · Max 5 MB</small>
+            </div>
+        </div>
+    </div>
 
-        <form method="post">
-            <div style="background:white; border:1px solid #E2E8F0; border-radius:12px; padding:1.5rem; margin-bottom:1rem;">
-                <h2 style="font-size:0.95rem; font-weight:600; color:#0F172A; margin:0 0 1rem;">Personal Information</h2>
+    <!-- Education -->
+    <div class="dash-form-card" style="margin-bottom:1rem;">
+        <h2 style="font-size: 1rem; font-weight: 700; margin-bottom: 1.2rem;">Education</h2>
+        <div class="dash-form-grid">
+            <div class="form-field">
+                <label asp-for="EducationLevel">Education Level</label>
+                <select asp-for="EducationLevel">
+                    <option value="">Select level...</option>
+                    <option>High School</option>
+                    <option>Diploma</option>
+                    <option>Bachelor's Degree</option>
+                    <option>Master's Degree</option>
+                    <option>PhD</option>
+                    <option>Other</option>
+                </select>
+            </div>
+            <div class="form-field">
+                <label asp-for="Institution">Institution / School</label>
+                <input asp-for="Institution" type="text" placeholder="University of Rwanda" />
+            </div>
+            <div class="form-field">
+                <label asp-for="GraduationYear">Graduation Year</label>
+                <input asp-for="GraduationYear" type="number" placeholder="2024" min="1990" max="2030" />
+            </div>
+        </div>
+    </div>
 
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
-                    <div>
-                        <label style="display:block; font-size:0.8rem; color:#475569; margin-bottom:.35rem;">First Name</label>
-                        <input asp-for="FirstName" type="text"
-                               style="width:100%; border:1px solid #E2E8F0; border-radius:8px; padding:.5rem .75rem; font-size:0.875rem; outline:none; box-sizing:border-box;"
-                               placeholder="John">
-                        </div>
-                        <div>
-                            <label style="display:block; font-size:0.8rem; color:#475569; margin-bottom:.35rem;">Last Name</label>
-                            <input asp-for="LastName" type="text"
-                                   style="width:100%; border:1px solid #E2E8F0; border-radius:8px; padding:.5rem .75rem; font-size:0.875rem; outline:none; box-sizing:border-box;"
-                                   placeholder="Doe">
-                            </div>
-                        </div>
+    <!-- Skills -->
+    @if (Model.SkillsByCategory.Any())
+    {
+        <div class="dash-form-card" style="margin-bottom:1rem;">
+            <h2 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem;">Skills</h2>
+            <p style="font-size:0.82rem;color:var(--color-text-muted);margin-bottom:1rem;">Select all skills that apply to you.</p>
+            @foreach (var category in Model.SkillsByCategory)
+            {
+                <div style="margin-bottom:1rem;">
+                    <p style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-muted);margin-bottom:0.5rem;">@category.Category</p>
+                    <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+                        @foreach (var skill in category.Skills)
+                        {
+                            var isSelected = Model.SelectedSkillIds.Contains(skill.Id);
+                            <label style="display:flex;align-items:center;gap:0.3rem;cursor:pointer;padding:0.3rem 0.6rem;border:1px solid @(isSelected ? "var(--color-accent)" : "var(--color-border)");border-radius:6px;font-size:0.82rem;background:@(isSelected ? "var(--color-accent-light)" : "transparent");">
+                                <input type="checkbox" name="SelectedSkillIds" value="@skill.Id" @(isSelected ? "checked" : "") style="width:14px;height:14px;" />
+                                @skill.Name
+                            </label>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
 
-                        <div style="margin-bottom:1rem;">
-                            <label style="display:block; font-size:0.8rem; color:#475569; margin-bottom:.35rem;">Bio</label>
-                            <textarea asp-for="Bio" rows="3"
-                                      style="width:100%; border:1px solid #E2E8F0; border-radius:8px; padding:.5rem .75rem; font-size:0.875rem; outline:none; box-sizing:border-box; resize:vertical;"
-                                      placeholder="Tell employers about yourself..."></textarea>
-                        </div>
+    <div class="dash-form-actions">
+        <button type="submit" class="dash-submit-btn">Save Profile</button>
+    </div>
 
-                        <div style="margin-bottom:1rem;">
-                            <label style="display:block; font-size:0.8rem; color:#475569; margin-bottom:.35rem;">Location</label>
-                            <input asp-for="Location" type="text"
-                                   style="width:100%; border:1px solid #E2E8F0; border-radius:8px; padding:.5rem .75rem; font-size:0.875rem; outline:none; box-sizing:border-box;"
-                                   placeholder="Kigali, Rwanda">
-                            </div>
-
-                            <div style="margin-bottom:1rem;">
-                                <label style="display:block; font-size:0.8rem; color:#475569; margin-bottom:.35rem;">Phone</label>
-                                <input asp-for="Phone" type="tel"
-                                       style="width:100%; border:1px solid #E2E8F0; border-radius:8px; padding:.5rem .75rem; font-size:0.875rem; outline:none; box-sizing:border-box;"
-                                       placeholder="+250 ...">
-                                </div>
-
-                                <div style="margin-bottom:1rem;">
-                                    <label style="display:block; font-size:0.8rem; color:#475569; margin-bottom:.35rem;">LinkedIn URL</label>
-                                    <input asp-for="LinkedInUrl" type="url"
-                                           style="width:100%; border:1px solid #E2E8F0; border-radius:8px; padding:.5rem .75rem; font-size:0.875rem; outline:none; box-sizing:border-box;"
-                                           placeholder="https://linkedin.com/in/...">
-                                    </div>
-
-                                    <div>
-                                        <label style="display:block; font-size:0.8rem; color:#475569; margin-bottom:.35rem;">Portfolio / GitHub</label>
-                                        <input asp-for="PortfolioUrl" type="url"
-                                               style="width:100%; border:1px solid #E2E8F0; border-radius:8px; padding:.5rem .75rem; font-size:0.875rem; outline:none; box-sizing:border-box;"
-                                               placeholder="https://github.com/...">
-                                        </div>
-                                    </div>
-
-                                    <button type="submit"
-                                            style="width:100%; background:#2563EB; color:white; padding:.75rem; border:none; border-radius:8px; font-size:0.95rem; font-weight:600; cursor:pointer;">
-                                        Save Profile
-                                    </button>
-                                </form>
-
-                            </div>
-                        </div>
+</form>

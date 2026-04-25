@@ -1,0 +1,82 @@
+@page
+@model JobLinkHub.Web.Pages.Public.CandidatesModel
+@{
+    ViewData["Title"] = "Browse Candidates";
+    Layout = "_Layout";
+}
+
+<section class="opportunities-page">
+
+    <div class="opportunities-hero">
+        <span class="opportunities-eyebrow"><i class="fa-solid fa-users"></i> TALENT POOL</span>
+        <h1>Browse <em style="color:var(--color-accent);font-style:normal;">Candidates</em></h1>
+        <p>Discover skilled candidates ready for their next opportunity.</p>
+    </div>
+
+    <form method="get" class="opportunities-filter-bar">
+        <div class="filter-input-group">
+            <label>Keyword</label>
+            <input name="Keyword" value="@Model.Keyword" type="text" placeholder="Search by skill or name..." />
+        </div>
+        <div class="filter-input-group">
+            <label>Location</label>
+            <input name="Location" value="@Model.Location" type="text" placeholder="City..." />
+        </div>
+        <button type="submit" class="public-opportunity-btn">
+            <i class="fa-solid fa-magnifying-glass"></i> Search
+        </button>
+    </form>
+
+    @if (!Model.Candidates.Any())
+    {
+        <div style="background:var(--color-card);border:1px solid var(--color-border);border-radius:var(--radius-xl);padding:3rem;text-align:center;">
+            <p style="color:var(--color-text-muted);">No candidates found matching your search.</p>
+        </div>
+    }
+
+    <div class="opportunity-card-grid">
+        @foreach (var c in Model.Candidates)
+        {
+            var initials = $"{c.FirstName.FirstOrDefault()}{c.LastName.FirstOrDefault()}".ToUpper();
+            <div class="public-opportunity-card">
+                <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.8rem;">
+                    <div class="job-avatar job-avatar-blue" style="flex-shrink:0;">@initials</div>
+                    <div>
+                        <p style="font-weight:700;font-size:0.95rem;margin-bottom:0.1rem;">@c.FirstName @c.LastName</p>
+                        @if (!string.IsNullOrEmpty(c.Location))
+                        {
+                            <p style="font-size:0.8rem;color:var(--color-text-light);"><i class="fa-solid fa-location-dot"></i> @c.Location</p>
+                        }
+                    </div>
+                </div>
+                @if (!string.IsNullOrEmpty(c.CareerInterest))
+                {
+                    <p style="font-size:0.82rem;color:var(--color-text-light);font-style:italic;margin-bottom:0.5rem;">@c.CareerInterest</p>
+                }
+                @if (!string.IsNullOrEmpty(c.Bio))
+                {
+                    <p class="public-opportunity-description">@c.Bio</p>
+                }
+                @if (c.Skills.Any())
+                {
+                    <div class="public-opportunity-skills">
+                        @foreach (var skill in c.Skills.Take(4))
+                        {
+                            <span>@skill</span>
+                        }
+                        @if (c.Skills.Count > 4)
+                        {
+                            <span style="background:var(--color-bg);color:var(--color-text-muted);">+@(c.Skills.Count - 4)</span>
+                        }
+                    </div>
+                }
+                <div class="public-opportunity-actions">
+                    <a href="/Public/CandidateDetail?id=@c.Id" class="public-opportunity-btn" style="font-size:0.82rem;padding:0.5rem 1rem;">
+                        View Profile <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+
+</section>

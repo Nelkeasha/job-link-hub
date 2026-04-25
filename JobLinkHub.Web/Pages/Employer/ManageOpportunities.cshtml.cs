@@ -1,90 +1,66 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Collections.Generic;
+using JobLinkHub.Services.Interfaces;
+using JobLinkHub.Services.DTOs;
 
-namespace JobLinkHub.Web.Pages
+namespace JobLinkHub.Web.Pages.Employer
 {
+    [Authorize(Roles = "EMPLOYER")]
     public class ManageOpportunitiesModel : PageModel
     {
+        private readonly IOpportunityService _opportunities;
+        private readonly IUserProfileService _profiles;
+
+        public ManageOpportunitiesModel(IOpportunityService opportunities, IUserProfileService profiles)
+        {
+            _opportunities = opportunities;
+            _profiles = profiles;
+        }
+
+        [BindProperty(SupportsGet = true)] public string? FilterStatus { get; set; }
+
         public int TotalOpportunitiesCount { get; set; }
         public int LiveOpportunitiesCount { get; set; }
         public int DraftOpportunitiesCount { get; set; }
         public int ClosedOpportunitiesCount { get; set; }
 
-        public List<OpportunityRow> Opportunities { get; set; } = new();
+        public List<OpportunityDto> Opportunities { get; set; } = new();
 
-        public void OnGet()
+        public async Task OnGetAsync()
         {
-            // Temporary mock data for UI development.
-            // Backend developers can later replace this with real service/database data.
-            TotalOpportunitiesCount = 12;
-            LiveOpportunitiesCount = 8;
-            DraftOpportunitiesCount = 2;
-            ClosedOpportunitiesCount = 2;
+            var userIdStr = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (!long.TryParse(userIdStr, out var userId)) return;
 
-            Opportunities = new List<OpportunityRow>
-            {
-                new OpportunityRow
-                {
-                    Title = "Frontend Developer Intern",
-                    Category = "Technology",
-                    Type = "Internship",
-                    Location = "Kigali",
-                    Deadline = "20 Apr 2026",
-                    ApplicantCount = 24,
-                    Status = "Live"
-                },
-                new OpportunityRow
-                {
-                    Title = "UI/UX Design Trainee",
-                    Category = "Design",
-                    Type = "Training",
-                    Location = "Remote",
-                    Deadline = "25 Apr 2026",
-                    ApplicantCount = 18,
-                    Status = "Live"
-                },
-                new OpportunityRow
-                {
-                    Title = "Backend Developer",
-                    Category = "Technology",
-                    Type = "Full-time",
-                    Location = "Kigali",
-                    Deadline = "15 Apr 2026",
-                    ApplicantCount = 31,
-                    Status = "Review"
-                },
-                new OpportunityRow
-                {
-                    Title = "Product Marketing Associate",
-                    Category = "Marketing",
-                    Type = "Full-time",
-                    Location = "Hybrid",
-                    Deadline = "30 Apr 2026",
-                    ApplicantCount = 12,
-                    Status = "Draft"
-                },
-                new OpportunityRow
-                {
-                    Title = "Data Analyst Intern",
-                    Category = "Data",
-                    Type = "Internship",
-                    Location = "Remote",
-                    Deadline = "10 Apr 2026",
-                    ApplicantCount = 27,
-                    Status = "Closed"
-                }
-            };
+            var profile = await _profiles.GetEmployerByUserIdAsync(userId);
+            if (profile == null) return;
+
+            var all = (await _opportunities.GetByEmployerAsync(profile.Id)).ToList();
+
+            TotalOpportunitiesCount = all.Count;
+            LiveOpportunitiesCount   = all.Count(o => o.Status == "Active");
+            DraftOpportunitiesCount  = all.Count(o => o.Status == "Draft");
+            ClosedOpportunitiesCount = all.Count(o => o.Status == "Closed");
+
+            Opportunities = (string.IsNullOrWhiteSpace(FilterStatus)
+                ? all
+                : all.Where(o => o.Status.Equals(FilterStatus, StringComparison.OrdinalIgnoreCase)))
+                .ToList();
         }
 
-        public class OpportunityRow
+        public async Task<IActionResult> OnPostDeleteAsync(long id)
         {
-            public string Title { get; set; } = string.Empty;
-            public string Category { get; set; } = string.Empty;
-            public string Type { get; set; } = string.Empty;
-            public string Location { get; set; } = string.Empty;
-            public string Deadline { get; set; } = string.Empty;
-            public int ApplicantCount { get; set; }
-            public string Status { get; set; } = string.Empty;
+            var userIdStr = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (!long.TryParse(userIdStr, out var userId)) return RedirectToPage();
+
+            var profile = await _profiles.GetEmployerByUserIdAsync(userId);
+            if (profile != null)
+            {
+                await _opportunities.DeleteAsync(id, profile.Id);
+                TempData["SuccessMessage"] = "Opportunity deleted.";
+            }
+
+            return RedirectToPage();
         }
     }
 }

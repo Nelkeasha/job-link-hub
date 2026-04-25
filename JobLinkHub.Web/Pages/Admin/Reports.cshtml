@@ -1,0 +1,283 @@
+@page
+@model JobLinkHub.Web.Pages.Admin.ReportsModel
+@{
+    ViewData["Title"] = "Reports";
+    Layout = "_DashboardLayout";
+    ViewData["DashboardRole"] = "Admin";
+    ViewData["UserName"] = "Admin";
+    ViewData["ActivePage"] = "Reports";
+}
+
+<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem;">
+    <div>
+        <p class="dash-header-label">ANALYTICS</p>
+        <h1 class="dash-greeting">Reports &amp; Analytics</h1>
+        <p class="dash-greeting-sub">Platform statistics, data tables, and exports.</p>
+    </div>
+</div>
+
+<!-- Filter bar -->
+<form method="get" class="dash-filter-bar" style="margin-bottom:1.5rem;">
+    <div class="filter-group">
+        <label>From Date</label>
+        <input type="date" name="FromDate" value="@Model.FromDate?.ToString("yyyy-MM-dd")" />
+    </div>
+    <div class="filter-group">
+        <label>To Date</label>
+        <input type="date" name="ToDate" value="@Model.ToDate?.ToString("yyyy-MM-dd")" />
+    </div>
+    <div class="filter-group">
+        <label>Role</label>
+        <select name="FilterRole">
+            <option value="">All Roles</option>
+            <option value="CANDIDATE" selected="@(Model.FilterRole=="CANDIDATE")">Candidate</option>
+            <option value="EMPLOYER" selected="@(Model.FilterRole=="EMPLOYER")">Employer</option>
+        </select>
+    </div>
+    <div class="filter-group">
+        <label>Type</label>
+        <select name="FilterType">
+            <option value="">All Types</option>
+            <option value="Job" selected="@(Model.FilterType=="Job")">Job</option>
+            <option value="Internship" selected="@(Model.FilterType=="Internship")">Internship</option>
+            <option value="Freelance" selected="@(Model.FilterType=="Freelance")">Freelance</option>
+            <option value="Mentorship" selected="@(Model.FilterType=="Mentorship")">Mentorship</option>
+        </select>
+    </div>
+    <div class="filter-group">
+        <label>App. Status</label>
+        <select name="FilterStatus">
+            <option value="">All</option>
+            <option value="Pending" selected="@(Model.FilterStatus=="Pending")">Pending</option>
+            <option value="Shortlisted" selected="@(Model.FilterStatus=="Shortlisted")">Shortlisted</option>
+            <option value="Accepted" selected="@(Model.FilterStatus=="Accepted")">Accepted</option>
+            <option value="Rejected" selected="@(Model.FilterStatus=="Rejected")">Rejected</option>
+        </select>
+    </div>
+    <button type="submit" class="filter-btn"><i class="fa-solid fa-filter"></i> Apply</button>
+    <a href="/Admin/Reports" class="dash-cancel-btn" style="height:40px;display:flex;align-items:center;">Clear</a>
+</form>
+
+<!-- Stats summary -->
+<div class="dash-stats-row" style="margin-bottom:1.5rem;">
+    <div class="dash-stat-card">
+        <div class="stat-icon stat-icon-green"><i class="fa-solid fa-users"></i></div>
+        <div class="stat-info"><p class="stat-label">Total Users</p><p class="stat-value">@Model.Stats.TotalUsers</p></div>
+    </div>
+    <div class="dash-stat-card">
+        <div class="stat-icon stat-icon-teal"><i class="fa-solid fa-user"></i></div>
+        <div class="stat-info"><p class="stat-label">Candidates</p><p class="stat-value">@Model.Stats.TotalCandidates</p></div>
+    </div>
+    <div class="dash-stat-card">
+        <div class="stat-icon stat-icon-purple"><i class="fa-solid fa-building"></i></div>
+        <div class="stat-info"><p class="stat-label">Employers</p><p class="stat-value">@Model.Stats.TotalEmployers</p></div>
+    </div>
+    <div class="dash-stat-card">
+        <div class="stat-icon stat-icon-blue"><i class="fa-solid fa-briefcase"></i></div>
+        <div class="stat-info"><p class="stat-label">Opportunities</p><p class="stat-value">@Model.Stats.ActiveOpportunities</p></div>
+    </div>
+    <div class="dash-stat-card">
+        <div class="stat-icon stat-icon-amber"><i class="fa-solid fa-file-lines"></i></div>
+        <div class="stat-info"><p class="stat-label">Applications</p><p class="stat-value">@Model.Stats.TotalApplications</p></div>
+    </div>
+</div>
+
+<!-- Charts row -->
+<div class="dash-panels" style="margin-bottom:1.5rem;">
+
+    <!-- Applications per month bar chart -->
+    <div class="dash-panel">
+        <div class="panel-header">
+            <h2 class="panel-title">Applications per Month</h2>
+        </div>
+        <canvas id="appsChart" height="200"></canvas>
+    </div>
+
+    <!-- Opportunities by type pie chart -->
+    <div class="dash-panel">
+        <div class="panel-header">
+            <h2 class="panel-title">Opportunities by Type</h2>
+        </div>
+        <canvas id="typeChart" height="200"></canvas>
+    </div>
+
+</div>
+
+<!-- Applications status breakdown -->
+<div class="dash-panels" style="margin-bottom:1.5rem;">
+    <div class="dash-panel">
+        <div class="panel-header">
+            <h2 class="panel-title">Application Status Breakdown</h2>
+        </div>
+        <canvas id="statusChart" height="180"></canvas>
+    </div>
+    <div class="dash-panel">
+        <div class="panel-header">
+            <h2 class="panel-title">Users by Role</h2>
+        </div>
+        <canvas id="usersChart" height="180"></canvas>
+    </div>
+</div>
+
+<!-- Users Table -->
+<div class="dash-table-card" style="margin-bottom:1.2rem;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+        <h2 class="panel-title">Users <span class="badge badge-gray">@Model.Users.Count</span></h2>
+        <a href="?handler=ExportUsers&FilterRole=@Model.FilterRole&FromDate=@Model.FromDate?.ToString("yyyy-MM-dd")&ToDate=@Model.ToDate?.ToString("yyyy-MM-dd")"
+           class="dash-submit-btn" style="font-size:0.82rem;padding:0.5rem 1rem;">
+            <i class="fa-solid fa-file-excel"></i> Export Excel
+        </a>
+    </div>
+    <table class="dash-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Registered</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var u in Model.Users.Take(20))
+            {
+                <tr>
+                    <td><div class="table-name-cell"><strong>@u.FirstName @u.LastName</strong></div></td>
+                    <td>@u.Email</td>
+                    <td><span class="badge @(u.Role=="ADMIN"?"badge-amber":u.Role=="EMPLOYER"?"badge-blue":"badge-green")">@u.Role</span></td>
+                    <td><span class="badge @(u.IsActive?"badge-green":"badge-red")">@(u.IsActive?"Active":"Inactive")</span></td>
+                    <td style="font-size:0.82rem;color:var(--color-text-light);">@u.CreatedAt.ToString("MMM dd, yyyy")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    @if (Model.Users.Count > 20)
+    {
+        <p style="text-align:center;padding:0.6rem;font-size:0.82rem;color:var(--color-text-muted);">Showing 20 of @Model.Users.Count — export for full list</p>
+    }
+</div>
+
+<!-- Opportunities Table -->
+<div class="dash-table-card" style="margin-bottom:1.2rem;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+        <h2 class="panel-title">Opportunities <span class="badge badge-gray">@Model.Opportunities.Count</span></h2>
+        <a href="?handler=ExportOpportunities&FilterType=@Model.FilterType"
+           class="dash-submit-btn" style="font-size:0.82rem;padding:0.5rem 1rem;">
+            <i class="fa-solid fa-file-excel"></i> Export Excel
+        </a>
+    </div>
+    <table class="dash-table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Company</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Applications</th>
+                <th>Created</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var o in Model.Opportunities.Take(20))
+            {
+                var statusCls = o.Status?.ToLower() switch { "active" or "live" => "badge-green", "draft" => "badge-gray", "closed" => "badge-red", _ => "badge-amber" };
+                <tr>
+                    <td><strong>@o.Title</strong></td>
+                    <td>@o.CompanyName</td>
+                    <td><span class="badge badge-blue">@o.OpportunityType</span></td>
+                    <td><span class="badge @statusCls">@o.Status</span></td>
+                    <td>@o.ApplicationCount</td>
+                    <td style="font-size:0.82rem;color:var(--color-text-light);">@o.CreatedAt.ToString("MMM dd, yyyy")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Applications Table -->
+<div class="dash-table-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+        <h2 class="panel-title">Applications <span class="badge badge-gray">@Model.Applications.Count</span></h2>
+        <a href="?handler=ExportApplications&FilterStatus=@Model.FilterStatus&FromDate=@Model.FromDate?.ToString("yyyy-MM-dd")&ToDate=@Model.ToDate?.ToString("yyyy-MM-dd")"
+           class="dash-submit-btn" style="font-size:0.82rem;padding:0.5rem 1rem;">
+            <i class="fa-solid fa-file-excel"></i> Export Excel
+        </a>
+    </div>
+    <table class="dash-table">
+        <thead>
+            <tr>
+                <th>Opportunity</th>
+                <th>Company</th>
+                <th>Candidate</th>
+                <th>Status</th>
+                <th>Applied</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var a in Model.Applications.Take(25))
+            {
+                var appCls = a.Status?.ToLower() switch { "accepted" or "shortlisted" => "badge-green", "rejected" => "badge-red", "interview" => "badge-blue", _ => "badge-amber" };
+                <tr>
+                    <td><strong>@a.OpportunityTitle</strong></td>
+                    <td>@a.CompanyName</td>
+                    <td>@a.CandidateName</td>
+                    <td><span class="badge @appCls">@a.Status</span></td>
+                    <td style="font-size:0.82rem;color:var(--color-text-light);">@a.ApplicationDate.ToString("MMM dd, yyyy")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    const accent = '#00d4aa';
+    const blue = '#2563eb';
+    const amber = '#d97706';
+    const red = '#ef4444';
+    const purple = '#7c3aed';
+
+    // Applications per month
+    const appsData = {
+        labels: [@Html.Raw(string.Join(",", Model.Stats.ApplicationsPerMonth.Select(m => $"'{m.Month}'")))],
+        datasets: [{ label: 'Applications', data: [@string.Join(",", Model.Stats.ApplicationsPerMonth.Select(m => m.Count))],
+            backgroundColor: accent + '33', borderColor: accent, borderWidth: 2, borderRadius: 6, fill: true }]
+    };
+    new Chart(document.getElementById('appsChart'), { type: 'bar', data: appsData,
+        options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } } });
+
+    // Opportunities by type
+    const typeData = {
+        labels: [@Html.Raw(string.Join(",", Model.Stats.OpportunitiesByType.Select(t => $"'{t.Type}'")))],
+        datasets: [{ data: [@string.Join(",", Model.Stats.OpportunitiesByType.Select(t => t.Count))],
+            backgroundColor: [accent, blue, amber, purple, red] }]
+    };
+    new Chart(document.getElementById('typeChart'), { type: 'doughnut', data: typeData,
+        options: { plugins: { legend: { position: 'bottom' } } } });
+
+    // Application status breakdown
+    new Chart(document.getElementById('statusChart'), {
+        type: 'bar',
+        data: {
+            labels: ['Pending','Accepted','Rejected'],
+            datasets: [{ label: 'Count',
+                data: [@Model.Stats.PendingApplications, @Model.Stats.AcceptedApplications, @Model.Stats.RejectedApplications],
+                backgroundColor: [amber + '99', accent + '99', red + '99'],
+                borderColor: [amber, accent, red], borderWidth: 2, borderRadius: 4 }]
+        },
+        options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+    });
+
+    // Users by role
+    new Chart(document.getElementById('usersChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Candidates', 'Employers'],
+            datasets: [{ data: [@Model.Stats.TotalCandidates, @Model.Stats.TotalEmployers],
+                backgroundColor: [accent + '99', blue + '99'], borderColor: [accent, blue], borderWidth: 2 }]
+        },
+        options: { plugins: { legend: { position: 'bottom' } } }
+    });
+</script>
+}

@@ -1,102 +1,130 @@
-﻿@page
+@page
 @model JobLinkHub.Web.Pages.JobSeeker.DashboardModel
 @{
     ViewData["Title"] = "My Dashboard";
-    Layout = "_Layout";
+    Layout = "_DashboardLayout";
+    ViewData["DashboardRole"] = "Candidate";
+    ViewData["UserName"] = Model.FullName;
+    ViewData["ActivePage"] = "Overview";
 }
 
-<div style="background:#F8FAFC; min-height:100vh; padding:2rem 1rem;">
-    <div style="max-width:960px; margin:0 auto;">
-
-        <!-- Header -->
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
-            <div>
-                <h1 style="font-size:1.5rem; font-weight:700; color:#0F172A; margin:0;">
-                    Welcome back, @Model.FullName 👋
-                </h1>
-                <p style="color:#64748B; font-size:0.875rem; margin:0.25rem 0 0;">Here's your job search overview</p>
-            </div>
-            <a href="/JobSeeker/BuildProfile"
-                   style="background:#2563EB; color:white; padding:0.5rem 1.25rem; border-radius:8px; text-decoration:none; font-size:0.875rem; font-weight:500;">
-                Edit Profile
-            </a>
+<!-- Header -->
+<div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+    <div>
+        <p class="dash-header-label">CANDIDATE PORTAL</p>
+        <h1 class="dash-greeting">Hello, @(string.IsNullOrEmpty(Model.FullName) ? "there" : Model.FullName.Split(' ')[0])!</h1>
+        <p class="dash-greeting-sub">Keep exploring. Let's find your dream job today.</p>
+    </div>
+    <a href="#" class="dash-premium-banner">
+        <div class="dash-premium-icon"><i class="fa-solid fa-star"></i></div>
+        <div class="dash-premium-text">
+            <strong>PREMIUM PLAN</strong>
+            <span>Upgrade to Pro</span>
         </div>
+        <i class="fa-solid fa-chevron-right" style="color: var(--color-text-muted); margin-left: auto;"></i>
+    </a>
+</div>
 
-        <!-- Stats -->
-        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-bottom:2rem;">
-            <div style="background:white; border:1px solid #E2E8F0; border-radius:12px; padding:1.25rem;">
-                <p style="font-size:0.75rem; color:#64748B; text-transform:uppercase; letter-spacing:.05em; margin:0 0 .5rem;">Applications</p>
-                <p style="font-size:2rem; font-weight:700; color:#0F172A; margin:0;">@Model.TotalApplications</p>
-            </div>
-            <div style="background:white; border:1px solid #E2E8F0; border-radius:12px; padding:1.25rem;">
-                <p style="font-size:0.75rem; color:#64748B; text-transform:uppercase; letter-spacing:.05em; margin:0 0 .5rem;">Saved Jobs</p>
-                <p style="font-size:2rem; font-weight:700; color:#2563EB; margin:0;">@Model.SavedJobsCount</p>
-            </div>
-            <div style="background:white; border:1px solid #E2E8F0; border-radius:12px; padding:1.25rem;">
-                <p style="font-size:0.75rem; color:#64748B; text-transform:uppercase; letter-spacing:.05em; margin:0 0 .5rem;">Profile</p>
-                <a href="/JobSeeker/BuildProfile"
-                       style="font-size:1rem; font-weight:600; color:#14B8A6; text-decoration:none; display:block; margin-top:.25rem;">
-                    View / Edit →
-                </a>
-            </div>
+<!-- Stats -->
+<div class="dash-stats-row">
+    <div class="dash-stat-card">
+        <div class="stat-icon stat-icon-blue"><i class="fa-solid fa-briefcase"></i></div>
+        <div class="stat-info">
+            <p class="stat-label">Applied Jobs</p>
+            <p class="stat-value">@Model.TotalApplications</p>
         </div>
-
-        <!-- Quick Links -->
-        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-bottom:2rem;">
-            <a href="/JobSeeker/OpportunitiesListing"
-                   style="background:white; border:1px solid #E2E8F0; border-radius:12px; padding:1.25rem; text-decoration:none; display:block; transition:.2s;">
-                <div style="font-size:1.5rem; margin-bottom:.5rem;">🔍</div>
-                <p style="font-weight:600; color:#0F172A; margin:0 0 .25rem;">Browse Jobs</p>
-                <p style="font-size:0.8rem; color:#64748B; margin:0;">Find opportunities</p>
-            </a>
-            <a href="/JobSeeker/MyApplications"
-                   style="background:white; border:1px solid #E2E8F0; border-radius:12px; padding:1.25rem; text-decoration:none; display:block;">
-                <div style="font-size:1.5rem; margin-bottom:.5rem;">📋</div>
-                <p style="font-weight:600; color:#0F172A; margin:0 0 .25rem;">My Applications</p>
-                <p style="font-size:0.8rem; color:#64748B; margin:0;">Track statuses</p>
-            </a>
-            <a href="/JobSeeker/SavedJobs"
-                   style="background:white; border:1px solid #E2E8F0; border-radius:12px; padding:1.25rem; text-decoration:none; display:block;">
-                <div style="font-size:1.5rem; margin-bottom:.5rem;">⭐</div>
-                <p style="font-weight:600; color:#0F172A; margin:0 0 .25rem;">Saved Jobs</p>
-                <p style="font-size:0.8rem; color:#64748B; margin:0;">Your shortlist</p>
-            </a>
+    </div>
+    <div class="dash-stat-card">
+        <div class="stat-icon stat-icon-green"><i class="fa-solid fa-circle-check"></i></div>
+        <div class="stat-info">
+            <p class="stat-label">Shortlisted</p>
+            <p class="stat-value">@Model.ShortlistedCount</p>
         </div>
+    </div>
+    <div class="dash-stat-card">
+        <div class="stat-icon stat-icon-amber"><i class="fa-solid fa-bookmark"></i></div>
+        <div class="stat-info">
+            <p class="stat-label">Saved Jobs</p>
+            <p class="stat-value">@Model.SavedJobsCount</p>
+        </div>
+    </div>
+</div>
 
-        <!-- Recent Applications -->
-        <div style="background:white; border:1px solid #E2E8F0; border-radius:12px; padding:1.5rem;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-                <h2 style="font-size:1rem; font-weight:600; color:#0F172A; margin:0;">Recent Applications</h2>
-                <a href="/JobSeeker/MyApplications" style="font-size:0.8rem; color:#2563EB; text-decoration:none;">View all →</a>
-            </div>
-
-            @if (!Model.RecentApplications.Any())
+<!-- Panels -->
+<div class="dash-panels">
+    <!-- Recent Applications -->
+    <div class="dash-panel">
+        <div class="panel-header">
+            <h2 class="panel-title">Recent Applications</h2>
+            <a href="/JobSeeker/MyApplications" class="panel-link">VIEW ALL</a>
+        </div>
+        @if (!Model.RecentApplications.Any())
+        {
+            <div class="panel-empty">No applications yet.</div>
+        }
+        else
+        {
+            @foreach (var app in Model.RecentApplications)
             {
-                <p style="font-size:0.875rem; color:#94A3B8;">No applications yet. <a href="/JobSeeker/OpportunitiesListing" style="color:#2563EB;">Browse opportunities →</a></p>
-            }
-            else
-            {
-                @foreach (var app in Model.RecentApplications)
-                {
-                    <div style="display:flex; justify-content:space-between; align-items:center; padding:.75rem 0; border-bottom:1px solid #F1F5F9;">
-                        <div>
-                            <p style="font-size:0.875rem; font-weight:500; color:#0F172A; margin:0;">@app.OpportunityTitle</p>
-                            <p style="font-size:0.75rem; color:#64748B; margin:.15rem 0 0;">@app.EmployerName · @app.AppliedAt.ToString("MMM dd, yyyy")</p>
-                        </div>
-                        @{
-                            var bg = app.Status?.ToLower() switch
-                            {
-                                "accepted" => "background:#DCFCE7; color:#166534;",
-                                "rejected" => "background:#FEE2E2; color:#991B1B;",
-                                "interview" => "background:#DBEAFE; color:#1E40AF;",
-                                _ => "background:#FEF9C3; color:#854D0E;"
-                            };
-                        }
-                        <span style="font-size:0.75rem; padding:.25rem .75rem; border-radius:999px; @bg">@app.Status</span>
+                <div class="panel-item">
+                    <div class="panel-item-avatar">
+                        @(app.CompanyName?.Length > 0 ? app.CompanyName[0].ToString().ToUpper() : "?")
                     </div>
-                }
+                    <div class="panel-item-info">
+                        <div class="panel-item-title">@app.OpportunityTitle</div>
+                        <div class="panel-item-sub">
+                            <span>@app.CompanyName</span> · <span>@app.ApplicationDate.ToString("MMM dd")</span>
+                        </div>
+                    </div>
+                    @{
+                        var badgeCls = app.Status?.ToUpper() switch
+                        {
+                            "ACCEPTED" or "SHORTLISTED" => "badge-green",
+                            "REJECTED" => "badge-red",
+                            "WITHDRAWN" => "badge-gray",
+                            _ => "badge-amber"
+                        };
+                        var statusLabel = app.Status?.ToUpper() switch {
+                            "PENDING" => "Pending", "SHORTLISTED" => "Shortlisted",
+                            "ACCEPTED" => "Accepted", "REJECTED" => "Rejected",
+                            "WITHDRAWN" => "Withdrawn", _ => app.Status
+                        };
+                    }
+                    <span class="badge @badgeCls">@statusLabel</span>
+                </div>
             }
-        </div>
+        }
+    </div>
 
+    <!-- Recommended Jobs -->
+    <div class="dash-panel">
+        <div class="panel-header">
+            <h2 class="panel-title">Recommended for You</h2>
+            <a href="/JobSeeker/OpportunitiesListing" class="panel-link">BROWSE MORE</a>
+        </div>
+        <div class="panel-item">
+            <div class="panel-item-avatar" style="background:#e0f2fe; color:#0284c7;">T</div>
+            <div class="panel-item-info">
+                <div class="panel-item-title">Frontend Developer</div>
+                <div class="panel-item-sub"><span>TECHCORP</span> · <span>Negotiable</span></div>
+            </div>
+            <i class="fa-solid fa-chevron-right panel-item-arrow"></i>
+        </div>
+        <div class="panel-item">
+            <div class="panel-item-avatar" style="background:#e0f2fe; color:#0284c7;">T</div>
+            <div class="panel-item-info">
+                <div class="panel-item-title">Backend Developer</div>
+                <div class="panel-item-sub"><span>TECHCORP</span> · <span>Negotiable</span></div>
+            </div>
+            <i class="fa-solid fa-chevron-right panel-item-arrow"></i>
+        </div>
+        <div class="panel-item">
+            <div class="panel-item-avatar" style="background:#ede9fe; color:#7c3aed;">F</div>
+            <div class="panel-item-info">
+                <div class="panel-item-title">Data Analyst</div>
+                <div class="panel-item-sub"><span>FINANCEHUB</span> · <span>Negotiable</span></div>
+            </div>
+            <i class="fa-solid fa-chevron-right panel-item-arrow"></i>
+        </div>
     </div>
 </div>

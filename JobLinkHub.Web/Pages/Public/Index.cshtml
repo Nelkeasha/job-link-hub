@@ -1,103 +1,187 @@
-﻿@page
+@page
 @model IndexModel
 @{
     ViewData["Title"] = "Home";
 }
 
-<section class="hero-section">
-    <div class="container hero-wrapper">
-        <div class="hero-text">
-            <span class="hero-badge">Skill-first careers</span>
-            <h1>Your skills deserve more than a CV</h1>
-            <p>
-                Build a profile that shows what you can do, validate your abilities with real
-                evidence, and connect to opportunities that match your potential.
-            </p>
+<!-- Hero Section -->
+<section class="hero-section" id="top">
+    <div class="hero-wrapper">
+        <span class="hero-badge"><i class="fa-solid fa-sparkles"></i> TRUSTED BY 10,000+ PROFESSIONALS</span>
+        <h1 class="hero-title">
+            Find Your <span class="accent">Dream Career</span><br />
+            With <span class="italic-accent">JobLink Hub</span>
+        </h1>
+        <p class="hero-subtitle">
+            Browse through hundreds of open positions and take the next leap in your professional adventure with <strong>JobLink Hub</strong>.
+        </p>
 
-            <div class="hero-actions">
-               <a asp-page="/Auth/ChooseRole" class="btn btn-primary-custom">Get Started</a>
-                <a asp-page="/Public/Opportunities" class="btn btn-outline-custom">Explore Opportunities</a>
-            </div>
-
-            <div class="hero-highlights">
-                <span class="highlight-chip">Skill-first profiles</span>
-                <span class="highlight-chip">Evidence-backed applications</span>
-                <span class="highlight-chip">Smart matching</span>
-            </div>
-        </div>
-
-        <div class="hero-visual">
-            <div class="dashboard-card main-card">
-                <div class="main-card-header">
-                    <h3>Career Snapshot</h3>
-                    <span class="status-pill">Ready to apply</span>
+        <!-- Search Bar -->
+        <form method="get" asp-page="/Public/Opportunities" class="hero-search">
+            <div class="hero-search-row">
+                <div class="hero-search-field">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" name="SearchQ" placeholder="What are you looking for?" />
                 </div>
-
-                <div class="metric-row">
-                    <div>
-                        <p class="metric-label">Profile Strength</p>
-                        <h4>85%</h4>
-                    </div>
-                    <div>
-                        <p class="metric-label">Match Score</p>
-                        <h4>92%</h4>
-                    </div>
+                <div class="hero-search-field">
+                    <i class="fa-solid fa-location-dot"></i>
+                    <select name="FilterLocation">
+                        <option value="">All Regions</option>
+                        <option>Kigali</option>
+                        <option>Musanze</option>
+                        <option>Huye</option>
+                        <option>Remote</option>
+                    </select>
                 </div>
-
-                <div class="skill-tags">
-                    <span>UI/UX Design</span>
-                    <span>Frontend</span>
-                    <span>Portfolio</span>
-                    <span>Figma</span>
+                <div class="hero-search-field">
+                    <i class="fa-solid fa-briefcase"></i>
+                    <select name="FilterType">
+                        <option value="">Choose a category</option>
+                        <option>Job</option>
+                        <option>Internship</option>
+                        <option>Training</option>
+                        <option>Gig</option>
+                        <option>Mentorship</option>
+                    </select>
                 </div>
+                <button type="submit" class="hero-search-btn">
+                    <i class="fa-solid fa-magnifying-glass"></i> FIND JOBS
+                </button>
             </div>
+        </form>
 
-            <div class="floating-card top-card">
-                <p class="small-label">Featured Opportunity</p>
-                <h4>UI/UX Internship</h4>
-                <p>Kigali • Remote Friendly</p>
-                <span class="match-pill">92% Match</span>
-            </div>
-
-            <div class="floating-card bottom-left-card">
-                <p class="small-label">Skill Evidence</p>
-                <ul>
-                    <li>Portfolio uploaded</li>
-                    <li>Certificate added</li>
-                    <li>GitHub linked</li>
-                </ul>
-            </div>
-
-            <div class="floating-card bottom-right-card">
-                <p class="small-label">This Week</p>
-                <h4>24 New Opportunities</h4>
-            </div>
+        <div class="hero-trending">
+            <span class="hero-trending-label"><i class="fa-solid fa-chart-line"></i> Trending:</span>
+            <a href="/Public/Opportunities?SearchQ=Developer" class="hero-trending-tag">Developer</a>
+            <a href="/Public/Opportunities?SearchQ=Design" class="hero-trending-tag">Design</a>
+            <a href="/Public/Opportunities?SearchQ=IT" class="hero-trending-tag">IT Company</a>
+            <a href="/Public/Opportunities?SearchQ=Media" class="hero-trending-tag">Media</a>
+            <a href="/Public/Opportunities?SearchQ=Medical" class="hero-trending-tag">Medical</a>
         </div>
     </div>
 </section>
 
-<section class="features-section">
-    <div class="container">
-        <div class="section-header">
-            <h2>Why JobLink Hub?</h2>
-            <p>Built to help early-career talent stand out through skills, potential, and career readiness.</p>
+<!-- Categories Section -->
+<section class="categories-section">
+    <div class="section-container">
+        <div class="section-title-row">
+            <p class="section-subtitle"><i class="fa-solid fa-sparkles"></i> EXPLORE BY CATEGORY</p>
+            <h2 class="section-heading">Explore <em>Exciting</em> Jobs</h2>
+            <p class="section-desc">Handpicked opportunities from top-tier companies across Rwanda. Find the one that fits your ambition.</p>
         </div>
+        <div class="categories-grid">
+            @if (Model.TopCategories.Any())
+            {
+                foreach (var cat in Model.TopCategories)
+                {
+                    <a href="/Public/Opportunities?SearchQ=@cat.CategoryName" style="text-decoration:none; color:inherit;">
+                        <div class="category-card">
+                            <div class="category-icon @cat.ColorClass">
+                                <i class="fa-solid @cat.IconClass"></i>
+                            </div>
+                            <p class="category-name">@cat.CategoryName</p>
+                            <p class="category-count">@cat.Count Open Positions</p>
+                        </div>
+                    </a>
+                }
+            }
+            else
+            {
+                <div style="grid-column: 1 / -1; text-align: center; color: #64748b;">
+                    <p>No categories available yet.</p>
+                </div>
+            }
+        </div>
+    </div>
+</section>
 
-        <div class="feature-grid">
-            <div class="feature-card">
-                <h3>Build a Skill-First Profile</h3>
-                <p>Create a profile that highlights what you can do, not just what is written on your CV.</p>
-            </div>
+<!-- Latest Jobs Section -->
+<section class="latest-jobs-section">
+    <div class="section-container">
+        <div class="section-title-row">
+            <p class="section-subtitle"><i class="fa-solid fa-sparkles"></i> LATEST OPPORTUNITIES</p>
+            <h2 class="section-heading">Explore <em>Exciting</em> Jobs</h2>
+            <p class="section-desc">Handpicked opportunities from top-tier companies across Rwanda.</p>
+        </div>
+        <div class="jobs-tabs">
+            <a href="/Public/Opportunities" class="jobs-tab active">ALL JOBS</a>
+            <a href="/Public/Opportunities?FilterType=Job" class="jobs-tab">JOBS</a>
+            <a href="/Public/Opportunities?FilterType=Internship" class="jobs-tab">INTERNSHIPS</a>
+            <a href="/Public/Opportunities?FilterType=Freelance" class="jobs-tab">FREELANCE</a>
+        </div>
+        <div class="jobs-grid">
+            @if (Model.LatestOpportunities.Any())
+            {
+                foreach (var job in Model.LatestOpportunities)
+                {
+                    <div class="job-card">
+                        <div class="job-avatar job-avatar-purple">
+                            @(string.IsNullOrEmpty(job.CompanyName) ? "C" : job.CompanyName.Substring(0, 1).ToUpper())
+                        </div>
+                        <div class="job-info">
+                            <p class="job-title">@job.Title</p>
+                            <p class="job-company">@job.CompanyName</p>
+                            <div class="job-meta">
+                                <span class="job-meta-pill"><i class="fa-solid fa-briefcase"></i> @job.OpportunityType</span>
+                                @if (!string.IsNullOrEmpty(job.Location))
+                                {
+                                    <span class="job-meta-pill"><i class="fa-solid fa-location-dot"></i> @job.Location</span>
+                                }
+                                @if (job.Deadline.HasValue)
+                                {
+                                    <span class="job-meta-pill"><i class="fa-regular fa-clock"></i> Ends @job.Deadline.Value.ToString("MMM dd")</span>
+                                }
+                            </div>
+                        </div>
+                        <div class="job-right">
+                            <a href="/Auth/Login" class="job-save-btn" title="Log in to save"><i class="fa-regular fa-heart"></i></a>
+                            <span class="job-stats"><i class="fa-solid fa-users"></i> @job.ApplicationCount Apps</span>
+                            <a href="/Auth/Login" class="job-apply-btn">VIEW & APPLY <i class="fa-solid fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; background: white; border-radius: 12px; border: 1px solid #e2e8f0;">
+                    <i class="fa-solid fa-briefcase" style="font-size: 2.5rem; color: #94a3b8; margin-bottom: 1rem;"></i>
+                    <h3 style="font-size: 1.2rem; font-weight: 700; color: #1e293b;">No Opportunities Found</h3>
+                    <p style="color: #64748b; margin-top: 0.5rem;">Check back later for new exciting roles.</p>
+                </div>
+            }
+        </div>
+        <div class="browse-all-link">
+            <a href="/Public/Opportunities">Browse All Jobs <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+    </div>
+</section>
 
-            <div class="feature-card">
-                <h3>Discover Relevant Opportunities</h3>
-                <p>Explore jobs, internships, gigs, mentorships, and training opportunities in one place.</p>
-            </div>
-
-            <div class="feature-card">
-                <h3>Prove Your Readiness</h3>
-                <p>Upload certificates, portfolio links, and project evidence to strengthen your visibility.</p>
-            </div>
+<!-- Top Companies Section -->
+<section class="companies-section">
+    <div class="section-container">
+        <div class="section-title-row" style="margin-bottom: 2rem;">
+            <h2 class="section-heading" style="text-transform: uppercase; letter-spacing: 0.04em;">TOP HIRING COMPANIES</h2>
+        </div>
+        <div class="companies-grid">
+            @if (Model.TopCompanies.Any())
+            {
+                foreach (var company in Model.TopCompanies)
+                {
+                    <div class="company-card">
+                        <div class="company-avatar">
+                            @(string.IsNullOrEmpty(company.CompanyName) ? "C" : company.CompanyName.Substring(0, 1).ToUpper())
+                        </div>
+                        <p class="company-name">@company.CompanyName</p>
+                        <span class="company-openings">@company.ActiveOpportunitiesCount OPENINGS</span>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="company-card">
+                    <p class="company-name">More companies joining soon!</p>
+                </div>
+            }
         </div>
     </div>
 </section>

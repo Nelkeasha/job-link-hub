@@ -1,106 +1,91 @@
-﻿@page
+@page
 @model JobLinkHub.Web.Pages.Admin.ModerateOpportunitiesModel
 @{
     ViewData["Title"] = "Moderate Opportunities";
-    Layout = "_Layout";
+    Layout = "_DashboardLayout";
+    ViewData["DashboardRole"] = "Admin";
+    ViewData["UserName"] = "Admin";
+    ViewData["ActivePage"] = "ModerateOpportunities";
 }
 
-<div style="background:#F8FAFC; min-height:100vh; padding:2rem 1rem;">
-    <div style="max-width:1100px; margin:0 auto;">
+<div style="margin-bottom: 1.5rem;">
+    <h1 class="dash-greeting" style="font-size: 1.4rem;">Moderate Opportunities</h1>
+    <p class="dash-greeting-sub">Review and manage all job postings.</p>
+</div>
 
-        <div style="display:flex; align-items:center; gap:1rem; margin-bottom:1.5rem;">
-            <a href="/Admin/AdminDashboard" style="color:#64748B; text-decoration:none; font-size:0.875rem;">← Dashboard</a>
-            <h1 style="font-size:1.25rem; font-weight:700; color:#0F172A; margin:0;">Moderate Opportunities</h1>
-        </div>
+@if (Model.Message != null)
+{
+    <div class="alert @(Model.Message.StartsWith("Error") ? "alert-danger" : "alert-success")">@Model.Message</div>
+}
 
-        @if (Model.Message != null)
-        {
-            <div style="padding:.75rem 1rem; border-radius:8px; margin-bottom:1rem; font-size:0.875rem;
-                background:@(Model.Message.StartsWith("Error") ? "#FEE2E2" : "#DCFCE7");
-                color:@(Model.Message.StartsWith("Error") ? "#991B1B" : "#166534");">
-                @Model.Message
-            </div>
-        }
-
-        <!-- Filters -->
-        <form method="get" style="background:white; border:1px solid #E2E8F0; border-radius:12px; padding:1rem; margin-bottom:1.25rem;">
-            <div style="display:grid; grid-template-columns:1fr 1fr auto; gap:.75rem; align-items:end;">
-                <div>
-                    <label style="display:block; font-size:0.75rem; color:#475569; margin-bottom:.3rem;">Search</label>
-                    <input asp-for="SearchQ" type="text"
-                           style="width:100%; border:1px solid #E2E8F0; border-radius:8px; padding:.5rem .75rem; font-size:0.875rem; outline:none; box-sizing:border-box;"
-                           placeholder="Title or employer...">
-                    </div>
-                    <div>
-                        <label style="display:block; font-size:0.75rem; color:#475569; margin-bottom:.3rem;">Type</label>
-                        <select asp-for="FilterType"
-                                style="width:100%; border:1px solid #E2E8F0; border-radius:8px; padding:.5rem .75rem; font-size:0.875rem; outline:none; background:white;">
-                            <option value="">All Types</option>
-                            <option>Job</option>
-                            <option>Internship</option>
-                            <option>Freelance</option>
-                            <option>Mentorship</option>
-                        </select>
-                    </div>
-                    <button type="submit"
-                            style="background:#2563EB; color:white; padding:.5rem 1.25rem; border:none; border-radius:8px; font-size:0.875rem; font-weight:500; cursor:pointer;">
-                        Filter
-                    </button>
-                </div>
-            </form>
-
-            <!-- Table -->
-            <div style="background:white; border:1px solid #E2E8F0; border-radius:12px; overflow:hidden;">
-                <table style="width:100%; border-collapse:collapse; font-size:0.875rem;">
-                    <thead>
-                        <tr style="background:#F8FAFC; border-bottom:1px solid #E2E8F0;">
-                            <th style="text-align:left; padding:.75rem 1rem; font-size:0.75rem; color:#64748B; font-weight:500; text-transform:uppercase; letter-spacing:.05em;">Title</th>
-                            <th style="text-align:left; padding:.75rem 1rem; font-size:0.75rem; color:#64748B; font-weight:500; text-transform:uppercase; letter-spacing:.05em;">Employer</th>
-                            <th style="text-align:left; padding:.75rem 1rem; font-size:0.75rem; color:#64748B; font-weight:500; text-transform:uppercase; letter-spacing:.05em;">Type</th>
-                            <th style="text-align:left; padding:.75rem 1rem; font-size:0.75rem; color:#64748B; font-weight:500; text-transform:uppercase; letter-spacing:.05em;">Posted</th>
-                            <th style="text-align:left; padding:.75rem 1rem; font-size:0.75rem; color:#64748B; font-weight:500; text-transform:uppercase; letter-spacing:.05em;">Apps</th>
-                            <th style="text-align:left; padding:.75rem 1rem; font-size:0.75rem; color:#64748B; font-weight:500; text-transform:uppercase; letter-spacing:.05em;">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (!Model.Opportunities.Any())
-                        {
-                            <tr>
-                                <td colspan="6" style="padding:2rem; text-align:center; color:#94A3B8;">No opportunities found.</td>
-                            </tr>
-                        }
-                        @foreach (var o in Model.Opportunities)
-                        {
-                            <tr style="border-bottom:1px solid #F1F5F9;">
-                                <td style="padding:.75rem 1rem; font-weight:500; color:#0F172A; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
-                                    @o.Title
-                                </td>
-                                <td style="padding:.75rem 1rem; color:#475569; font-size:0.8rem;">@o.CompanyName</td>
-                                <td style="padding:.75rem 1rem;">
-                                    <span style="font-size:0.7rem; background:#DBEAFE; color:#1E40AF; padding:.2rem .6rem; border-radius:999px;">@o.Type</span>
-                                </td>
-                                <td style="padding:.75rem 1rem; color:#64748B; font-size:0.8rem;">@o.CreatedAt.ToString("MMM dd, yyyy")</td>
-                                <td style="padding:.75rem 1rem; color:#0F172A; font-weight:500;">@o.ApplicationCount</td>
-                                <td style="padding:.75rem 1rem;">
-                                    <div style="display:flex; gap:.75rem; align-items:center;">
-                                        <a href="/JobSeeker/OpportunityDetails?id=@o.Id"
-                                           style="font-size:0.8rem; color:#2563EB; text-decoration:none;">View</a>
-                                        <form method="post" asp-page-handler="Delete"
-                                              onsubmit="return confirm('Delete this opportunity and all its applications?');"
-                                              style="margin:0;">
-                                            <input type="hidden" name="id" value="@o.Id" />
-                                            <button type="submit"
-                                                    style="background:none; border:none; color:#EF4444; font-size:0.8rem; cursor:pointer; padding:0;">
-                                                Delete
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-
-        </div>
+<form method="get" class="dash-filter-bar">
+    <div class="filter-group">
+        <label>Search</label>
+        <input asp-for="SearchQ" type="text" placeholder="Title or employer..." />
     </div>
+    <div class="filter-group">
+        <label>Type</label>
+        <select asp-for="FilterType">
+            <option value="">All Types</option>
+            <option>Job</option>
+            <option>Internship</option>
+            <option>Freelance</option>
+            <option>Mentorship</option>
+        </select>
+    </div>
+    <button type="submit" class="filter-btn">Filter</button>
+</form>
+
+<div class="dash-table-card">
+    <table class="dash-table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Employer</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Posted</th>
+                <th>Apps</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Opportunities.Any())
+            {
+                <tr><td colspan="7" class="panel-empty">No opportunities found.</td></tr>
+            }
+            @foreach (var o in Model.Opportunities)
+            {
+                var statusBadge = o.Status == "Active" ? "badge-green" : o.Status == "Closed" ? "badge-red" : "badge-gray";
+                <tr>
+                    <td><strong>@o.Title</strong></td>
+                    <td style="color: var(--color-text-light); font-size: 0.82rem;">@o.CompanyName</td>
+                    <td><span class="badge badge-blue">@o.OpportunityType</span></td>
+                    <td><span class="badge @statusBadge">@o.Status</span></td>
+                    <td style="color: var(--color-text-light); font-size: 0.82rem;">@o.CreatedAt.ToString("MMM dd, yyyy")</td>
+                    <td><strong>@o.ApplicationCount</strong></td>
+                    <td>
+                        <div style="display: flex; gap: 0.8rem; align-items: center;flex-wrap:wrap;">
+                            <a href="/JobSeeker/OpportunityDetails?id=@o.Id" class="table-action-link">View</a>
+                            <form method="post" asp-page-handler="ToggleStatus" style="margin:0;">
+                                <input type="hidden" name="id" value="@o.Id" />
+                                <input type="hidden" name="currentStatus" value="@o.Status" />
+                                <button type="submit" class="table-action-link" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:0.82rem;font-weight:600;padding:0;color:@(o.Status == "Active" ? "#f59e0b" : "#16a34a");">
+                                    @(o.Status == "Active" ? "Suspend" : "Activate")
+                                </button>
+                            </form>
+                            <form method="post" asp-page-handler="Delete"
+                                  onsubmit="return confirm('Delete this opportunity and all its applications?');"
+                                  style="margin:0;">
+                                <input type="hidden" name="id" value="@o.Id" />
+                                <button type="submit" class="table-action-link table-action-danger" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:0.82rem;font-weight:600;padding:0;">
+                                    Delete
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

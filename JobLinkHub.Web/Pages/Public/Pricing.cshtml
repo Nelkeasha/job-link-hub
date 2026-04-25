@@ -1,0 +1,84 @@
+@page
+@model JobLinkHub.Web.Pages.Public.PricingModel
+@{
+    ViewData["Title"] = "Pricing";
+    Layout = "_Layout";
+}
+
+<div style="background:#F8FAFC; min-height:100vh; padding:3rem 1rem;">
+  <div style="max-width:960px; margin:0 auto;">
+
+    <div style="text-align:center; margin-bottom:3rem;">
+      <h1 style="font-size:2.25rem; font-weight:700; color:#0F172A; margin:0 0 .75rem;">Simple, transparent pricing</h1>
+      <p style="color:#64748B; font-size:1.05rem; margin:0;">Job seekers are always free. Employers pay only when they need more.</p>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:1.5rem; margin-bottom:3rem;">
+
+      <!-- Free -->
+      <div style="background:white; border:1px solid #E2E8F0; border-radius:16px; padding:2rem;">
+        <p style="font-size:.8rem; font-weight:600; color:#64748B; text-transform:uppercase; letter-spacing:.05em; margin:0 0 .5rem;">Job Seekers</p>
+        <p style="font-size:2.5rem; font-weight:800; color:#0F172A; margin:0 0 .25rem;">Free</p>
+        <p style="color:#64748B; font-size:.875rem; margin:0 0 1.5rem;">Always and forever.</p>
+        <ul style="list-style:none; padding:0; margin:0 0 1.5rem; font-size:.875rem; color:#374151;">
+          <li style="padding:.4rem 0; border-bottom:1px solid #F1F5F9;">&#10003; Unlimited applications</li>
+          <li style="padding:.4rem 0; border-bottom:1px solid #F1F5F9;">&#10003; Skill profile builder</li>
+          <li style="padding:.4rem 0; border-bottom:1px solid #F1F5F9;">&#10003; Job recommendations</li>
+          <li style="padding:.4rem 0; border-bottom:1px solid #F1F5F9;">&#10003; Save & track applications</li>
+          <li style="padding:.4rem 0;">&#10003; Email notifications</li>
+        </ul>
+        <a asp-page="/Auth/RegisterCandidate"
+           style="display:block; text-align:center; background:#F1F5F9; color:#0F172A; padding:.75rem; border-radius:8px; font-size:.875rem; font-weight:600; text-decoration:none;">
+          Get Started Free
+        </a>
+      </div>
+
+      <!-- Employer Starter -->
+      <div style="background:white; border:2px solid #2563EB; border-radius:16px; padding:2rem; position:relative;">
+        <span style="position:absolute; top:-12px; left:50%; transform:translateX(-50%); background:#2563EB; color:white; font-size:.7rem; font-weight:700; padding:.3rem .9rem; border-radius:999px; letter-spacing:.04em;">MOST POPULAR</span>
+        <p style="font-size:.8rem; font-weight:600; color:#2563EB; text-transform:uppercase; letter-spacing:.05em; margin:0 0 .5rem;">Employer Starter</p>
+        <p style="font-size:2.5rem; font-weight:800; color:#0F172A; margin:0 0 .25rem;">$29<span style="font-size:1rem; font-weight:400; color:#64748B;">/mo</span></p>
+        <p style="color:#64748B; font-size:.875rem; margin:0 0 1.5rem;">For small teams getting started.</p>
+        <ul style="list-style:none; padding:0; margin:0 0 1.5rem; font-size:.875rem; color:#374151;">
+          <li style="padding:.4rem 0; border-bottom:1px solid #F1F5F9;">&#10003; Up to 5 active postings</li>
+          <li style="padding:.4rem 0; border-bottom:1px solid #F1F5F9;">&#10003; Applicant management</li>
+          <li style="padding:.4rem 0; border-bottom:1px solid #F1F5F9;">&#10003; Skill-based candidate matching</li>
+          <li style="padding:.4rem 0; border-bottom:1px solid #F1F5F9;">&#10003; Company profile page</li>
+          <li style="padding:.4rem 0;">&#10003; Email support</li>
+        </ul>
+        <a asp-page="/Auth/RegisterEmployer"
+           style="display:block; text-align:center; background:#2563EB; color:white; padding:.75rem; border-radius:8px; font-size:.875rem; font-weight:600; text-decoration:none;">
+          Start Free Trial
+        </a>
+      </div>
+
+      <!-- Employer Pro -->
+      <div style="background:white; border:1px solid #E2E8F0; border-radius:16px; padding:2rem;">
+        <p style="font-size:.8rem; font-weight:600; color:#64748B; text-transform:uppercase; letter-spacing:.05em; margin:0 0 .5rem;">Employer Pro</p>
+        <p style="font-size:2.5rem; font-weight:800; color:#0F172A; margin:0 0 .25rem;">$99<span style="font-size:1rem; font-weight:400; color:#64748B;">/mo</span></p>
+        <p style="color:#64748B; font-size:.875rem; margin:0 0 1.5rem;">For scaling teams with high volume.</p>
+        <ul style="list-style:none; padding:0; margin:0 0 1.5rem; font-size:.875rem; color:#374151;">
+          <li style="padding:.4rem 0; border-bottom:1px solid #F1F5F9;">&#10003; Unlimited postings</li>
+          <li style="padding:.4rem 0; border-bottom:1px solid #F1F5F9;">&#10003; Priority candidate matching</li>
+          <li style="padding:.4rem 0; border-bottom:1px solid #F1F5F9;">&#10003; Advanced analytics & reports</li>
+          <li style="padding:.4rem 0; border-bottom:1px solid #F1F5F9;">&#10003; Excel export</li>
+          <li style="padding:.4rem 0;">&#10003; Dedicated account manager</li>
+        </ul>
+        <a asp-page="/Public/Contact"
+           style="display:block; text-align:center; background:#F1F5F9; color:#0F172A; padding:.75rem; border-radius:8px; font-size:.875rem; font-weight:600; text-decoration:none;">
+          Contact Sales
+        </a>
+      </div>
+    </div>
+
+    <div style="background:white; border:1px solid #E2E8F0; border-radius:12px; padding:2rem; text-align:center;">
+      <h2 style="font-size:1.15rem; font-weight:700; color:#0F172A; margin:0 0 .5rem;">Questions about pricing?</h2>
+      <p style="color:#64748B; font-size:.875rem; margin:0 0 1rem;">We're happy to walk you through the right plan for your team size and hiring needs.</p>
+      <a asp-page="/Public/Contact"
+         style="display:inline-block; background:#2563EB; color:white; padding:.65rem 1.75rem; border-radius:8px; font-size:.875rem; font-weight:600; text-decoration:none;">
+        Talk to us
+      </a>
+    </div>
+
+  </div>
+</div>

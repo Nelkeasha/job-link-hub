@@ -66,7 +66,7 @@ public class EmailService : IEmailService
 
         var smtpUser = _config["Email:SmtpUser"];
         var smtpPass = _config["Email:SmtpPass"];
-        if (!string.IsNullOrEmpty(smtpUser))
+        if (!string.IsNullOrEmpty(smtpUser) && !string.IsNullOrEmpty(smtpPass))
             await client.AuthenticateAsync(smtpUser, smtpPass);
 
         var message = new MimeKit.MimeMessage();
@@ -167,6 +167,26 @@ public class EmailService : IEmailService
         </div>";
 
         await SendEmailAsync(to, $"New Application: {opportunityTitle} - JobLink Hub", html);
+    }
+
+    public async Task SendLoginOtpAsync(string to, string userName, string otp)
+    {
+        var html = $@"
+        <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>
+            <h2 style='color: #2563eb;'>Your Login Code</h2>
+            <p>Hi {userName},</p>
+            <p>Use the code below to complete your sign-in. It expires in <strong>10 minutes</strong>.</p>
+            <div style='text-align: center; margin: 30px 0;'>
+                <span style='background-color: #f1f5f9; border: 2px dashed #2563eb; padding: 16px 40px; font-size: 2rem; font-weight: 800; letter-spacing: 0.4em; color: #0f172a; border-radius: 8px;'>
+                    {otp}
+                </span>
+            </div>
+            <p style='color: #6b7280; font-size: 0.875rem;'>If you didn't try to log in, please ignore this email.</p>
+            <hr style='border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;' />
+            <p style='color: #9ca3af; font-size: 12px;'>JobLink Hub Team</p>
+        </div>";
+
+        await SendEmailAsync(to, "Your JobLink Hub login code", html);
     }
 
     public async Task SendOpportunityMatchAsync(string to, string userName, List<string> opportunityTitles)

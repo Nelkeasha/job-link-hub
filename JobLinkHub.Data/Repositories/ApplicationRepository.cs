@@ -19,6 +19,15 @@ public class ApplicationRepository : Repository<Application>, IApplicationReposi
             .OrderByDescending(a => a.ApplicationDate)
             .ToListAsync();
 
+    public async Task<IEnumerable<Application>> GetByEmployerAsync(long employerProfileId)
+        => await _context.Applications
+            .Include(a => a.Opportunity)
+            .Include(a => a.JobSeekerProfile)
+                .ThenInclude(p => p.User)
+            .Where(a => a.Opportunity.EmployerProfileId == employerProfileId)
+            .OrderByDescending(a => a.ApplicationDate)
+            .ToListAsync();
+
     public async Task<IEnumerable<Application>> GetByJobSeekerAsync(long jobSeekerProfileId)
         => await _context.Applications
             .Include(a => a.Opportunity)

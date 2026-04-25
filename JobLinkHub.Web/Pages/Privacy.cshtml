@@ -2,7 +2,42 @@
 @model PrivacyModel
 @{
     ViewData["Title"] = "Privacy Policy";
+    Layout = "_Layout";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<section style="padding:4rem 0;background:var(--color-bg);min-height:60vh;">
+    <div class="section-container" style="max-width:760px;">
+        <h1 style="font-family:'Outfit',sans-serif;font-size:2rem;font-weight:800;margin-bottom:0.5rem;">Privacy Policy</h1>
+        <p style="color:var(--color-text-muted);margin-bottom:2rem;">Last updated: April 2026</p>
+
+        <div class="feature-card" style="margin-bottom:1.2rem;">
+            <h2 style="font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:0.5rem;">Information We Collect</h2>
+            <p style="color:var(--color-text-light);line-height:1.7;">
+                We collect information you provide directly, such as account registration details, profile information, and application content.
+                We also collect usage data to improve the platform experience.
+            </p>
+        </div>
+
+        <div class="feature-card" style="margin-bottom:1.2rem;">
+            <h2 style="font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:0.5rem;">How We Use Information</h2>
+            <p style="color:var(--color-text-light);line-height:1.7;">
+                Your information is used to operate the platform, match candidates with opportunities, and communicate service updates.
+                We do not sell personal data to third parties.
+            </p>
+        </div>
+
+        <div class="feature-card" style="margin-bottom:1.2rem;">
+            <h2 style="font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:0.5rem;">Data Security</h2>
+            <p style="color:var(--color-text-light);line-height:1.7;">
+                We implement appropriate security measures to protect your personal information. Access to data is restricted to authorized personnel only.
+            </p>
+        </div>
+
+        <div class="feature-card">
+            <h2 style="font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:0.5rem;">Contact</h2>
+            <p style="color:var(--color-text-light);line-height:1.7;">
+                For privacy-related questions, contact us via the <a href="/Public/Contact" style="color:var(--color-primary);">Contact</a> page.
+            </p>
+        </div>
+    </div>
+</section>

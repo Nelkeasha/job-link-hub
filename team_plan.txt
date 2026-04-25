@@ -1,0 +1,264 @@
+JobLink Hub
+Team Work Breakdown Plan
+4 Members  |  2 Backend  ·  2 Frontend  |  7 Weeks
+1. Team Overview
+JobLink Hub will be built by a team of four developers split evenly between backend and frontend responsibilities. Each developer owns a clearly defined domain so work can happen in parallel without blocking each other.
+Backend Dev 1  (BE1)  — Database Design, Core API & Opportunity Module
+Backend Dev 2  (BE2)  — Authentication, Services Layer & Notifications
+Frontend Dev 1  (FE1)  — Public-Facing Pages, Job Search & Candidate Profiles
+Frontend Dev 2  (FE2)  — Dashboards, Shared UI Components & Admin Panel
+2. Individual Responsibilities
+Backend Dev 1 — Database, Core API & Opportunities
+BE1 owns the foundation that the entire project builds on — the database schema and the Opportunities (Jobs) module.
+Design and set up the full database schema (Users, Profiles, Opportunities, Applications, Skills, Notifications)
+Write and manage all Entity Framework Core migrations
+Seed the database with test categories, skills, and sample data
+Build the AppDbContext and all repository classes
+Implement all Opportunity API endpoints: list, filter, search, create, update, delete, view tracking
+Implement the Applications API endpoints: submit, view, withdraw, status updates
+Implement the Saved Jobs / Saved Opportunities endpoints
+Implement the Skills and Categories lookup endpoints
+Write unit and integration tests for the above modules
+Write and maintain Swagger/OpenAPI documentation for all endpoints
+Backend Dev 2 — Authentication, Services & Notifications
+BE2 handles all security, business logic services, and the notification pipeline that the frontend and BE1 depend on.
+Set up ASP.NET Identity with role-based access control (Job Seeker, Employer, Admin)
+Build the full auth flow: register, login, logout, email verification, password reset
+Implement JWT token generation, validation, and refresh token mechanism
+Build the User Profile service (candidate and employer profile CRUD)
+Build the Application service (business rules for applying, status transitions)
+Build the Recommendation / Matching service (opportunity matching by skills)
+Build the Notification service and email templates (SendGrid / SMTP)
+Set up Hangfire background jobs for scheduled emails and alerts
+Build the Dashboard API endpoints (stats for candidate, employer, admin)
+Write unit tests for all services and auth flows
+Frontend Dev 1 — Public Pages & Job Search
+FE1 builds everything a visitor or job seeker sees before and during their job search — the public-facing experience of the platform.
+Set up the Razor Pages project structure, shared layout, header, footer, and navigation
+Build the Home page: featured opportunities, platform stats, call-to-action sections
+Build the Opportunities Listing page: paginated cards, keyword search bar, filter panel
+Build the Opportunity Detail page: full description, employer info, apply button, save button
+Build the Candidate Browse page: searchable candidate cards with skills and location
+Build the Candidate Profile Detail page: bio, skills, education, experience, resume download
+Build the Employer Browse page: company cards with open positions count
+Build the Employer Profile Detail page: company info, active listings
+Build the Login and Registration pages with client-side validation
+Build the Blog listing and Blog detail pages
+Build the Contact and Pricing pages
+Ensure all public pages are fully mobile-responsive using TailwindCSS
+Frontend Dev 2 — Dashboards, Components & Admin Panel
+FE2 builds the authenticated experience — all role-specific dashboards, the shared component library, and the admin panel.
+Build the Candidate Dashboard: stats overview, applied jobs list, saved jobs grid, profile edit form
+Build the Employer Dashboard: stats overview, manage jobs table, job posting form, applications inbox
+Build the Admin Dashboard: user management table, content moderation, system statistics
+Build the shared UI component library: job cards, candidate cards, status badges, modals, alerts, pagination
+Build the Dashboard sidebar navigation with role-based menu items
+Build the profile picture and resume upload UI flows
+Build the rich-text job description editor in the employer job posting form
+Implement all in-app notification UI: notification bell, notification centre, read/unread states
+Implement client-side form validation across all dashboard forms
+Ensure all dashboard pages are fully mobile-responsive with collapsible sidebar
+3. Week-by-Week Task Breakdown
+Work is divided so backend and frontend can run in parallel from Week 3 onward. The first two weeks establish the shared foundation both sides depend on.
+Week 1 — Foundation
+Week
+Backend Dev 1
+(DB & API Core)
+Backend Dev 2
+(Auth & Services)
+Frontend Dev 1
+(Public Pages)
+Frontend Dev 2
+(Dashboards & UI)
+Week 1
+Set up solution structure, install NuGet packages, configure appsettings.json, write all EF Core entities and DbContext, create initial migration, seed database
+Set up ASP.NET Identity, configure JWT settings, scaffold Auth controller, build register & login endpoints, implement password hashing
+Set up Razor Pages project, install TailwindCSS, build _Layout, _Header, _Footer, _Navbar shared templates
+Set up dashboard layout (_DashboardLayout), sidebar navigation skeleton, plan component library structure
+Week 2 — Core Models & Auth
+Week
+Backend Dev 1
+(DB & API Core)
+Backend Dev 2
+(Auth & Services)
+Frontend Dev 1
+(Public Pages)
+Frontend Dev 2
+(Dashboards & UI)
+Week 2
+Build Repository base class and all entity repositories (Job, Application, SavedJob, SkillEvidence), write seed data for categories and skills
+Complete auth flows: email verification, password reset, refresh tokens, RBAC policies; build UserProfileService
+Build Home page (static sections, placeholder data), Login page, and Registration page with full client-side validation
+Build Candidate Dashboard shell with stats overview cards (wired to mock data until API is ready)
+Week 3 — API & Public Pages
+Week
+Backend Dev 1
+(DB & API Core)
+Backend Dev 2
+(Auth & Services)
+Frontend Dev 1
+(Public Pages)
+Frontend Dev 2
+(Dashboards & UI)
+Week 3
+Build all Opportunity endpoints (GET list with filters, GET detail, POST, PUT, DELETE, view tracking), add Swagger docs, write integration tests
+Build ApplicationService and Application endpoints (apply, withdraw, status update), build SavedJobsService and endpoints
+Build Opportunity Listing page with filter panel and search, build Opportunity Detail page with apply/save buttons
+Connect Candidate Dashboard stats to live API, build Applied Jobs section with status filter
+Week 4 — Profiles & Employer Features
+Week
+Backend Dev 1
+(DB & API Core)
+Backend Dev 2
+(Auth & Services)
+Frontend Dev 1
+(Public Pages)
+Frontend Dev 2
+(Dashboards & UI)
+Week 4
+Build Dashboard API endpoints (candidate stats, employer stats, admin stats), build Skills/Categories lookup endpoints
+Build RecommendationService (skill-based matching), build employer dashboard API (manage jobs, applications inbox data)
+Build Candidate Browse page, Candidate Profile Detail page, Employer Browse and Employer Detail pages
+Build Employer Dashboard: manage jobs table (edit/close/delete actions), Job Posting form with full field set
+Week 5 — Dashboards & Admin
+Week
+Backend Dev 1
+(DB & API Core)
+Backend Dev 2
+(Auth & Services)
+Frontend Dev 1
+(Public Pages)
+Frontend Dev 2
+(Dashboards & UI)
+Week 5
+Performance tuning: add DB indexes, fix N+1 queries, implement in-memory caching for category/skill lookups
+Build Admin API endpoints (user management, content moderation, system stats), build Notification data model and service
+Build Blog listing, Blog detail, Contact, and Pricing pages; complete mobile responsiveness audit for all public pages
+Build Admin Dashboard (user table, moderation panel, stats); build shared component library (modals, pagination, alerts, badges)
+Week 6 — Notifications, Search & Polish
+Week
+Backend Dev 1
+(DB & API Core)
+Backend Dev 2
+(Auth & Services)
+Frontend Dev 1
+(Public Pages)
+Frontend Dev 2
+(Dashboards & UI)
+Week 6
+Implement advanced search endpoint (multi-filter, relevance sorting), implement job alerts (Hangfire background job), write unit tests
+Wire up SendGrid email templates for all notification types (welcome, application updates, deadline reminders, weekly recommendations)
+Implement in-app notification bell and notification centre UI, connect recommendation API to candidate dashboard job feed
+Build profile picture and resume upload flows, implement messaging UI, complete employer applications inbox with candidate preview modal
+Week 7 — Testing, Hardening & Deployment
+Week
+Backend Dev 1
+(DB & API Core)
+Backend Dev 2
+(Auth & Services)
+Frontend Dev 1
+(Public Pages)
+Frontend Dev 2
+(Dashboards & UI)
+Week 7
+Security testing (SQL injection, XSS checks, auth bypass), finalize API docs, set up CI/CD pipeline (GitHub Actions), deploy to Azure
+Integration tests for all service flows, load testing, error handling middleware review, configure Application Insights monitoring
+Cross-browser testing, accessibility audit (WCAG), fix any responsive layout issues, final UX review of public pages
+E2E flow testing (register → apply → dashboard), final dashboard QA, fix remaining UI bugs, prepare demo environment
+4. How the Team Works Together
+4.1 Shared Contracts (API First)
+BE1 and BE2 write and publish Swagger API docs before FE1/FE2 start wiring data. This means frontend developers can build with mock/stub data immediately and swap in real endpoints as they become available.
+BE1 publishes the Opportunities and Applications API contract by end of Week 2
+BE2 publishes the Auth and User Profile API contract by end of Week 2
+Both FE developers use Swagger UI to test endpoints independently
+4.2 Git Branching Strategy
+main
+Stable, deployable code only — merged after review
+develop
+Active integration branch — all features merge here first
+feature/be1-*
+BE1 feature branches (e.g. feature/be1-opportunities-api)
+feature/be2-*
+BE2 feature branches (e.g. feature/be2-auth-service)
+feature/fe1-*
+FE1 feature branches (e.g. feature/fe1-job-listing-page)
+feature/fe2-*
+FE2 feature branches (e.g. feature/fe2-employer-dashboard)
+4.3 Daily & Weekly Rhythm
+Daily 10-minute standup: What did you finish? What are you working on today? Any blockers?
+End of each week: each developer demos their completed work to the team
+BE1 and BE2 sync at least twice per week to coordinate shared database changes
+FE1 and FE2 sync at least twice per week to keep layouts and components consistent
+All four meet at the start of each new week to confirm priorities and dependencies
+4.4 Dependency Management
+Some frontend work depends on backend APIs being ready. The table below shows the key dependencies to watch:
+FE1 needs from BE1
+Opportunities list & detail endpoints (Week 3)
+FE1 needs from BE2
+Auth endpoints — login/register (Week 2)
+FE2 needs from BE1
+Dashboard stats endpoints (Week 4)
+FE2 needs from BE2
+User profile endpoints, notification data (Week 4–5)
+BE2 needs from BE1
+DbContext, entity models, and repositories (Week 1–2)
+4.5 Code Review Rules
+No one merges their own pull request — always get at least one review
+Backend PRs should be reviewed by the other backend developer
+Frontend PRs should be reviewed by the other frontend developer
+For any changes touching shared code (DbContext, layouts), all four review
+5. Recommended Tools & Setup
+Version Control
+Git + GitHub — one shared repository with the branching strategy above
+Project Tracking
+GitHub Projects (Kanban board) or Trello — one card per task, assigned by name
+Communication
+WhatsApp group for quick messages + weekly video call for demos
+API Testing
+Swagger UI (built into the project) + Postman for manual testing
+IDE
+Visual Studio 2022 (BE1, BE2) / VS Code (FE1, FE2)
+Database
+SQL Server Express (local) — BE1 manages the shared migrations
+Design Reference
+Figma or simple wireframes — FE2 maintains the shared component guide
+Deployment
+Azure App Service (free tier for dev/staging) — BE1 owns the pipeline
+6. Quick Reference — Who Owns What
+Backend Dev 1
+Backend Dev 2
+Frontend Dev 1
+Frontend Dev 2
+Database schema & migrations
+Authentication & JWT
+Shared layouts & navigation
+Candidate dashboard
+EF Core DbContext & repos
+ASP.NET Identity & RBAC
+Home & landing page
+Employer dashboard
+Opportunities API
+User profile services
+Job listing & search pages
+Admin dashboard
+Applications API
+Recommendation engine
+Job detail page
+UI component library
+Saved jobs API
+Email notifications
+Candidate profiles
+In-app notifications UI
+Skills & categories API
+Dashboard stats API
+Employer profiles
+Upload flows & modals
+DB indexes & caching
+Background jobs (Hangfire)
+Blog & contact pages
+Mobile responsiveness
+CI/CD & deployment
+Monitoring & logging
+Public page QA
+E2E testing & demo env
+JobLink Hub Team Plan  |  Version 1.0

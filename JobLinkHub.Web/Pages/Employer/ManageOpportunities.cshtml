@@ -1,100 +1,83 @@
 @page
-@model JobLinkHub.Web.Pages.ManageOpportunitiesModel
+@model JobLinkHub.Web.Pages.Employer.ManageOpportunitiesModel
 @{
-    ViewData["Title"] = "Manage Opportunities";
+    ViewData["Title"] = "My Listings";
+    Layout = "_DashboardLayout";
+    ViewData["DashboardRole"] = "Employer";
+    ViewData["UserName"] = "Employer";
+    ViewData["ActivePage"] = "MyListings";
 }
 
-<section class="manage-opportunities-page">
-    <div class="container manage-opportunities-wrapper">
-
-        <div class="manage-hero">
-            <div>
-                <span class="manage-eyebrow">Opportunity management</span>
-                <h1>Manage your opportunities</h1>
-                <p>
-                    Review, track, and update all opportunities posted by your organization from one place.
-                </p>
-            </div>
-
-            <div class="manage-hero-actions">
-                <a asp-page="/Employer/PostOpportunity" class="manage-primary-btn">Post New Opportunity</a>
-            </div>
-        </div>
-
-        <div class="manage-summary-grid">
-            <div class="manage-summary-card">
-                <p>Total Opportunities</p>
-                <h2>@Model.TotalOpportunitiesCount</h2>
-            </div>
-
-            <div class="manage-summary-card">
-                <p>Live Opportunities</p>
-                <h2>@Model.LiveOpportunitiesCount</h2>
-            </div>
-
-            <div class="manage-summary-card">
-                <p>Draft Opportunities</p>
-                <h2>@Model.DraftOpportunitiesCount</h2>
-            </div>
-
-            <div class="manage-summary-card">
-                <p>Closed Opportunities</p>
-                <h2>@Model.ClosedOpportunitiesCount</h2>
-            </div>
-        </div>
-
-        <div class="manage-opportunities-panel">
-            <div class="panel-top">
-                <div>
-                    <h3>All Opportunities</h3>
-                    <p>Track status, deadline, and candidate activity for each opportunity.</p>
-                </div>
-            </div>
-
-            <div class="opportunities-table-wrapper">
-                <table class="opportunities-table">
-                    <thead>
-                        <tr>
-                            <th>Opportunity</th>
-                            <th>Type</th>
-                            <th>Location</th>
-                            <th>Deadline</th>
-                            <th>Applicants</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model.Opportunities)
-                        {
-                            <tr>
-                                <td>
-                                    <div class="opportunity-title-block">
-                                        <strong>@item.Title</strong>
-                                        <span>@item.Category</span>
-                                    </div>
-                                </td>
-                                <td>@item.Type</td>
-                                <td>@item.Location</td>
-                                <td>@item.Deadline</td>
-                                <td>@item.ApplicantCount</td>
-                                <td>
-                                    <span class="table-status-badge @(item.Status.ToLower())">
-                                        @item.Status
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="table-action-group">
-                                        <a asp-page="/Employer/PostOpportunity" class="table-action-btn">Edit</a>
-                                        <a asp-page="/Employer/ViewApplicants" class="table-action-btn secondary-action">Applicants</a>
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
+<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+    <div>
+        <h1 class="dash-greeting" style="font-size: 1.4rem;">My Listings</h1>
+        <p class="dash-greeting-sub">Track status, deadline, and candidate activity for each opportunity.</p>
     </div>
-</section>
+    <a href="/Employer/PostOpportunity" class="cta-btn"><i class="fa-solid fa-plus"></i> Post New</a>
+</div>
+
+<div class="dash-stats-row">
+    <div class="dash-stat-card">
+        <div class="stat-icon stat-icon-blue"><i class="fa-solid fa-list"></i></div>
+        <div class="stat-info"><p class="stat-label">Total</p><p class="stat-value">@Model.TotalOpportunitiesCount</p></div>
+    </div>
+    <div class="dash-stat-card">
+        <div class="stat-icon stat-icon-green"><i class="fa-solid fa-circle-check"></i></div>
+        <div class="stat-info"><p class="stat-label">Live</p><p class="stat-value">@Model.LiveOpportunitiesCount</p></div>
+    </div>
+    <div class="dash-stat-card">
+        <div class="stat-icon stat-icon-amber"><i class="fa-solid fa-file-pen"></i></div>
+        <div class="stat-info"><p class="stat-label">Draft</p><p class="stat-value">@Model.DraftOpportunitiesCount</p></div>
+    </div>
+    <div class="dash-stat-card">
+        <div class="stat-icon stat-icon-red"><i class="fa-solid fa-xmark"></i></div>
+        <div class="stat-info"><p class="stat-label">Closed</p><p class="stat-value">@Model.ClosedOpportunitiesCount</p></div>
+    </div>
+</div>
+
+<div class="dash-table-card">
+    <table class="dash-table">
+        <thead>
+            <tr>
+                <th>Opportunity</th>
+                <th>Type</th>
+                <th>Location</th>
+                <th>Deadline</th>
+                <th>Applicants</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Opportunities)
+            {
+                var statusCls = item.Status?.ToLower() switch { "active" or "live" => "badge-green", "draft" => "badge-gray", "closed" => "badge-red", _ => "badge-amber" };
+                <tr>
+                    <td><div class="table-name-cell"><strong>@item.Title</strong><span>@item.OpportunityType</span></div></td>
+                    <td><span class="badge badge-blue">@item.OpportunityType</span></td>
+                    <td>@item.Location</td>
+                    <td style="font-size:0.82rem;color:var(--color-text-light);">@item.Deadline</td>
+                    <td><strong>@item.ApplicationCount</strong></td>
+                    <td><span class="badge @statusCls">@item.Status</span></td>
+                    <td>
+                        <div style="display:flex;gap:0.6rem;align-items:center;">
+                            <a href="/Employer/EditOpportunity?id=@item.Id" class="table-action-link">
+                                <i class="fa-solid fa-pen-to-square"></i> Edit
+                            </a>
+                            <a href="/Employer/ViewApplicants?OpportunityId=@item.Id" class="table-action-link">
+                                <i class="fa-solid fa-users"></i> Applicants
+                            </a>
+                            <form method="post" asp-page-handler="Delete" style="display:inline;" onsubmit="return confirm('Delete this opportunity?');">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@item.Id" />
+                                <button type="submit" class="table-action-link table-action-danger" style="background:none;border:none;cursor:pointer;font-family:inherit;">
+                                    <i class="fa-solid fa-trash"></i> Delete
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

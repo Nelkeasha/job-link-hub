@@ -1,0 +1,78 @@
+@page
+@model JobLinkHub.Web.Pages.Auth.RegisterEmployerModel
+@{
+    ViewData["Title"] = "Join as an Employer";
+    Layout = "_AuthLayout";
+}
+
+<section class="auth-page">
+    <div class="auth-container">
+        <div class="auth-grid">
+            <div class="auth-showcase">
+                <h1>Post opportunities and discover <span style="color:var(--color-accent);">qualified talent</span>.</h1>
+                <p>Create your company profile, manage applicants, and find the right candidates efficiently.</p>
+            </div>
+            <div class="auth-card">
+                <h2 class="auth-card-title">Create employer account</h2>
+                <p class="auth-card-subtitle">Join JobLink Hub as an employer.</p>
+
+                <form method="post">
+                    @Html.AntiForgeryToken()
+                    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                    {
+                        <div class="alert alert-danger">@Model.ErrorMessage</div>
+                    }
+                    <div asp-validation-summary="All" style="color:#ef4444;font-size:0.85rem;margin-bottom:0.75rem;padding:0.5rem 0.75rem;border-radius:6px;background:rgba(239,68,68,0.08);display:@(ViewData.ModelState.IsValid ? "none" : "block");"></div>
+                    <div class="form-field-row">
+                        <div class="form-field">
+                            <label>First name</label>
+                            <input name="FirstName" type="text" value="@Model.FirstName" placeholder="John" required />
+                        </div>
+                        <div class="form-field">
+                            <label>Last name</label>
+                            <input name="LastName" type="text" value="@Model.LastName" placeholder="Smith" required />
+                        </div>
+                    </div>
+                    <div class="form-field">
+                        <label>Work email</label>
+                        <input name="Email" type="email" value="@Model.Email" placeholder="john@company.com" required />
+                    </div>
+                    <div class="form-field">
+                        <label>Company name</label>
+                        <input name="CompanyName" type="text" value="@Model.CompanyName" placeholder="Acme Ltd" required />
+                    </div>
+                    <div class="form-field-row">
+                        <div class="form-field">
+                            <label>Industry <span style="color:var(--color-text-muted);">(optional)</span></label>
+                            <input name="Industry" type="text" value="@Model.Industry" placeholder="Technology" />
+                        </div>
+                        <div class="form-field">
+                            <label>Location <span style="color:var(--color-text-muted);">(optional)</span></label>
+                            <input name="Location" type="text" value="@Model.Location" placeholder="Kigali" />
+                        </div>
+                    </div>
+                    <div class="form-field">
+                        <label>Website <span style="color:var(--color-text-muted);">(optional)</span></label>
+                        <input name="Website" type="url" value="@Model.Website" placeholder="https://yourcompany.com" />
+                    </div>
+                    <div class="form-field">
+                        <label>Password</label>
+                        <input name="Password" type="password" placeholder="Min 8 chars, 1 uppercase, 1 number" required />
+                    </div>
+                    <div class="form-field">
+                        <label>Confirm password</label>
+                        <input name="ConfirmPassword" type="password" placeholder="Repeat your password" required />
+                    </div>
+                    <button type="submit" class="form-submit-btn">Create Employer Account</button>
+                </form>
+
+                @section Scripts {
+                    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+                }
+                <div class="form-bottom-text">
+                    Already have an account? <a asp-page="/Auth/Login">Log in</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

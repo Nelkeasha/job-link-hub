@@ -18,6 +18,8 @@ public static class SeedData
                 await roleManager.CreateAsync(new IdentityRole<long>(role));
 
         // Create default admin
+       
+
         const string adminEmail = "admin@joblinkhub.com";
         if (await userManager.FindByEmailAsync(adminEmail) == null)
         {

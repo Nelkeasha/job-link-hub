@@ -1,93 +1,128 @@
 @page
-@model JobLinkHub.Web.Pages.ViewApplicantsModel
+@model JobLinkHub.Web.Pages.Employer.ViewApplicantsModel
 @{
-    ViewData["Title"] = "View Applicants";
+    ViewData["Title"] = "Applicants";
+    Layout = "_DashboardLayout";
+    ViewData["DashboardRole"] = "Employer";
+    ViewData["UserName"] = "Employer";
+    ViewData["ActivePage"] = "Applicants";
 }
 
-<section class="view-applicants-page">
-    <div class="container view-applicants-wrapper">
+<div style="margin-bottom: 1.5rem;">
+    <h1 class="dash-greeting" style="font-size: 1.4rem;">Applicants</h1>
+    <p class="dash-greeting-sub">Review submitted applications across your opportunities.</p>
+</div>
 
-        <div class="applicants-hero">
-            <div>
-                <span class="applicants-eyebrow">Applicant management</span>
-                <h1>View applicants</h1>
-                <p>
-                    Review submitted applications across your opportunities and move candidates through your hiring process.
-                </p>
-            </div>
-        </div>
-
-        <div class="applicants-summary-grid">
-            <div class="applicants-summary-card">
-                <p>Total Applications</p>
-                <h2>@Model.TotalApplicationsCount</h2>
-            </div>
-
-            <div class="applicants-summary-card">
-                <p>Pending Review</p>
-                <h2>@Model.PendingReviewCount</h2>
-            </div>
-
-            <div class="applicants-summary-card">
-                <p>Shortlisted</p>
-                <h2>@Model.ShortlistedCount</h2>
-            </div>
-
-            <div class="applicants-summary-card">
-                <p>Rejected</p>
-                <h2>@Model.RejectedCount</h2>
-            </div>
-        </div>
-
-        <div class="view-applicants-panel">
-            <div class="panel-top">
-                <div>
-                    <h3>All Applications</h3>
-                    <p>Track candidate submissions, roles applied for, and review status.</p>
-                </div>
-            </div>
-
-            <div class="applicants-table-wrapper">
-                <table class="applicants-table">
-                    <thead>
-                        <tr>
-                            <th>Applicant</th>
-                            <th>Opportunity</th>
-                            <th>Submitted</th>
-                            <th>Status</th>
-                            <th>Skill Highlight</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var applicant in Model.Applications)
-                        {
-                            <tr>
-                                <td>
-                                    <div class="applicant-name-block">
-                                        <strong>@applicant.FullName</strong>
-                                        <span>@applicant.Email</span>
-                                    </div>
-                                </td>
-                                <td>@applicant.OpportunityTitle</td>
-                                <td>@applicant.SubmittedAt</td>
-                                <td>
-                                    <span class="application-status-badge @(applicant.Status.ToLower().Replace(" ", "-"))">
-                                        @applicant.Status
-                                    </span>
-                                </td>
-                                <td>@applicant.SkillHighlight</td>
-                                <td>
-                                    <a asp-page="/Employer/CandidateProfileReview" asp-route-id="@applicant.ApplicationId" class="review-applicant-btn">
-                                        Review
-                                    </a>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
+<!-- Stats -->
+<div class="dash-stats-row">
+    <div class="dash-stat-card">
+        <div class="stat-icon stat-icon-blue"><i class="fa-solid fa-file-lines"></i></div>
+        <div class="stat-info"><p class="stat-label">Total Applications</p><p class="stat-value">@Model.TotalApplicationsCount</p></div>
     </div>
-</section>
+    <div class="dash-stat-card">
+        <div class="stat-icon stat-icon-amber"><i class="fa-solid fa-clock"></i></div>
+        <div class="stat-info"><p class="stat-label">Pending Review</p><p class="stat-value">@Model.PendingReviewCount</p></div>
+    </div>
+    <div class="dash-stat-card">
+        <div class="stat-icon stat-icon-green"><i class="fa-solid fa-circle-check"></i></div>
+        <div class="stat-info"><p class="stat-label">Shortlisted</p><p class="stat-value">@Model.ShortlistedCount</p></div>
+    </div>
+    <div class="dash-stat-card">
+        <div class="stat-icon stat-icon-red"><i class="fa-solid fa-xmark"></i></div>
+        <div class="stat-info"><p class="stat-label">Rejected</p><p class="stat-value">@Model.RejectedCount</p></div>
+    </div>
+</div>
+
+<!-- Filters: opportunity + status -->
+<div style="display:flex;gap:0.8rem;margin-bottom:1rem;flex-wrap:wrap;align-items:center;">
+    <!-- Opportunity dropdown -->
+    <form method="get" style="margin:0;display:flex;gap:0.5rem;align-items:center;">
+        <select name="OpportunityId" onchange="this.form.submit()"
+                style="padding:0.4rem 0.7rem;border:1px solid var(--color-border);border-radius:8px;font-size:0.85rem;background:var(--color-bg);color:var(--color-text);">
+            <option value="">All Opportunities</option>
+            @foreach (var opp in Model.EmployerOpportunities)
+            {
+                <option value="@opp.Id" selected="@(Model.OpportunityId == opp.Id)">@opp.Title</option>
+            }
+        </select>
+        <input type="hidden" name="FilterStatus" value="@Model.FilterStatus" />
+    </form>
+
+    <!-- Status tabs -->
+    @foreach (var tab in new[] { ("", "All"), ("PENDING", "Pending"), ("SHORTLISTED", "Shortlisted"), ("REJECTED", "Rejected"), ("ACCEPTED", "Accepted") })
+    {
+        bool isActive = Model.FilterStatus == tab.Item1 || (string.IsNullOrEmpty(Model.FilterStatus) && tab.Item1 == "");
+        <a href="?OpportunityId=@Model.OpportunityId&FilterStatus=@tab.Item1"
+           class="jobs-tab @(isActive ? "active" : "")">@tab.Item2</a>
+    }
+</div>
+
+<!-- Table -->
+<div class="dash-table-card">
+    <table class="dash-table">
+        <thead>
+            <tr>
+                <th>Applicant</th>
+                <th>Opportunity</th>
+                <th>Submitted</th>
+                <th>Status</th>
+                <th>Cover Note</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Applications.Any())
+            {
+                <tr><td colspan="6" class="panel-empty">No applications found.</td></tr>
+            }
+            @foreach (var applicant in Model.Applications)
+            {
+                var sCls = applicant.Status?.ToUpper() switch {
+                    "SHORTLISTED" or "ACCEPTED" => "badge-green",
+                    "REJECTED" => "badge-red",
+                    "WITHDRAWN" => "badge-gray",
+                    _ => "badge-amber"
+                };
+                var statusLabel = applicant.Status?.ToUpper() switch {
+                    "PENDING" => "Pending", "SHORTLISTED" => "Shortlisted",
+                    "REJECTED" => "Rejected", "ACCEPTED" => "Accepted",
+                    "WITHDRAWN" => "Withdrawn", _ => applicant.Status
+                };
+                <tr>
+                    <td>
+                        <div class="table-name-cell">
+                            <strong>@applicant.CandidateName</strong>
+                            <span>@applicant.CandidateEmail</span>
+                        </div>
+                    </td>
+                    <td style="font-size:0.85rem;">@applicant.OpportunityTitle</td>
+                    <td style="font-size:0.82rem;color:var(--color-text-light);">@applicant.ApplicationDate.ToString("MMM dd, yyyy")</td>
+                    <td><span class="badge @sCls">@statusLabel</span></td>
+                    <td style="color:var(--color-text-light);font-size:0.85rem;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">@applicant.CoverLetter</td>
+                    <td>
+                        <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+                            <a asp-page="/Employer/CandidateProfileReview" asp-route-id="@applicant.Id" class="table-action-link">Review</a>
+                            @if (applicant.Status?.ToUpper() != "SHORTLISTED" && applicant.Status?.ToUpper() != "REJECTED" && applicant.Status?.ToUpper() != "WITHDRAWN")
+                            {
+                                <form method="post" asp-page-handler="UpdateStatus" style="margin:0;">
+                                    <input type="hidden" name="appId" value="@applicant.Id" />
+                                    <input type="hidden" name="status" value="SHORTLISTED" />
+                                    <button type="submit" class="table-action-link" style="background:none;border:none;cursor:pointer;color:#16a34a;font-weight:600;font-size:0.82rem;padding:0;">Shortlist</button>
+                                </form>
+                            }
+                            @if (applicant.Status?.ToUpper() != "REJECTED" && applicant.Status?.ToUpper() != "WITHDRAWN")
+                            {
+                                <form method="post" asp-page-handler="UpdateStatus" style="margin:0;"
+                                      onsubmit="return confirm('Reject this application?');">
+                                    <input type="hidden" name="appId" value="@applicant.Id" />
+                                    <input type="hidden" name="status" value="REJECTED" />
+                                    <button type="submit" class="table-action-link table-action-danger" style="background:none;border:none;cursor:pointer;font-size:0.82rem;font-weight:600;padding:0;">Reject</button>
+                                </form>
+                            }
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,38 @@
+@page
+@model JobLinkHub.Web.Pages.Public.BlogModel
+@{
+    ViewData["Title"] = "Blog";
+    Layout = "_Layout";
+}
+
+<section style="padding:4rem 0;background:var(--color-bg);">
+  <div class="section-container">
+
+    <div class="section-title-row">
+      <p class="section-subtitle"><i class="fa-solid fa-rss"></i> BLOG</p>
+      <h1 class="section-heading">JobLink Hub <em>Blog</em></h1>
+      <p class="section-desc">Career tips, industry insights, and platform updates.</p>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:1.2rem;">
+      @foreach (var post in Model.Posts)
+      {
+        <article class="public-opportunity-card">
+          <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem;flex-wrap:wrap;">
+            <span class="public-opportunity-type">@post.Category</span>
+            <span style="color:var(--color-text-muted);font-size:0.8rem;">@post.Date.ToString("MMM d, yyyy")</span>
+            <span style="color:var(--color-text-muted);font-size:0.8rem;">&middot; @post.ReadMinutes min read</span>
+          </div>
+          <h2 style="font-size:1.1rem;font-weight:700;margin-bottom:0.4rem;">
+            <a href="/Public/BlogDetail?slug=@post.Slug" style="color:var(--color-text);text-decoration:none;">@post.Title</a>
+          </h2>
+          <p class="public-opportunity-description">@post.Summary</p>
+          <a href="/Public/BlogDetail?slug=@post.Slug" class="table-action-link" style="font-size:0.85rem;">
+            Read more <i class="fa-solid fa-arrow-right"></i>
+          </a>
+        </article>
+      }
+    </div>
+
+  </div>
+</section>
