@@ -1,5 +1,5 @@
 # JobLink Hub
-
+Link: https://job-portal-front-topaz.vercel.app/
 > **A smart digital platform bridging young talent and career opportunities** — built with ASP.NET Core 8, Entity Framework Core, and SQL Server.
 
 JobLink Hub shifts recruitment away from traditional CV-based screening toward **skills, potential, and career readiness** — helping students, graduates, and emerging professionals connect with jobs, internships, mentorships, and freelance opportunities.
