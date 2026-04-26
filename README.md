@@ -6,7 +6,7 @@ JobLink Hub shifts recruitment away from traditional CV-based screening toward *
 
 ---
 
-Link: https://job-portal-front-topaz.vercel.app/
+Live app link: https://job-portal-front-topaz.vercel.app/
 
 ## Table of Contents
 
