@@ -4,9 +4,6 @@
 
 JobLink Hub shifts recruitment away from traditional CV-based screening toward **skills, potential, and career readiness** — helping students, graduates, and emerging professionals connect with jobs, internships, mentorships, and freelance opportunities.
 
----
-
-Live app link: https://job-portal-front-topaz.vercel.app/
 
 ## Table of Contents
 
